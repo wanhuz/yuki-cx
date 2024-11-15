@@ -1,13 +1,18 @@
 import SeriesMetadata from "@/components/SeriesMetadata";
 import SeriesPoster from "@/components/SeriesPoster";
+import { TorrentCard } from "@/components/TorrentCard";
 import { getAnime } from "@/lib/api/animebytes";
+import { extractTorrent } from "@/lib/util/animebytes";
 import {removeUnderscoreFromTitle, normalizeDictToArray} from "@/lib/util/util";
 import Image from "next/image";
+
 export default async function Page({params} : { params: { title: string }} ) {
   const searchResult = getAnime(removeUnderscoreFromTitle(params.title));
   let anime_data : Anime;
+  let series_torrent : Torrent[];
 
   await searchResult.then((result) => { 
+    console.log(result.Torrents)
     anime_data = {
       ID: result.ID, 
       SeriesName: result.SeriesName, 
@@ -19,8 +24,15 @@ export default async function Page({params} : { params: { title: string }} ) {
       Episode: result.EpCount,
       Aired: result.Year,
       Tags: result.Tags,
-      Links: normalizeDictToArray(result.Links)
+      Links: normalizeDictToArray(result.Links),
+      Torrents: extractTorrent(result.Torrents)
     } as Anime;
+
+    series_torrent = 
+      anime_data.Torrents.map(entry =>  {
+        return <TorrentCard torrent={entry} key={entry.ID}></TorrentCard>
+      });
+    
   });
 
   return (
@@ -52,9 +64,9 @@ export default async function Page({params} : { params: { title: string }} ) {
                 </h1>
               </div>
 
-              <div className="flex flex-row space-x-3  ">
-                <button className="bg-sky-500 text-white py-1 px-3 rounded hover:bg-sky-600 h-12 rounded-xl "> Add to Download </button>
-                <button className="bg-sky-500 text-white py-1 px-3 rounded hover:bg-sky-600 h-12 rounded-xl"> Add to Scheduler </button>
+              <div className="flex flex-row space-x-3 font-bold ">
+                <button className="bg-sky-500 text-white py-1 px-3 hover:bg-sky-600 h-12 rounded-xl "> Add to Download </button>
+                <button className="bg-sky-500 text-white py-1 px-3 hover:bg-sky-600 h-12 rounded-xl"> Add to Scheduler </button>
               </div>
 
             </div>
@@ -77,27 +89,32 @@ export default async function Page({params} : { params: { title: string }} ) {
                 </span>
               </div>
 
-              <div className="flex flex-col mt-10  ">
+              <div className="flex flex-col mt-10">
                 <b>Downloads</b>
                 <hr />
-                <table className="mt-5">
-                  <thead className="bg-sky-500 text-white text-xs sm:text-base">
-                    <tr>
-                      <th className="table-cell sm:hidden">Name</th>
-                      <th className="py-2 hidden sm:table-cell">Group</th>
-                      <th className="hidden sm:table-cell">Resolution</th>
-                      <th className="hidden sm:table-cell">Type</th>
-                      <th className="hidden sm:table-cell">Extension</th>
-                      <th className="hidden sm:table-cell">Subtitle</th>
-                      <th className="hidden sm:table-cell">Size</th>
-                      <th className="hidden sm:table-cell">Codec</th>
-                      <th className="sm:hidden">Health</th>
-                      <th className="hidden sm:table-cell">Seeders</th>
-                      <th className="hidden sm:table-cell">Leechers</th>
-                      <th className="sm:hidden">Action</th>
+                <table className="bg-sky-500 py-3 mt-3 text-sm">
+                  <thead>
+                    <tr className="text-white text-start  font-bold">
+                        <td className="py-3 px-5">Name</td>
+                        <td>Resolution</td>
+                        <td>Codec</td>
+                        <td>Extension</td>
+                        <td>Size</td>
+                        <td>Subtitle</td>
+                        <td>Seeders</td>
+                        <td>Leechers</td>
+                        <td>Downloads</td>
                     </tr>
                   </thead>
+                  <tbody>
+                    {series_torrent}
+                  </tbody>
+                  
                 </table>
+
+                
+
+
               </div>
             </div>
           </div>

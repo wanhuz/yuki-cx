@@ -1,6 +1,6 @@
 
 export default function SeriesMetadata({series} : {series : Anime}) {
-    console.log(series);
+    
     const altName = (series.AlternativeName || []).map((name, index) => (
         <li key={index}>{name}</li>
     ));

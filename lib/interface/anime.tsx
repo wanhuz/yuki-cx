@@ -11,6 +11,6 @@ interface Anime {
     Aired: string;
     Tags: string[];
     Links: string[];
-    RelatedAnime: string[];
+    RelatedAnime?: string[];
     Torrents: Torrent[]
 }

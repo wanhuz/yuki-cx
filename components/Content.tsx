@@ -3,7 +3,7 @@ import SeriesCard from "./SeriesCard";
 
 interface ContentProps {
     contentCard: Anime[];
-  }
+ }
   
 
 export default function Content( contentCard : ContentProps) {

@@ -12,18 +12,19 @@ export async function search(series_name : string, type : string) {
 
     const search_result = await data.json();
     const search_result_groups = search_result["Groups"];
-
+    
     return search_result_groups;
 }
 
 export async function getAnime(anime_title: string) {
     const search_query = generateSearchQuery(anime_title, "");
-    console.log(search_query);
+    
     const data = await fetch(search_query);
 
     const search_result = await data.json();
     
     const search_result_groups = await search_result["Groups"];
+    
 
     const anime_data = search_result_groups[0];
 
