@@ -14,7 +14,8 @@ export function extractTorrent(torrentResult) : Torrent[] {
             Seeders: entry.Seeders,
             Leechers: entry.Leechers,
             Size: formatBytes(entry.Size),
-            Link: entry.Link
+            Link: entry.Link,
+            Property: entry.Property
         } as Torrent);
     });
 

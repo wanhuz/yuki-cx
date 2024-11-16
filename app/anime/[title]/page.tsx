@@ -95,13 +95,14 @@ export default async function Page({params} : { params: { title: string }} ) {
                   <thead>
                     <tr className="text-white text-start  font-bold">
                         <td className="py-3 px-5">Name</td>
-                        <td>Resolution</td>
-                        <td>Codec</td>
-                        <td>Extension</td>
-                        <td>Size</td>
-                        <td>Subtitle</td>
-                        <td>Seeders</td>
-                        <td>Leechers</td>
+                        <td className="hidden sm:table-cell">Resolution</td>
+                        <td className="hidden sm:table-cell">Codec</td>
+                        <td className="hidden sm:table-cell">Extension</td>
+                        <td className="hidden sm:table-cell">Size</td>
+                        <td className="hidden sm:table-cell">Subtitle</td>
+                        <td className="hidden sm:table-cell">Seeders</td>
+                        <td className="hidden sm:table-cell">Leechers</td>
+                        <td  className="table-cell sm:hidden">Health</td>
                         <td>Downloads</td>
                     </tr>
                   </thead>

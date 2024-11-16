@@ -9,5 +9,6 @@ interface Torrent {
     Seeders: number,
     Leechers: number,
     Size: string,
-    Link: string
+    Link: string,
+    Property? : string
 }
