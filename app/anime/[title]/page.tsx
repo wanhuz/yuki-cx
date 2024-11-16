@@ -9,10 +9,10 @@ import Image from "next/image";
 export default async function Page({params} : { params: { title: string }} ) {
   const searchResult = getAnime(removeUnderscoreFromTitle(params.title));
   let anime_data : Anime;
-  let series_torrent : Torrent[];
+  let series_torrent: JSX.Element[];
 
   await searchResult.then((result) => { 
-    console.log(result.Torrents)
+
     anime_data = {
       ID: result.ID, 
       SeriesName: result.SeriesName, 
@@ -28,10 +28,9 @@ export default async function Page({params} : { params: { title: string }} ) {
       Torrents: extractTorrent(result.Torrents)
     } as Anime;
 
-    series_torrent = 
-      anime_data.Torrents.map(entry =>  {
-        return <TorrentCard torrent={entry} key={entry.ID}></TorrentCard>
-      });
+    series_torrent = anime_data.Torrents.map((entry) => (
+      <TorrentCard torrent={entry} key={entry.ID} />
+    ));
     
   });
 
