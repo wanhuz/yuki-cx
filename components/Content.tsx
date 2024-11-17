@@ -26,7 +26,7 @@ export default function Content( contentCard : ContentProps) {
 
 
     return (
-        <div className="container mx-auto flex flex-wrap gap-3">
+        <div className="container px-5 sm:px-0 sm:mx-auto flex flex-wrap gap-3 flex-1">
             {listCards ? listCards : null}
         </div>
     );
