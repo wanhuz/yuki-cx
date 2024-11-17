@@ -9,8 +9,14 @@ export async function POST(request: Request) {
     if (!torrentLink) {
         return NextResponse.json({ error: 'Missing parameters torrent link' }, { status: 400 });
     }
-    const status = await addTorrent(torrentLink);
+    let status = 0;
 
+    if (!torrentLink.includes("animebytes")) {
+        return NextResponse.json({ error: 'Invalid torrent link' }, { status: 403 });
+    }
+
+    status = await addTorrent(torrentLink);
+    
     return NextResponse.json({
         status: {status},
     });
