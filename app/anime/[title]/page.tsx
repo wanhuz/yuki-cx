@@ -1,10 +1,10 @@
+import SeriesBackground from "@/components/SeriesBackground";
 import SeriesMetadata from "@/components/SeriesMetadata";
 import SeriesPoster from "@/components/SeriesPoster";
 import { TorrentCard } from "@/components/TorrentCard";
 import { getAnime } from "@/lib/api/animebytes";
 import { extractTorrent } from "@/lib/util/animebytes";
 import {removeUnderscoreFromTitle, normalizeDictToArray} from "@/lib/util/util";
-import Image from "next/image";
 
 export default async function Page({params} : { params: { title: string }} ) {
   const searchResult = getAnime(removeUnderscoreFromTitle(params.title));
@@ -38,25 +38,17 @@ export default async function Page({params} : { params: { title: string }} ) {
 
       <>
         {/* Background image */}
-        <div className="-z-50 h-96 w-full absolute">
-          <div>
-              <Image fill={true} className="object-cover object-half-top" src={anime_data? anime_data.Image : ""}  alt=""></Image>
-              <div  className="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
-          </div>
-        </div>
+        <SeriesBackground imgUrl={anime_data? anime_data.Image : ""}></SeriesBackground>
 
         <main className="container flex flex-col w-80 sm:w-full mx-auto sm:items-start sm:mx-auto mb-10">
-
-          {/* Main information */}
           <div className="flex flex-col sm:flex-row gap-5 sm:gap-24 mt-28 ">
 
             <div className="mt-5">
-              {<SeriesPoster posterURL={anime_data? anime_data.Image : ""}>
-              </SeriesPoster> }
+              <SeriesPoster posterURL={anime_data? anime_data.Image : ""}>
+              </SeriesPoster>
             </div>
 
             <div className="flex flex-col justify-between  space-y-5 sm:mt-24">
-
               <div className="">
                 <h1 className="text-xl font-extrabold leading-none text-gray-700 sm:text-white md:text-5xl lg:text-5xl dark:text-white drop-shadow-md">
                   {anime_data?.SeriesName}
@@ -67,14 +59,11 @@ export default async function Page({params} : { params: { title: string }} ) {
                 <button className="bg-sky-500 text-white py-1 px-3 hover:bg-sky-600 h-12 rounded-xl "> Add to Download </button>
                 <button className="bg-sky-500 text-white py-1 px-3 hover:bg-sky-600 h-12 rounded-xl"> Add to Scheduler </button>
               </div>
-
             </div>
-
           </div>
 
 
           <div className="flex flex-col sm:w-full sm:flex-row sm:gap-24">
-
             <div className="mt-8 sm:min-w-[230px]">
               {<SeriesMetadata series={anime_data}></SeriesMetadata>}
             </div>
@@ -102,7 +91,7 @@ export default async function Page({params} : { params: { title: string }} ) {
                         <td className="hidden sm:table-cell">Subtitle</td>
                         <td className="hidden sm:table-cell">Seeders</td>
                         <td className="hidden sm:table-cell">Leechers</td>
-                        <td  className="table-cell sm:hidden">Health</td>
+                        <td className="table-cell sm:hidden">Health</td>
                         <td>Downloads</td>
                     </tr>
                   </thead>
@@ -111,10 +100,6 @@ export default async function Page({params} : { params: { title: string }} ) {
                   </tbody>
                   
                 </table>
-
-                
-
-
               </div>
             </div>
           </div>

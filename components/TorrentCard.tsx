@@ -1,30 +1,44 @@
 'use client';
-async function handleSubmit(data) {
-    console.log(JSON.stringify(data));
+
+import { useState } from "react";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Image from "next/image";
+
+
+async function handleSubmit(torrentUrl: string, setDownloadIcon: (iconUrl: string) => void) {
     try {
-      const response = await fetch("/api/torrent/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            torrentLink: data,
-          }), 
-      });
+        setDownloadIcon("/spinner.svg");
 
-      if (!response.ok) {
-        throw new Error("Failed to send POST request");
-      }
+        const response = await fetch("/api/torrent/add", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                torrentLink: torrentUrl,
+            }),
+        });
 
-      const result = await response.json();
-      console.log("Server response:", result);
+        if (!response.ok) {
+            toast.error("Failed to send POST request", {position: "bottom-right"})
+            console.error("Failed to send POST request");
+        }
+
+        const result = await response.json();
+        console.log(result);
+        toast.success("Successfully added torrent!", {position: "bottom-right"})
     } catch (error) {
-      console.error("Error:", error);
-    };
+        console.error("Error:", error);
+        toast.error("Error: " + error, {position: "bottom-right"})
+    } finally {
+        setDownloadIcon("/download.svg");
+    }
 }
 
 
 export function TorrentCard({torrent} : {torrent : Torrent}) {
+    const [downloadIcon, setDownloadIcon] = useState("/download.svg");
 
     return (
         <tr className="drop-shadow-sm border-gray-100 border-2 bg-white hover:bg-gray-50 px-10 text-gray-600">
@@ -43,8 +57,8 @@ export function TorrentCard({torrent} : {torrent : Torrent}) {
             </td>
             <td>
                 <div className="text-white text-lg font-bold mx-5" >
-                    <button onClick={() => handleSubmit(torrent.Link)}>
-                        <img src="/download.svg" alt="Download"></img>
+                    <button onClick={() => handleSubmit(torrent.Link, setDownloadIcon)}>
+                        <Image src={downloadIcon} alt="Download" width={25} height={25}></Image>
                     </button>
                 </div>
             </td>

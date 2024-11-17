@@ -1,6 +1,6 @@
 
 
-export function extractTorrent(torrentResult) : Torrent[] {
+export function extractTorrent(torrentResult: { ID: number; Property: string; Seeders: number; Leechers: number; Size: number; Link: string; }[]) : Torrent[] {
     const torrent_extracted: Torrent[] = [];
 
     torrentResult.map((entry: { ID: number; Property: string; Seeders: number; Leechers: number; Size: number; Link: string}) => {
