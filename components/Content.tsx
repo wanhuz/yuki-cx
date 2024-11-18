@@ -7,7 +7,7 @@ interface ContentProps {
   
 
 export default function Content( contentCard : ContentProps) {
-    const [listCards, setListCards] = useState<SeriesCard[]>([]);
+    const [listCards, setListCards] = useState<JSX.Element[]>([]);
     
 
     useEffect(() => {
@@ -18,6 +18,7 @@ export default function Content( contentCard : ContentProps) {
                 key={entry.ID}
                 title={entry.SeriesName} 
                 poster={entry.Image} 
+                id={entry.ID}
             />
         ));
         setListCards(listCards);

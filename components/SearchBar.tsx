@@ -7,11 +7,13 @@ async function getServerSideProps(title : string, type : string) {
     const anime_search_result: Anime[] = [];
 
     await searchResult.then((result) => {
-        result.map((entry: { ID: number; SeriesName: string; Description: string; Image: string; }) => {
+        result.map((entry: { ID: number; SeriesName: string; FullName: string; Description: string; Image: string; }) => {
+
             if (entry.SeriesName.toLowerCase().includes(title.toLowerCase())) {
                 anime_search_result.push({
                     ID: entry.ID, 
                     SeriesName: entry.SeriesName, 
+                    FullName: entry.FullName,
                     Description: entry.Description, 
                     Image: entry.Image} as Anime);
             }

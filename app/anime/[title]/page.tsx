@@ -6,10 +6,21 @@ import { getAnime } from "@/lib/api/animebytes";
 import { extractTorrent } from "@/lib/util/animebytes";
 import {removeUnderscoreFromTitle, normalizeDictToArray} from "@/lib/util/util";
 
-export default async function Page({params} : { params: { title: string }} ) {
-  const searchResult = getAnime(removeUnderscoreFromTitle(params.title));
-  let anime_data : Anime;
-  let series_torrent: JSX.Element[];
+export default async function Page({
+  params, 
+  searchParams
+  } : { 
+  params: { title: string }, 
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+  } ) {
+
+  const title = params.title;
+  const filters = await searchParams;
+  const id = Number(filters.id);
+
+  const searchResult = getAnime(removeUnderscoreFromTitle(title), id);
+  let anime_data!: Anime;
+  let series_torrent: JSX.Element[]  | null = null;
 
   await searchResult.then((result) => { 
 
@@ -38,13 +49,13 @@ export default async function Page({params} : { params: { title: string }} ) {
 
       <>
         {/* Background image */}
-        <SeriesBackground imgUrl={anime_data? anime_data.Image : ""}></SeriesBackground>
+        <SeriesBackground imgUrl={anime_data?.Image || ""}></SeriesBackground>
 
         <main className="container flex flex-col w-80 sm:w-full mx-auto sm:items-start sm:mx-auto mb-10">
           <div className="flex flex-col sm:flex-row gap-5 sm:gap-24 mt-28 ">
 
             <div className="mt-5">
-              <SeriesPoster posterURL={anime_data? anime_data.Image : ""}>
+              <SeriesPoster posterURL={anime_data?.Image || ""}>
               </SeriesPoster>
             </div>
 

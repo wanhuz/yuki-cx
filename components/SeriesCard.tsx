@@ -5,8 +5,12 @@ function replaceWhitespaceWithUnderscore(title : string) {
     return title.replaceAll(" ", "_");
 }
 
-export default function SeriesCard({title, poster} : {title: string, poster: string}) {
-    const seriesLink = "/anime/" + replaceWhitespaceWithUnderscore(title);
+function generateSeriesLink(title : string, id : number) {
+    return "/anime/" + replaceWhitespaceWithUnderscore(title) + "?id=" + id;
+}
+
+export default function SeriesCard({title, poster, id} : {title: string, poster: string, id : number}) {
+    const seriesLink = generateSeriesLink(title, id);
 
     return (
         <Link href={seriesLink}>

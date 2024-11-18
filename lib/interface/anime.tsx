@@ -2,6 +2,7 @@
 interface Anime {
     ID: number;
     SeriesName: string;
+    FullName: string;
     Description: string;
     Image: string;
     AlternativeName: string[];

@@ -16,7 +16,7 @@ export async function search(series_name : string, type : string) {
     return search_result_groups;
 }
 
-export async function getAnime(anime_title: string) {
+export async function getAnime(anime_title: string, id : number) {
     const search_query = generateSearchQuery(anime_title, "");
     
     const data = await fetch(search_query);
@@ -24,9 +24,14 @@ export async function getAnime(anime_title: string) {
     const search_result = await data.json();
     
     const search_result_groups = await search_result["Groups"];
-    
 
-    const anime_data = search_result_groups[0];
+    for (const result of search_result_groups) {
+        if (result.ID === id) {
+            return result;
+        }
+    }
+    
+    const anime_data = search_result_groups[0] // Temporary default to first item if not found;
 
     return anime_data;
 }
