@@ -50,8 +50,10 @@ function extractGroup(property : string) : string {
     const properties = property.split("|");
 
     let group = getTextInBrackets(properties[5].trim());
-
-    if (group === "　")
+    
+    if (group === "　" && properties.length < 7) // Group is not returned in properties
+        group = "　"
+    else if (group === "　")
         group = getTextInBrackets(properties[6].trim());
 
     return group;
