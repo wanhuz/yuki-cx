@@ -6,7 +6,7 @@ const USERNAME = "";
 
 export async function search(series_name : string, type : string) {
 
-    const search_query = generateSearchQuery(series_name, type);
+    const search_query = generateSearchQuery(series_name, type, 25);
 
     const data = await fetch(search_query);
 
@@ -17,7 +17,7 @@ export async function search(series_name : string, type : string) {
 }
 
 export async function getAnime(anime_title: string, id : number) {
-    const search_query = generateSearchQuery(anime_title, "");
+    const search_query = generateSearchQuery(anime_title, "", 10);
     
     const data = await fetch(search_query);
 
@@ -36,7 +36,7 @@ export async function getAnime(anime_title: string, id : number) {
     return anime_data;
 }
 
-function generateSearchQuery(title : string, type : string) {
+function generateSearchQuery(title : string, type : string, maxItem : number) {
     const auth_params = ANIMEBYTES_URL + "?torrent_pass=" + PASSKEY + "&username=" + USERNAME;
     let filter_anime_type_params;
 
@@ -61,7 +61,7 @@ function generateSearchQuery(title : string, type : string) {
             break;
     }
 
-    const search_query = auth_params + "&searchstr=" + title + "&type=anime" + "&search_type=title" + "&sort=relevance" + filter_anime_type_params
+    const search_query = auth_params + "&searchstr=" + title + "&type=anime" + "&search_type=title" + "&sort=relevance" + filter_anime_type_params + "&limit=" + maxItem;
 
     return search_query
 }
