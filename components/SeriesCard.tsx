@@ -1,12 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 
-function replaceWhitespaceWithUnderscore(title : string) {
-    return title.replaceAll(" ", "_");
-}
-
 function generateSeriesLink(title : string, id : number) {
-    return "/anime/" + replaceWhitespaceWithUnderscore(title) + "?id=" + id;
+    return "/anime/" + encodeURIComponent(title) + "?id=" + id;
 }
 
 export default function SeriesCard({title, poster, id} : {title: string, poster: string, id : number}) {
