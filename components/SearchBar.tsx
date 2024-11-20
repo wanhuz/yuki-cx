@@ -28,11 +28,13 @@ export default function SearchBar({onSearchTextChange} : {onSearchTextChange: Re
     const [searchText, setSearchText] = useState('');
 
     useEffect(() => {
+        onSearchTextChange([]);
+
         const getData = setTimeout(() => {
             getServerSideProps(searchText, "").then((result) => {
                 onSearchTextChange(result);
             });;
-        }, 500)
+        }, 1000)
     
         return () => clearTimeout(getData)
       }, [searchText, onSearchTextChange])

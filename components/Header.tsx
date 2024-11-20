@@ -1,3 +1,4 @@
+import Link from "next/link";
 
 
 export default function Header() {
@@ -6,11 +7,11 @@ export default function Header() {
             <div className="container mx-auto flex justify-between items-center">
 
                 <div className="space-x-3 sm:space-x-12">
-                    <a href="/" className="text-white hover:text-gray-400">Home</a>
-                    <a href="#about" className="text-white hover:text-gray-400">Status</a>
-                    <a href="#services" className="text-white hover:text-gray-400">Seasonal</a>
-                    <a href="#contact" className="text-white hover:text-gray-400">Calendar</a>
-                    <a href="#contact" className="text-white hover:text-gray-400">Search</a>
+                    <Link href="/" className="text-white hover:text-gray-400">Home</Link>
+                    <Link href="#about" className="text-white hover:text-gray-400">Status</Link>
+                    <Link href="#services" className="text-white hover:text-gray-400">Seasonal</Link>
+                    <Link href="#contact" className="text-white hover:text-gray-400">Calendar</Link>
+                    <Link href="/search" className="text-white hover:text-gray-400">Search</Link>
                 </div>
 
                 <div className="text-white text-lg font-bold">

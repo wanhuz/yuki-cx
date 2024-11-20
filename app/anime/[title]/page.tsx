@@ -7,11 +7,11 @@ import { extractTorrent } from "@/lib/util/animebytes";
 import {removeUnderscoreFromTitle, normalizeDictToArray} from "@/lib/util/util";
 
 export default async function Page({
-  params, 
-  searchParams
+    params, 
+    searchParams
   } : { 
-  params: { title: string }, 
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+    params: { title: string }, 
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>
   } ) {
 
   const title = params.title;
@@ -55,8 +55,8 @@ export default async function Page({
           <div className="flex flex-col sm:flex-row gap-5 sm:gap-24 mt-28 ">
 
             <div className="mt-5">
-              <SeriesPoster posterURL={anime_data?.Image || ""}>
-              </SeriesPoster>
+              <SeriesPoster posterURL={anime_data?.Image || ""} />
+              
             </div>
 
             <div className="flex flex-col justify-between  space-y-5 sm:mt-24">
