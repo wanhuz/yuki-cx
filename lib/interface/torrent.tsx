@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface Torrent {
     ID: number,
+    Release: string,
     Group: string,
     Resolution: string,
     Codec: string,

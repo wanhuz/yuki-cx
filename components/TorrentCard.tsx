@@ -36,19 +36,38 @@ async function handleSubmit(torrentUrl: string, setDownloadIcon: (iconUrl: strin
     }
 }
 
+function getReleaseIcon(type : string) {
+    const size = 20;
+
+    switch (type) {
+        case "TV":
+            return (<Image src="/tv.png" width={size} height={size} alt="TV release"></Image>);
+        case "Web":
+            return (<Image src="/web.png" width={size} height={size} alt="Web release"></Image>);
+        case "DVD":
+            return (<Image src="/dvd.png" width={size} height={size} alt="DVD release"></Image>);
+        case "Blu-ray":
+            return (<Image src="/blu-ray.png" width={size} height={size} alt="Blu-ray release"></Image>);
+        default:
+            return <></>
+    }
+
+}
+
 
 export function TorrentCard({torrent} : {torrent : Torrent}) {
     const [downloadIcon, setDownloadIcon] = useState("/download.svg");
 
     return (
         <tr className="drop-shadow-sm border-gray-100 border-2 bg-white hover:bg-gray-50 px-10 text-gray-600">
-            <td className="hidden sm:table-cell py-5 px-5">{torrent.Group}</td>
+            <td className="hidden sm:table-cell py-5 px-5">{getReleaseIcon(torrent.Release)}</td>
+            <td className="hidden sm:table-cell">{torrent.Group}</td>
             <td className="py-5 px-5 table-cell sm:hidden">{torrent.Property}</td>
-            <td className="hidden sm:table-cell">{torrent.Resolution}</td>
             <td className="hidden sm:table-cell">{torrent.Codec}</td>
-            <td className="hidden sm:table-cell">{torrent.Extension}</td>
+            <td className="hidden sm:table-cell">{torrent.Resolution}</td>
             <td className="hidden sm:table-cell">{torrent.Size}</td>
             <td className="hidden sm:table-cell">{torrent.Subtitle}</td>
+            <td className="hidden sm:table-cell">{torrent.Extension}</td>
             <td className="hidden sm:table-cell"><span className="mx-5">{torrent.Seeders}</span></td>
             <td className="hidden sm:table-cell"><span className="mx-5">{torrent.Leechers}</span></td>
             <td className="table-cell sm:hidden">

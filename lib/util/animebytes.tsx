@@ -6,6 +6,7 @@ export function extractTorrent(torrentResult: { ID: number; Property: string; Se
     torrentResult.map((entry: { ID: number; Property: string; Seeders: number; Leechers: number; Size: number; Link: string}) => {
         torrent_extracted.push({
             ID: entry.ID, 
+            Release: extractReleaseType(entry.Property),
             Group: extractGroup(entry.Property), 
             Resolution: extractResolution(entry.Property), 
             Codec: extractCodecs(entry.Property),
@@ -57,6 +58,12 @@ function extractGroup(property : string) : string {
         group = getTextInBrackets(properties[6].trim());
 
     return group;
+}
+
+function extractReleaseType(property : string) : string {
+    const properties = property.split("|");
+
+    return properties[0].trim();
 }
 
 function formatBytes(bytes : number) {
