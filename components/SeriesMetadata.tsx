@@ -33,9 +33,9 @@ function generateAltNameList(alternativeName : string[]) : JSX.Element[] {
 }
 
 function generateStudioList(studioList : string) : string {
-    const cleanedStudioList = studioList.match(/[^|/]+(?=\/\/\/)/g)?.join(", ");
+    const cleanedStudioList = studioList ? studioList.match(/[^|/]+(?=\/\/\/)/g)?.join(", ") : null;
 
-    return cleanedStudioList ?  cleanedStudioList : "";
+    return cleanedStudioList ? cleanedStudioList : "";
 }
 
 export default function SeriesMetadata({series} : {series : Anime}) {
