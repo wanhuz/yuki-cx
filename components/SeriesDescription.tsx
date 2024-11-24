@@ -1,4 +1,4 @@
-const jsdom = require("jsdom");
+import jsdom from "jsdom";
 const { JSDOM } = jsdom;
 
 function stripHTML(html : string) : string{

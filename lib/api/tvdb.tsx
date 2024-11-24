@@ -63,12 +63,12 @@ export async function getBackgroundArtwork(id : number, token : string) {
           else return score; 
         };
         
-        const normalizedData = artworks.map(item => ({
+        const normalizedData = artworks.map((item : {score: number}) => ({
           ...item,
           score: normalizeScore(item.score),
         }));
 
-        const artworksWithHighestScore = normalizedData.reduce((prev, current) =>
+        const artworksWithHighestScore = normalizedData.reduce((prev : { score: number }, current : { score: number } ) =>
           current.score > prev.score ? current : prev
         );
   
