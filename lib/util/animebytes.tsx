@@ -8,7 +8,7 @@ export function extractTorrent(torrentResult: { ID: number; Property: string; Se
     torrentResult.map((entry: { ID: number; Property: string; Seeders: number; Leechers: number; Size: number; Link: string}) => {
         torrent_extracted.push({
             ID: entry.ID, 
-            Release: extractSource(entry.Property),
+            Source: extractSource(entry.Property),
             Group: extractGroup(entry.Property), 
             Resolution: extractResolution(entry.Property), 
             Codec: extractCodecs(entry.Property),
@@ -156,5 +156,9 @@ function extractFreeleechStatus(property: string): boolean {
     }
 
     return false;
+}
+
+export function generateABTorrentLink(id : number) : string {
+    return "https://animebytes.tv/torrents.php?id=" + id.toString();
 }
 

@@ -6,7 +6,7 @@ interface Anime {
     Description: string;
     Image: string;
     AlternativeName: string[];
-    Studio: string[],
+    StudioList: string,
     Type: string;
     Episode: number;
     Aired: string;

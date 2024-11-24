@@ -16,7 +16,7 @@ export default function TorrentTable({torrent_data, isOngoing} : {torrent_data :
         <table className="bg-sky-500 py-3 mt-3 text-sm">
             <thead>
                 <tr className="text-white font-bold text-xs sm:text-md text-center">
-                    <td className="py-3 hidden sm:table-cell ">Release</td>
+                    <td className="py-3 hidden sm:table-cell ">Source</td>
                     <td className="py-3 sm:py-0 sm:ps-4 text-center sm:text-start">Name</td>
                     {isOngoing ? <td>Episode</td> : null}
                     <td className="hidden sm:table-cell text-start">Codec</td>

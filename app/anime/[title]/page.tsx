@@ -28,7 +28,7 @@ export default async function Page({
       SeriesName: result.SeriesName, 
       Description: result.Description, 
       Image: result.Image,
-      Studio: result.StudioList,
+      StudioList: result.StudioList,
       AlternativeName: normalizeDictToArray(result.Synonymns),
       Type: result.GroupName,
       Episode: result.EpCount,
