@@ -26,7 +26,7 @@ export default async function Page({
     anime_data = {
       ID: result.ID, 
       SeriesName: result.SeriesName, 
-      Description: result.Description, 
+      Description: result.DescriptionHTML, 
       Image: result.Image,
       StudioList: result.StudioList,
       AlternativeName: normalizeDictToArray(result.Synonymns),

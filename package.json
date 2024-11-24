@@ -13,6 +13,7 @@
     "@ctrl/qbittorrent": "^9.1.0",
     "better-sqlite3": "^11.5.0",
     "fast-xml-parser": "^4.5.0",
+    "jsdom": "^25.0.1",
     "next": "14.2.11",
     "react": "^18",
     "react-dom": "^18",
