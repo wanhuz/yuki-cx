@@ -1,4 +1,6 @@
 
+const regex = /^(?<source>.+?) \| (?<extension>.+?) \| (?:(?<aspectRatio>\d+:\d+) \| )?(?:(?<videoCodec>(?:h265|h264|XviD|DivX|MPEG-1\/2|VP9|RAW)(?: [a-zA-Z0-9\-./]+)?) \| )?(?:(?<dimensions>\d+[xX]\d+)(?: \| )?)?(?:(?<resolution>\d+[pi])(?: \| )?)?(?<audioCodec>[^\|]+?)(?: \| (?<dualAudio>Dual Audio))?(?: \| (?<subtitleType>(?:Softsubs|Hardsubs|RAW))(?: \((?<subgroup>.+?)\))?)?(?: \| Episode (?<episodeNo>\d+))?(?: \| (?<freeleechStatus>Freeleech))?$/;
+
 
 export function extractTorrent(torrentResult: { ID: number; Property: string; Seeders: number; Leechers: number; Size: number; Link: string; }[]) : Torrent[] {
     const torrent_extracted: Torrent[] = [];
@@ -6,7 +8,7 @@ export function extractTorrent(torrentResult: { ID: number; Property: string; Se
     torrentResult.map((entry: { ID: number; Property: string; Seeders: number; Leechers: number; Size: number; Link: string}) => {
         torrent_extracted.push({
             ID: entry.ID, 
-            Release: extractReleaseType(entry.Property),
+            Release: extractSource(entry.Property),
             Group: extractGroup(entry.Property), 
             Resolution: extractResolution(entry.Property), 
             Codec: extractCodecs(entry.Property),
@@ -15,6 +17,8 @@ export function extractTorrent(torrentResult: { ID: number; Property: string; Se
             Seeders: entry.Seeders,
             Leechers: entry.Leechers,
             Size: formatBytes(entry.Size),
+            EpisodeNo: extractEpisodeNo(entry.Property),
+            FreeleechStatus: extractFreeleechStatus(entry.Property),
             Link: entry.Link,
             Property: entry.Property
         } as Torrent);
@@ -23,47 +27,81 @@ export function extractTorrent(torrentResult: { ID: number; Property: string; Se
     return torrent_extracted;
 }
 
-function extractExtension(property : string) : string {
-    const properties = property.split("|");
-
-    return properties[1].trim();
-}
-
-function extractCodecs(property : string) : string {
-    const properties = property.split("|");
-
-    return properties[2].trim() + " " + properties[4].trim();
-}
-
-function extractResolution(property : string) : string {
-    const properties = property.split("|");
-
-    return properties[3].trim();
-}
-
-function extractSubtitle(property : string) : string {
-    const properties = property.split("|");
-
-    return properties[5].split(" (")[0].trim();
-}
-
-function extractGroup(property : string) : string {
-    const properties = property.split("|");
-
-    let group = getTextInBrackets(properties[5].trim());
+export function extractExtension(property : string) : string {
+    const match = property.match(regex);
     
-    if (group === "　" && properties.length < 7) // Group is not returned in properties
-        group = "　"
-    else if (group === "　")
-        group = getTextInBrackets(properties[6].trim());
+    if (match?.groups) {
+        const extension = match.groups.extension.trim();
+        return extension;
+    }
 
-    return group;
+    return "";
 }
 
-function extractReleaseType(property : string) : string {
-    const properties = property.split("|");
+export function extractCodecs(property : string) : string {
+    const videoCodec = extractVideoCodecs(property);
+    const audioCodec = extractAudioCodecs(property);
 
-    return properties[0].trim();
+    return videoCodec? videoCodec + " " + audioCodec : audioCodec;
+}
+
+export function extractResolution(property : string) {
+    const match = property.match(regex);
+    
+    if (match?.groups) {
+        let resolution = match.groups.resolution?.trim() || null
+
+        if (!resolution) {
+            resolution = match.groups.dimensions || null;
+        }
+
+        return resolution?.toLowerCase();
+    }
+
+    return "";
+}
+
+export function extractSubtitle(property : string) { 
+    const match = property.match(regex);
+    
+    if (match?.groups) {
+        const subtitle = match.groups.subtitleType?.trim() || null
+        return subtitle;
+    }
+
+    return "";
+}
+
+export function extractGroup(property : string) : string { 
+    const match = property.match(regex);
+    const blankLine = "　"; // Make table properly padded
+    
+    if (match?.groups) {
+        const subgroup =  match.groups.subgroup?.trim() || blankLine;
+        return subgroup;
+    }
+
+    return blankLine;
+}
+
+export function extractSource(property : string) : string {
+    const match = property.match(regex);
+    
+    if (match?.groups) {
+        const source =  match.groups.source.trim();
+        return source;
+    }
+
+    return "";
+}
+
+export function extractOngoingStatus(property : string) : boolean {
+    const episodeMatch =  extractEpisodeNo(property);
+    
+    if (episodeMatch)
+        return true
+
+    return false;
 }
 
 function formatBytes(bytes : number) {
@@ -76,7 +114,47 @@ function formatBytes(bytes : number) {
     }
 }
 
-function getTextInBrackets(str : string) {
-    const match = str.match(/\(([^)]+)\)/);
-    return match ? match[1] : "　";
+function extractVideoCodecs(property : string) {
+    const match = property.match(regex);
+    
+    if (match?.groups) {
+        const videoCodec =  match.groups.videoCodec?.trim() || "";
+        return videoCodec;
+    }
+
+    return "";
 }
+
+function extractAudioCodecs(property : string) {
+    const match = property.match(regex);
+    
+    if (match?.groups) {
+        const audioCodec =  match.groups.audioCodec.trim() || "";
+        return audioCodec;
+    }
+
+    return "";
+}
+
+function extractEpisodeNo(property: string) {
+    const match = property.match(regex);
+    
+    if (match?.groups) {
+        const episodeNo =  match.groups.episodeNo ? parseInt(match.groups.episodeNo, 10) : null;
+        return episodeNo;
+    }
+
+    return null;
+}
+
+function extractFreeleechStatus(property: string): boolean {
+    const match = property.match(regex);
+    
+    if (match?.groups) {
+        const isFreeleech =  Boolean(match.groups.freeleechStatus);
+        return isFreeleech;
+    }
+
+    return false;
+}
+

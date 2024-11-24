@@ -11,7 +11,9 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        "header" : "#383F51"
+        "header" : "#383F51",
+        "seeders" : "#4eb41c",
+        "leechers" : "#d63600"
       },
       objectPosition: {
         'half-top': '70% 30%',

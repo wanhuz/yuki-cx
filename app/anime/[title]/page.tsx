@@ -4,7 +4,7 @@ import SeriesMetadata from "@/components/SeriesMetadata";
 import SeriesPoster from "@/components/SeriesPoster";
 import TorrentTable from "@/components/TorrentTable";
 import { getAnime } from "@/lib/api/animebytes";
-import { extractTorrent } from "@/lib/util/animebytes";
+import { extractOngoingStatus, extractTorrent } from "@/lib/util/animebytes";
 import {removeUnderscoreFromTitle, normalizeDictToArray} from "@/lib/util/util";
 
 export default async function Page({
@@ -34,6 +34,7 @@ export default async function Page({
       Episode: result.EpCount,
       Aired: result.Year,
       Tags: result.Tags,
+      Ongoing: extractOngoingStatus(result.Torrents[0].Property),
       Links: normalizeDictToArray(result.Links),
       Torrents: extractTorrent(result.Torrents)
     } as Anime;
@@ -59,8 +60,8 @@ export default async function Page({
               </div>
 
               <div className="flex flex-row space-x-3 font-bold ">
-                <button className="bg-sky-500 text-white py-1 px-3 hover:bg-sky-600 h-12 rounded-xl "> Add to Download </button>
-                <button className="bg-sky-500 text-white py-1 px-3 hover:bg-sky-600 h-12 rounded-xl"> Add to Scheduler </button>
+                <button className="bg-sky-500 text-white py-1 px-3 hover:bg-sky-600 h-12 rounded-xl text-sm sm:text-md"> Add to Download </button>
+                <button className="bg-sky-500 text-white py-1 px-3 hover:bg-sky-600 h-12 rounded-xl text-sm sm:text-md"> Add to Scheduler </button>
               </div>
             </div>
           </div>
@@ -73,7 +74,7 @@ export default async function Page({
 
             <div className="flex flex-col w-full ">
                 {<SeriesDescription description={anime_data? anime_data.Description : ""}/>}
-                {<TorrentTable torrent_data={anime_data? anime_data.Torrents : []}/>}
+                {<TorrentTable torrent_data={anime_data? anime_data.Torrents : []} isOngoing={anime_data? anime_data.Ongoing : false}/>}
             </div>
           </div>
         </main>

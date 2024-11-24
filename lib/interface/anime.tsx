@@ -12,6 +12,7 @@ interface Anime {
     Aired: string;
     Tags: string[];
     Links: string[];
+    Ongoing: boolean;
     RelatedAnime?: string[];
     Torrents: Torrent[]
 }

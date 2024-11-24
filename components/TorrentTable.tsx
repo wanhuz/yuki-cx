@@ -8,25 +8,25 @@ function createTorrentRow(torrents_data : Torrent[]) {
     );
 }
 
-export default function TorrentTable({torrent_data} : {torrent_data : Torrent[]}) {
+export default function TorrentTable({torrent_data, isOngoing} : {torrent_data : Torrent[], isOngoing : boolean}) {
     return (
         <div className="flex flex-col mt-10">
         <b>Downloads</b>
         <hr />
         <table className="bg-sky-500 py-3 mt-3 text-sm">
             <thead>
-                <tr className="text-white text-start  font-bold">
-                    <td className="py-3 px-5">Release</td>
-                    <td>Name</td>
-                    <td className="hidden sm:table-cell">Codec</td>
+                <tr className="text-white font-bold text-xs sm:text-md text-center">
+                    <td className="py-3 hidden sm:table-cell ">Release</td>
+                    <td className="py-3 sm:py-0 sm:ps-4 text-center sm:text-start">Name</td>
+                    {isOngoing ? <td>Episode</td> : null}
+                    <td className="hidden sm:table-cell text-start">Codec</td>
                     <td className="hidden sm:table-cell">Resolution</td>
                     <td className="hidden sm:table-cell">Size</td>
                     <td className="hidden sm:table-cell">Subtitle</td>
                     <td className="hidden sm:table-cell">Extension</td>
-                    <td className="hidden sm:table-cell">Seeders</td>
+                    <td className="px-3 sm:px-0">Seeders</td>
                     <td className="hidden sm:table-cell">Leechers</td>
-                    <td className="table-cell sm:hidden">Health</td>
-                    <td>Downloads</td>
+                    <td className="pe-2 sm:px-0">Action</td>
                 </tr>
             </thead>
             <tbody>

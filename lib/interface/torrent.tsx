@@ -10,6 +10,8 @@ interface Torrent {
     Seeders: number,
     Leechers: number,
     Size: string,
+    EpisodeNo: number,
+    FreeleechStatus: boolean,
     Link: string,
     Property? : string
 }
