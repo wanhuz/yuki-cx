@@ -60,8 +60,8 @@ export default async function Page({
               </div>
 
               <div className="flex flex-row space-x-3 font-bold ">
-                <button className="bg-sky-500 text-white py-1 px-3 hover:bg-sky-600 h-12 rounded-xl text-sm sm:text-md"> Add to Download </button>
-                <button className="bg-sky-500 text-white py-1 px-3 hover:bg-sky-600 h-12 rounded-xl text-sm sm:text-md"> Add to Scheduler </button>
+                <button disabled className="bg-sky-500 text-white py-1 px-3 hover:bg-sky-600 h-12 rounded-xl text-sm sm:text-md disabled:bg-sky-300"> Add to Download </button>
+                <button disabled className="bg-sky-500 text-white py-1 px-3 hover:bg-sky-600 h-12 rounded-xl text-sm sm:text-md disabled:bg-sky-300"> Add to Scheduler </button>
               </div>
             </div>
           </div>
