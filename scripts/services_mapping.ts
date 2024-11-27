@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import fs from "fs";
 import sqlite3 from "better-sqlite3";
 import { XMLParser  } from "fast-xml-parser";
+import 'dotenv/config'
 
-const animeMappingURL = "https://raw.githubusercontent.com/Anime-Lists/anime-lists/master/anime-list.xml";
-const localXMLFilePath = "resources/anime-list.xml";
-const dbLocalFilePath = "resources/yuki-cx.db";
+const animeMappingURL = process.env.SERVICE_MAPPING_URL ?? ""
+const dbLocalFilePath =  process.env.DATABASE_URL_PREBUILD ?? ""
 
 const parseNumber = (value: string | null | undefined): number | null => {
   const num = Number(value);
@@ -13,7 +12,7 @@ const parseNumber = (value: string | null | undefined): number | null => {
   return Number.isFinite(num) ? num : null; 
 };
 
-const fetchXMLFile = async (url: string, outputPath: string) => {
+const fetchXMLFile = async (url: string) => {
   try {
     console.log(`Fetching XML file from ${url}...`);
     const response = await fetch(url);
@@ -23,17 +22,16 @@ const fetchXMLFile = async (url: string, outputPath: string) => {
     }
 
     const data = await response.text();
-    fs.writeFileSync(outputPath, data, "utf8");
-    console.log(`XML file saved to ${outputPath}`);
+
+    return data;
+
   } catch (error) {
     console.error("Error fetching XML file:", error);
     process.exit(1);
   }
 };
 
-const readAndParseXML = (filePath: string) => {
-  try {
-    const xmlData = fs.readFileSync(filePath, "utf8");
+const readAndParseXML = (xmlData: string) => {
 
     const parser = new XMLParser({
       ignoreAttributes: false, 
@@ -58,10 +56,7 @@ const readAndParseXML = (filePath: string) => {
       name: anime.name || null,
       studio: anime["supplemental-info"]?.studio || null,
     }));
-  } catch (error) {
-    console.error("Error reading or parsing XML file:", error);
-    process.exit(1);
-  }
+
 };
 
 const createDatabase = (animeList: any[], dbFilePath : string) => {
@@ -69,23 +64,11 @@ const createDatabase = (animeList: any[], dbFilePath : string) => {
     const db = sqlite3(dbFilePath);
 
     db.exec(`
-      DROP TABLE IF EXISTS anime
-    `);
-
-    db.exec(`
-      CREATE TABLE IF NOT EXISTS anime (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        anidbid NUMBER,
-        tvdbid NUMBER,
-        tmdbid NUMBER,
-        imdbid NUMBER,
-        name TEXT,
-        studio TEXT
-      )
+      DELETE FROM ServiceMapping
     `);
 
     const insert = db.prepare(`
-      INSERT INTO anime (anidbid, tvdbid, tmdbid, imdbid, name, studio) 
+      INSERT INTO ServiceMapping (anidbid, tvdbid, tmdbid, imdbid, name, studio) 
       VALUES (?, ?, ?, ?, ?, ?)
     `);
 
@@ -112,17 +95,9 @@ const createDatabase = (animeList: any[], dbFilePath : string) => {
 };
 
 const main = async () => {
-  await fetchXMLFile(animeMappingURL, localXMLFilePath);
-  const animeList = readAndParseXML(localXMLFilePath);
+  const animeServiceMapping = await fetchXMLFile(animeMappingURL);
+  const animeList = readAndParseXML(animeServiceMapping);
   createDatabase(animeList, dbLocalFilePath);
-
-  try {
-    fs.unlinkSync(localXMLFilePath);
-    console.log(`Deleted local XML file: ${localXMLFilePath}`);
-  } catch (error) {
-    console.error("Error deleting XML file:", error);
-    process.exit(1);
-  }
 };
 
 main();

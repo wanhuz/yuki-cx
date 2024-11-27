@@ -2,7 +2,7 @@
   "name": "anime-ui",
   "private": true,
   "scripts": {
-    "//": "npx tsx scripts/map_anidb.ts",
+    "prebuild": "npx prisma migrate --name init && npx tsx scripts/services_mapping.ts",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -13,6 +13,7 @@
     "@ctrl/qbittorrent": "^9.1.0",
     "@prisma/client": "^5.22.0",
     "better-sqlite3": "^11.5.0",
+    "dotenv": "^16.4.5",
     "fast-xml-parser": "^4.5.0",
     "jsdom": "^25.0.1",
     "next": "14.2.11",
