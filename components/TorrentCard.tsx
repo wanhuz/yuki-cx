@@ -72,7 +72,7 @@ export function TorrentCard({torrent} : {torrent : Torrent}) {
             {torrent.EpisodeNo? <td>{torrent.EpisodeNo}</td> : null}
             <td className="hidden sm:table-cell text-start">{torrent.Codec}</td>
             <td className="hidden sm:table-cell">{torrent.Resolution}</td>
-            <td className="hidden sm:table-cell">{torrent.Size}</td>
+            <td className="text-xs">{torrent.Size}</td>
             <td className="hidden sm:table-cell">{torrent.Subtitle}</td>
             <td className="hidden sm:table-cell">{torrent.Extension}</td>
             <td className="text-xs sm:text-sm text-seeders font-semibold"><span className="">{torrent.Seeders}</span></td>

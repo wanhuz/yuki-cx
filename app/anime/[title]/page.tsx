@@ -61,7 +61,12 @@ export default async function Page({
 
               <div className="flex flex-row space-x-3 font-bold ">
                 <button disabled className="bg-sky-500 text-white py-1 px-3 hover:bg-sky-600 h-12 rounded-xl text-sm sm:text-md disabled:bg-sky-300"> Add to Download </button>
-                <button disabled className="bg-sky-500 text-white py-1 px-3 hover:bg-sky-600 h-12 rounded-xl text-sm sm:text-md disabled:bg-sky-300"> Add to Scheduler </button>
+                {
+                  anime_data?.Ongoing ? 
+<                 button disabled className="bg-sky-500 text-white py-1 px-3 hover:bg-sky-600 h-12 rounded-xl text-sm sm:text-md disabled:bg-sky-300"> Add to Scheduler </button> :
+                  null
+                }
+                
               </div>
             </div>
           </div>

@@ -21,7 +21,7 @@ export default function TorrentTable({torrent_data, isOngoing} : {torrent_data :
                     {isOngoing ? <td>Episode</td> : null}
                     <td className="hidden sm:table-cell text-start">Codec</td>
                     <td className="hidden sm:table-cell">Resolution</td>
-                    <td className="hidden sm:table-cell">Size</td>
+                    <td>Size</td>
                     <td className="hidden sm:table-cell">Subtitle</td>
                     <td className="hidden sm:table-cell">Extension</td>
                     <td className="px-3 sm:px-0">Seeders</td>

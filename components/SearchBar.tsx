@@ -42,7 +42,7 @@ export default function SearchBar({onSearchTextChange} : {onSearchTextChange: Re
     return (
         <div className="container mx-auto my-8">
             <div className="flex items-center justify-center">
-                <div className="relative w-full">
+                <div className="relative w-11/12 mx-auto sm:w-full">
                     <input 
                         type="text" 
                         className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
