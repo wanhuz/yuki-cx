@@ -14,4 +14,5 @@ interface Torrent {
     FreeleechStatus: boolean,
     Link: string,
     Property? : string
+    FileList? : FileData[]
 }

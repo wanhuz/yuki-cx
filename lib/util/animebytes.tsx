@@ -2,10 +2,11 @@
 const regex = /^(?<source>.+?) \| (?<extension>.+?) \| (?:(?<aspectRatio>\d+:\d+) \| )?(?:(?<videoCodec>(?:h265|h264|XviD|DivX|MPEG-1\/2|VP9|RAW)(?: [a-zA-Z0-9\-./]+)?) \| )?(?:(?<dimensions>\d+[xX]\d+)(?: \| )?)?(?:(?<resolution>\d+[pi])(?: \| )?)?(?<audioCodec>[^\|]+?)(?: \| (?<dualAudio>Dual Audio))?(?: \| (?<subtitleType>(?:Softsubs|Hardsubs|RAW))(?: \((?<subgroup>.+?)\))?)?(?: \| Episode (?<episodeNo>\d+))?(?: \| (?<freeleechStatus>Freeleech))?$/;
 
 
-export function extractTorrent(torrentResult: { ID: number; Property: string; Seeders: number; Leechers: number; Size: number; Link: string; }[]) : Torrent[] {
+export function extractTorrent(torrentResult: { ID: number; Property: string; Seeders: number; Leechers: number; Size: number; Link: string; FileList: [{filename : string, size : number}] }[]) : Torrent[] {
     const torrent_extracted: Torrent[] = [];
 
-    torrentResult.map((entry: { ID: number; Property: string; Seeders: number; Leechers: number; Size: number; Link: string}) => {
+
+    torrentResult.map((entry: { ID: number; Property: string; Seeders: number; Leechers: number; Size: number; Link: string; FileList: [{filename : string, size : number}]}) => {
         torrent_extracted.push({
             ID: entry.ID, 
             Source: extractSource(entry.Property),
@@ -20,10 +21,11 @@ export function extractTorrent(torrentResult: { ID: number; Property: string; Se
             EpisodeNo: extractEpisodeNo(entry.Property),
             FreeleechStatus: extractFreeleechStatus(entry.Property),
             Link: entry.Link,
-            Property: entry.Property
+            Property: entry.Property,
+            FileList: entry.FileList.map(item => ({filename : item.filename, size: item.size} as FileData))
         } as Torrent);
     });
-
+    
     return torrent_extracted;
 }
 
@@ -104,7 +106,7 @@ export function extractOngoingStatus(property : string) : boolean {
     return false;
 }
 
-function formatBytes(bytes : number) {
+export function formatBytes(bytes : number) {
     if (bytes < 1024 * 1024) {
         return (bytes / 1024).toFixed(2) + ' KB';
     } else if (bytes < 1024 * 1024 * 1024) {
