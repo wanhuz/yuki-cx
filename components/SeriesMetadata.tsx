@@ -18,7 +18,7 @@ function generateLink(link: string): JSX.Element {
         "animebytes.tv" : "AnimeBytes"
     };
 
-    const baseStyle = "text-blue-600 hover:text-blue-800";
+    const baseStyle = "text-sky-600 hover:text-sky-800";
 
     try {
         const url = new URL(link);
@@ -75,7 +75,7 @@ export default function SeriesMetadata({series} : {series : Anime}) {
 
     return (
         <div className="sm:max-w-64 overflow-hidden flex flex-col gap-4" >
-            <div id="title">
+            <div id="title" className={series.AlternativeName.length ? "block" : "hidden"}>
                 <b>Alternative Title</b>
                 <hr></hr>
                 <ul className="mt-3 text-sm text-wrap">
