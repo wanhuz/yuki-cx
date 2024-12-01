@@ -17,7 +17,10 @@ const config: Config = {
       },
       objectPosition: {
         'half-top': '70% 30%',
-      }
+      },
+      fontSize: {
+        'xxs': '0.625rem', // Smaller than xs (10px)
+      },
     },
   },
   plugins: [],

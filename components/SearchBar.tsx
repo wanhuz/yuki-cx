@@ -1,4 +1,5 @@
 import { search } from "@/lib/api/animebytes";
+import { extractOngoingStatus } from "@/lib/util/animebytes";
 import { useEffect, useState } from "react";
 
 async function getServerSideProps(title : string, type : string) {
@@ -7,7 +8,7 @@ async function getServerSideProps(title : string, type : string) {
     const anime_search_result: Anime[] = [];
 
     await searchResult.then((result) => {
-        result.map((entry: { ID: number; SeriesName: string; FullName: string; Description: string; Image: string; }) => {
+        result.map((entry: { ID: number; SeriesName: string; FullName: string; Description: string; Image: string; GroupName : string, Year: string, Torrents: Torrent[] }) => {
 
             if (entry.SeriesName.toLowerCase().includes(title.toLowerCase())) {
                 anime_search_result.push({
@@ -15,7 +16,11 @@ async function getServerSideProps(title : string, type : string) {
                     SeriesName: entry.SeriesName, 
                     FullName: entry.FullName,
                     Description: entry.Description, 
-                    Image: entry.Image} as Anime);
+                    Image: entry.Image,
+                    Type: entry.GroupName,
+                    Aired: entry.Year,
+                    Ongoing: extractOngoingStatus(entry.Torrents[0].Property ?? "")
+                } as Anime);
             }
         });
    });

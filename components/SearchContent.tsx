@@ -18,6 +18,9 @@ export default function Content( contentCard : ContentProps) {
                 title={entry.SeriesName} 
                 poster={entry.Image} 
                 id={entry.ID}
+                type={entry.Type}
+                year={entry.Aired}
+                isOngoing={entry.Ongoing}
             />
         ));
         setListCards(listCards);
