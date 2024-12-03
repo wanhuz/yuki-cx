@@ -2,7 +2,7 @@
   "name": "anime-ui",
   "private": true,
   "scripts": {
-    "prebuild": "npx prisma migrate --name init && npx tsx scripts/services_mapping.ts",
+    "--": "npx prisma migrate --name init && npx tsx scripts/services_mapping.ts",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
