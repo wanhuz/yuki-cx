@@ -8,7 +8,9 @@ export async function search(series_name : string, type : string) {
 
     const search_query = generateSearchQuery(series_name, type, 25);
 
-    const data = await fetch(search_query);
+    const data = await fetch(search_query, {
+        next: { revalidate: 3600 }, 
+    });
 
     const search_result = await data.json();
     const search_result_groups = search_result["Groups"];
@@ -18,8 +20,10 @@ export async function search(series_name : string, type : string) {
 
 export async function getAnime(anime_title: string, id : number) {
     const search_query = generateSearchQuery(anime_title, "", 10);
-    
-    const data = await fetch(search_query);
+
+    const data = await fetch(search_query, {
+        next: { revalidate: 3600 }, 
+    });
 
     const search_result = await data.json();
     
