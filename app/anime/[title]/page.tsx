@@ -48,7 +48,7 @@ export default async function Page({
         <main className="container flex flex-col w-80 sm:w-full mx-auto sm:items-start sm:mx-auto mb-10">
           <div className="flex flex-col sm:flex-row gap-5 sm:gap-18 mt-28 ">
 
-            <div className="mt-5">
+            <div className="mt-5 sm:px-2 md:px-0">
               <SeriesPoster posterURL={anime_data?.Image || ""} />
             </div>
 
@@ -72,7 +72,7 @@ export default async function Page({
           </div>
 
 
-          <div className="flex flex-col sm:w-full lg:flex-row sm:gap-24 sm:gap-8">
+          <div className="flex flex-col sm:w-full lg:flex-row sm:gap-24 sm:gap-2">
             <div className="mt-8 sm:min-w-full lg:min-w-[230px]">
               {<SeriesMetadata series={anime_data}/>}
             </div>

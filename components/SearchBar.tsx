@@ -3,44 +3,55 @@ import { extractOngoingStatus } from "@/lib/util/animebytes";
 import { useEffect, useState } from "react";
 
 async function getServerSideProps(title : string, type : string) {
+
     const searchResult = search(title, type);
  
     const anime_search_result: Anime[] = [];
 
     await searchResult.then((result) => {
-        result.map((entry: { ID: number; SeriesName: string; FullName: string; Description: string; Image: string; GroupName : string, Year: string, Torrents: Torrent[] }) => {
+        if (result) {
+            result.map((entry: { ID: number; SeriesName: string; FullName: string; Description: string; Image: string; GroupName : string, Year: string, Torrents: Torrent[] }) => {
 
-            if (entry.SeriesName.toLowerCase().includes(title.toLowerCase())) {
-                anime_search_result.push({
-                    ID: entry.ID, 
-                    SeriesName: entry.SeriesName, 
-                    FullName: entry.FullName,
-                    Description: entry.Description, 
-                    Image: entry.Image,
-                    Type: entry.GroupName,
-                    Aired: entry.Year,
-                    Ongoing: extractOngoingStatus(entry.Torrents[0].Property ?? "")
-                } as Anime);
-            }
-        });
+                if (entry.SeriesName.toLowerCase().includes(title.toLowerCase())) {
+                    anime_search_result.push({
+                        ID: entry.ID, 
+                        SeriesName: entry.SeriesName, 
+                        FullName: entry.FullName,
+                        Description: entry.Description, 
+                        Image: entry.Image,
+                        Type: entry.GroupName,
+                        Aired: entry.Year,
+                        Ongoing: extractOngoingStatus(entry.Torrents[0].Property ?? "")
+                    } as Anime);
+                }
+            });
+        }
    });
- 
+
     return anime_search_result;
  }
  
 
-export default function SearchBar({onSearchTextChange} : {onSearchTextChange: React.Dispatch<React.SetStateAction<Anime[]>> }) {
-    const [searchText, setSearchText] = useState('');
+export default function SearchBar({
+  onSearchTextChange,
+  onIsSearch,
+}: {
+  onSearchTextChange: React.Dispatch<React.SetStateAction<Anime[]>>;
+  onIsSearch: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
+  const [searchText, setSearchText] = useState('');
 
     useEffect(() => {
         onSearchTextChange([]);
-
+        onIsSearch(true);
         const getData = setTimeout(() => {
+            
             getServerSideProps(searchText, "").then((result) => {
                 onSearchTextChange(result);
-            });;
+                onIsSearch(false);
+            });
         }, 1000)
-    
+        
         return () => clearTimeout(getData)
       }, [searchText, onSearchTextChange])
     
