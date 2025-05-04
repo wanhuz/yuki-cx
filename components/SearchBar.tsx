@@ -53,7 +53,7 @@ export default function SearchBar({
         }, 1000)
         
         return () => clearTimeout(getData)
-      }, [searchText, onSearchTextChange])
+      }, [searchText, onSearchTextChange, onIsSearch])
     
     return (
         <div className="container mx-auto my-8 px-2 md:px-0">

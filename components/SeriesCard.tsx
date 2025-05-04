@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import SeriesDescription from "./SeriesDescription";
 
 function generateSeriesLink(title : string, id : number) {
     return "/anime/" + encodeURIComponent(title) + "?id=" + id;

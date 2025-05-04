@@ -75,7 +75,7 @@ export default function SeriesMetadata({series} : {series : Anime}) {
     const studios = generateStudioList(series.StudioList);
 
     return (
-        <div className="sm:max-w-64 overflow-hidden flex flex-col sm:flex-row sm:min-w-full sm:px-2 lg:flex-col md:min-w-auto gap-4" >
+        <div className="sm:max-w-64 overflow-hidden flex flex-col sm:flex-row sm:min-w-full sm:px-4 lg:flex-col md:min-w-auto gap-4" >
             <div id="title" className={series.AlternativeName.length ? "block" : "hidden"}>
                 <b>Alternative Title</b>
                 <hr></hr>
