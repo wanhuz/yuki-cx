@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import SeriesDescription from "./SeriesDescription";
 
 function generateSeriesLink(title : string, id : number) {
     return "/anime/" + encodeURIComponent(title) + "?id=" + id;
@@ -31,23 +32,44 @@ function generateTagLabel(type : string) {
     return (<span className={style}>{type}</span>);
 }
 
-export default function SeriesCard({title, poster, id, type, year, isOngoing} : {title: string, poster: string, id : number, type: string, year: string, isOngoing: boolean}) {
+export default function SeriesCard({
+    title,
+    poster,
+    id,
+    type,
+    year,
+    isOngoing,
+    summary
+}: {
+    title: string;
+    poster: string;
+    id: number;
+    type: string;
+    year: string;
+    isOngoing: boolean;
+    summary: string;
+}) {
     const seriesLink = generateSeriesLink(title, id);
 
     return (
-        <Link href={seriesLink}>
-            <div className="max-w-xs h-72 hover:bg-gray-100 overflow-hidden rounded-md" >
-                <Image className="w-32 h-48 object-cover rounded-md" src={poster} alt={title} width={160} height={180}></Image>
-                <div className="py-4 flex flex-col justify-between min-h-[100px] pt-5">
-                    
-                    <div className="text-xs px-2  w-32 line-clamp-2 overflow-hidden">{title}</div>
-                    <div className="text-xxs px-2 flex flex-row gap-1 flex-wrap w-32">
-                        {isOngoing ? generateTagLabel("Airing") : generateTagLabel(type)}
-                        {generateTagLabel(year)}
-                        
+            <Link href={seriesLink} className="flex-shrink-0 flex-grow-0 w-full px-2 md:px-0 md:flex-initial md:w-auto">
+                <div className="w-full md:w-min-content md:max-w-min md:h-72 flex flex-row md:flex-col overflow-hidden rounded-md hover:bg-gray-100">
+                    <Image 
+                        className="w-32 h-48 object-cover rounded-md" 
+                        src={poster} 
+                        alt={title} 
+                        width={160} 
+                        height={180}
+                    />
+                    <div className="flex flex-col justify-between w-full px-2 py-4 md:py-4 md:pt-5 md:min-h-[100px]">
+                        <div className="w-full px-2 text-sm font-semibold md:font-normal md:w-auto md:text-xs line-clamp-2 overflow-hidden">{title}</div>
+                        <div className="w-full px-2 text-xs md:w-auto line-clamp-4 md:hidden">{summary ? summary : ""}</div>
+                        <div className="flex flex-row gap-1 flex-wrap w-32 px-2 text-xxs">
+                            {isOngoing ? generateTagLabel("Airing") : generateTagLabel(type)}
+                            {generateTagLabel(year)}
+                        </div>
                     </div>
                 </div>
-            </div>
-        </Link>
+            </Link>
     );
   }

@@ -75,9 +75,9 @@ export function TorrentCard({torrent} : {torrent : Torrent}) {
         <tr className="cursor-pointer drop-shadow-sm border-gray-100 border-2 bg-white hover:bg-gray-50 text-gray-600 text-center" onClick={toggleRow}>
             <td className="hidden sm:table-cell py-5">{getReleaseIcon(torrent.Source)}</td>
             <td className="hidden sm:table-cell text-start ps-4">{torrent.Group}</td>
-            <td className="py-5 px-5 text-xs table-cell sm:hidden text-start">{torrent.Property}</td>
+            <td className="py-5 px-5 text-xs table-cell sm:hidden  text-start">{torrent.Property}</td>
             {torrent.EpisodeNo? <td>{torrent.EpisodeNo}</td> : null}
-            <td className="hidden sm:table-cell text-start">{torrent.Codec}</td>
+            <td className="hidden sm:table-cell text-start sm:hidden lg:table-cell">{torrent.Codec}</td>
             <td className="hidden sm:table-cell">{torrent.Resolution}</td>
             <td className="text-xs">{torrent.Size}</td>
             <td className="hidden sm:table-cell">{torrent.Subtitle}</td>

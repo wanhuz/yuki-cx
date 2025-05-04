@@ -46,13 +46,13 @@ export default async function Page({
         <SeriesBackground imgUrl={anime_data?.Image || ""}/>
 
         <main className="container flex flex-col w-80 sm:w-full mx-auto sm:items-start sm:mx-auto mb-10">
-          <div className="flex flex-col sm:flex-row gap-5 sm:gap-24 mt-28 ">
+          <div className="flex flex-col sm:flex-row gap-5 sm:gap-18 mt-28 ">
 
             <div className="mt-5">
               <SeriesPoster posterURL={anime_data?.Image || ""} />
             </div>
 
-            <div className="flex flex-col justify-between space-y-5 sm:mt-24">
+            <div className="flex flex-col justify-between space-y-5 sm:mt-24 sm:ps-3">
               <div>
                 <h1 className="text-xl font-extrabold leading-none text-gray-700 sm:text-white md:text-5xl lg:text-5xl dark:text-white drop-shadow-md">
                   {anime_data?.SeriesName}
@@ -72,8 +72,8 @@ export default async function Page({
           </div>
 
 
-          <div className="flex flex-col sm:w-full sm:flex-row sm:gap-24">
-            <div className="mt-8 sm:min-w-[230px]">
+          <div className="flex flex-col sm:w-full lg:flex-row sm:gap-24 sm:gap-8">
+            <div className="mt-8 sm:min-w-full lg:min-w-[230px]">
               {<SeriesMetadata series={anime_data}/>}
             </div>
 
