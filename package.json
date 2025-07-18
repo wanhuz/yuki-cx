@@ -17,9 +17,11 @@
     "fast-xml-parser": "^4.5.0",
     "jsdom": "^25.0.1",
     "next": "^15.3.1",
+    "node-cron": "^4.2.1",
     "react": "^18",
     "react-dom": "^18",
-    "react-toastify": "^10.0.6"
+    "react-toastify": "^10.0.6",
+    "rss-parser": "^3.13.0"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.0",

@@ -1,4 +1,4 @@
-import { QBittorrent } from '@ctrl/qbittorrent';
+import { AddTorrentOptions, QBittorrent } from '@ctrl/qbittorrent';
 
 const client = new QBittorrent({
   baseUrl: '',
@@ -28,7 +28,12 @@ async function getBase64FromTorrentURL(url : string) {
 
 export async function addTorrent(url : string) {
     const base64Torrent = await getBase64FromTorrentURL(url)
-    const status = await client.addTorrent(base64Torrent);
+    const torrentOption: Partial<AddTorrentOptions> = {
+      paused: "true",
+      category: "Anime"
+    }
+
+    const status = await client.addTorrent(base64Torrent, torrentOption);
 
     if (status)
         return 200

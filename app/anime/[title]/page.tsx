@@ -5,7 +5,7 @@ import SeriesMetadata from "@/components/SeriesMetadata";
 import SeriesPoster from "@/components/SeriesPoster";
 import TorrentTable from "@/components/TorrentTable";
 import { getAnime } from "@/lib/api/animebytes";
-import { addToScheduler } from "@/lib/app/scheduler";
+import { addToScheduler } from "@/lib/api/scheduler";
 import { extractOngoingStatus, extractTorrent } from "@/lib/util/animebytes";
 import {removeUnderscoreFromTitle, normalizeDictToArray} from "@/lib/util/util";
 

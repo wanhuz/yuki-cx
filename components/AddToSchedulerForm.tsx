@@ -2,7 +2,7 @@
 'use client';
 
 import { useFormStatus } from 'react-dom';
-import { addToScheduler } from '@/lib/app/scheduler';
+import { addToScheduler } from '@/lib/api/scheduler';
 import { toast } from 'react-toastify';
 
 export function AddToSchedulerForm({ AB_ID, SeriesName }: { AB_ID: number, SeriesName : string}) {

@@ -29,6 +29,6 @@ model ServiceMapping {
 
 model AnimeScheduler {
   id            Int     @id @default(autoincrement())
-  ab_id         Int
+  ab_id         Int     @unique
   series_name   String
 }

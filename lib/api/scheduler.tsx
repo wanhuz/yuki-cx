@@ -1,6 +1,7 @@
 "use server";
 
 import { PrismaClient } from "@prisma/client";
+import cron from "node-cron";
 
 export async function addToScheduler(formData : FormData) {
     const ab_id = Number(formData.get('ab_id'));
@@ -8,8 +9,10 @@ export async function addToScheduler(formData : FormData) {
 
     const prisma = new PrismaClient();
 
-    const result = await prisma.animeScheduler.create({
-        data: {
+    await prisma.animeScheduler.upsert({
+        where: { ab_id: ab_id }, 
+        update: {},              
+        create: {                
             ab_id: ab_id,
             series_name: series_name
         }
