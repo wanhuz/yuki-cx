@@ -25,3 +25,10 @@ model ServiceMapping {
   name      String?
   studio    String?
 }
+
+
+model AnimeScheduler {
+  id            Int     @id @default(autoincrement())
+  ab_id         Int
+  series_name   String
+}

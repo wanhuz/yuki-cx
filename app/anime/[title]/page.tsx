@@ -1,9 +1,11 @@
+import { AddToSchedulerForm } from "@/components/AddToSchedulerForm";
 import SeriesBackground from "@/components/SeriesBackground";
 import SeriesDescription from "@/components/SeriesDescription";
 import SeriesMetadata from "@/components/SeriesMetadata";
 import SeriesPoster from "@/components/SeriesPoster";
 import TorrentTable from "@/components/TorrentTable";
 import { getAnime } from "@/lib/api/animebytes";
+import { addToScheduler } from "@/lib/app/scheduler";
 import { extractOngoingStatus, extractTorrent } from "@/lib/util/animebytes";
 import {removeUnderscoreFromTitle, normalizeDictToArray} from "@/lib/util/util";
 
@@ -63,10 +65,9 @@ export default async function Page({
                 <button disabled className="bg-sky-500 text-white py-1 px-3 hover:bg-sky-600 h-12 rounded-xl text-sm sm:text-md disabled:bg-sky-300"> Add to Download </button>
                 {
                   anime_data?.Ongoing ? 
-<                 button disabled className="bg-sky-500 text-white py-1 px-3 hover:bg-sky-600 h-12 rounded-xl text-sm sm:text-md disabled:bg-sky-300"> Add to Scheduler </button> :
+                  <AddToSchedulerForm SeriesName={anime_data.SeriesName} AB_ID={anime_data.ID} />:
                   null
                 }
-                
               </div>
             </div>
           </div>
