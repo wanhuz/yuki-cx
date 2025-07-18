@@ -13,6 +13,8 @@ type AnimeBytesItem = {
   isoDate: string;
   groupId?: string;        // custom field
   groupTitle?: string;     // custom field
+  torrentProperty?: string; // custom field
+  torrentId?: string;       // custom field
 };
 
 const parser = new Parser<{}, AnimeBytesItem>({
@@ -20,7 +22,8 @@ const parser = new Parser<{}, AnimeBytesItem>({
     item: [
       ['ab:groupId', 'groupId'],
       ['ab:groupTitle', 'groupTitle'],
-      ['ab:torrentProperty', 'torrentProperty']
+      ['ab:torrentProperty', 'torrentProperty'],
+      ['ab:torrentId', 'torrentId'],
     ]
   }
 });
@@ -28,9 +31,25 @@ const parser = new Parser<{}, AnimeBytesItem>({
 const prisma = new PrismaClient();
 const RSS_FEED_URL = 'https://animebytes.tv/feed/rss_torrents_airing_anime/';  // Do not hardcode token
 
-async function processMatchedLink(ab_id: number, downloadLink: string) {
+async function processMatchedLink(ab_id: number, downloadLink: string, torrentId: number) {
   console.log(`Matched ab_id=${ab_id}. Download link: ${downloadLink}`);
+
+  const existing = await prisma.processedTorrent.findUnique({
+    where: { torrent_id: torrentId }  // ab:torrentId from RSS
+  });
+
+  if (existing) {
+      console.log(`Torrent ${torrentId} already processed, skipping.`);
+      return;  // Already processed
+  }
+
   addTorrent(downloadLink);
+
+  await prisma.processedTorrent.create({
+      data: {
+          torrent_id: torrentId
+      }
+  });
 }
 
 async function fetchAndProcessRSS() {
@@ -39,16 +58,7 @@ async function fetchAndProcessRSS() {
   const seriesList = await prisma.animeScheduler.findMany();
   const feed = await parser.parseURL(RSS_FEED_URL);
 
-  console.log('Series to be matched:');
-  for (const series of seriesList) {
-    console.log(`  ab_id=${series.ab_id}`);
-  }
-
-  console.log(`Fetched ${feed.items.length} RSS items.`);
-
   for (const item of feed.items) {
-    console.log(item.groupId);       // This will now output ab:groupId
-    console.log(item.groupTitle);    // This will now output ab:groupTitle
 
     const groupId = parseInt(item.groupId ?? '', 10);
 
@@ -59,7 +69,9 @@ async function fetchAndProcessRSS() {
     const matchedSeries = seriesList.find(series => series.ab_id === groupId);
 
     if (matchedSeries && item.link) {
-      await processMatchedLink(matchedSeries.ab_id, item.link);
+      const torrentId = parseInt(item.torrentId || '0', 10);
+
+      await processMatchedLink(matchedSeries.ab_id, item.link, torrentId);
     }
   }
 
@@ -67,8 +79,8 @@ async function fetchAndProcessRSS() {
 }
 
 // Run every 5 minutes
-//cron.schedule('*/5 * * * *', () => {
+cron.schedule('*/5 * * * *', () => {
   fetchAndProcessRSS().catch(console.error);
-//});
+});
 
 console.log('AnimeBytes RSS watcher started.');

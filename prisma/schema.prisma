@@ -26,9 +26,14 @@ model ServiceMapping {
   studio    String?
 }
 
-
 model AnimeScheduler {
   id            Int     @id @default(autoincrement())
   ab_id         Int     @unique
   series_name   String
+}
+
+model ProcessedTorrent {
+  id          Int    @id @default(autoincrement())
+  torrent_id  Int    @unique
+  processedAt DateTime @default(now())
 }
