@@ -65,7 +65,7 @@ export default async function Page({
                 <button disabled className="bg-sky-500 text-white py-1 px-3 hover:bg-sky-600 h-12 rounded-xl text-sm sm:text-md disabled:bg-sky-300"> Add to Download </button>
                 {
                   anime_data?.Ongoing ? 
-                  <AddToSchedulerForm SeriesName={anime_data.SeriesName} AB_ID={anime_data.ID} />:
+                  <AddToSchedulerForm anime_data={anime_data} />:
                   null
                 }
               </div>

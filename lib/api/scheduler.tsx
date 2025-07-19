@@ -1,22 +1,53 @@
 "use server";
 
 import { PrismaClient } from "@prisma/client";
-import cron from "node-cron";
 
-export async function addToScheduler(formData : FormData) {
-    const ab_id = Number(formData.get('ab_id'));
-    const series_name = formData.get('series_name') as string;
+export async function addToScheduler(anime_data : Anime) {
+    const ab_id = anime_data.ID;
+    const series_name = anime_data.SeriesName;
 
     const prisma = new PrismaClient();
 
-    await prisma.animeScheduler.upsert({
-        where: { ab_id: ab_id }, 
-        update: {},              
-        create: {                
-            ab_id: ab_id,
-            series_name: series_name
-        }
-    });
+    const existingItem = await prisma.animeScheduler.findUnique({where: {ab_id: ab_id}});
+
+    if (existingItem) {
+        await prisma.animeScheduler.update({
+            where: { id: existingItem.id },
+            data: {
+                soft_deleted: false
+            }
+        });
+
+        const animeSchedulerReference = await prisma.animeSchedulerReference.updateMany({
+            where: { scheduler_id: existingItem.id },
+            data: {
+                series_name: series_name,
+                studio_name: anime_data.StudioList,
+                summary: anime_data.Description,
+                tags: anime_data.Tags.join(", "),
+                poster_url: anime_data.Image
+            }
+        });
+    }
+    else {
+        const createdItem = await prisma.animeScheduler.create({       
+            data: {
+                ab_id: ab_id,
+                series_name: series_name
+            }  
+        });
+
+        await prisma.animeSchedulerReference.create({
+            data: {
+                scheduler_id: createdItem.id,
+                series_name: series_name,
+                studio_name: anime_data.StudioList,
+                summary: anime_data.Description,
+                tags: anime_data.Tags.join(", "),
+                poster_url: anime_data.Image
+            }
+        });
+    }
 
     await prisma.$disconnect();
 }
