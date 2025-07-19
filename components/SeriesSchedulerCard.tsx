@@ -9,13 +9,15 @@ function generateSeriesLink(title : string, id : number) {
     return "/anime/" + encodeURIComponent(title) + "?id=" + id;
 }
 
-async function deleteFromSchedulerHandler(id: number) {
+async function deleteFromSchedulerHandler(id: number, triggerUpdate: () => void) {
     try {
         await deleteFromScheduler(id);
         toast.success("Successfully deleted from scheduler", {position: "bottom-right"});
     } catch (error) {
         toast.error("Failed to delete from scheduler", {position: "bottom-right"});
     }
+
+    triggerUpdate();
 }
 
 
@@ -28,7 +30,8 @@ export default function SeriesCard({
     tags,
     filter_property,
     last_fetched_episode,
-    last_fetched_at
+    last_fetched_at,
+    triggerUpdate
 }: {
     series_name: string;
     studio_name: string;
@@ -39,6 +42,7 @@ export default function SeriesCard({
     filter_property: string;
     last_fetched_episode: number;
     last_fetched_at: Date;
+    triggerUpdate: () => void;
 }) {
 
     const seriesLink = generateSeriesLink(series_name, id);
@@ -81,7 +85,7 @@ export default function SeriesCard({
                                 </span>
                             ))}
                         </div>
-                        <button onClick={() => deleteFromSchedulerHandler(id)} className="px-3 text-red-500">
+                        <button onClick={() => deleteFromSchedulerHandler(id, triggerUpdate)} className="px-3 text-red-500">
                             <svg width="22" height="22" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                                 <circle cx="50" cy="50" r="45" stroke="black" strokeWidth="5" fill="none" />
                                 <line x1="30" y1="50" x2="70" y2="50" stroke="black" strokeWidth="5" strokeLinecap="round" />

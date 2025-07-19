@@ -8,7 +8,6 @@ import { getAnimeInScheduler } from "@/lib/api/scheduler";
 
   useEffect(() => {
     const fetchAndSetCards = async () => {
-      console.log(isSearch, searchQuery);
       const result = isSearch ? await getAnimeInScheduler(searchQuery) : await getAnimeInScheduler();
 
       const cards = result.map((entry: { ab_id: number; last_fetched_episode: number; last_fetched_at: Date; filter_property: string; references: { series_name: string; studio_name: string; summary: string; tags: string; poster_url: string }[] }) => (
@@ -23,6 +22,7 @@ import { getAnimeInScheduler } from "@/lib/api/scheduler";
           filter_property={entry.filter_property}
           last_fetched_episode={entry.last_fetched_episode}
           last_fetched_at={entry.last_fetched_at}
+          triggerUpdate={fetchAndSetCards}
         />
       ));
       setListCards(cards);
