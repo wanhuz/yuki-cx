@@ -33,7 +33,7 @@ export async function addToScheduler(anime_data : Anime) {
         const createdItem = await prisma.animeScheduler.create({       
             data: {
                 ab_id: ab_id,
-                series_name: series_name
+                series_name: series_name.toLowerCase(),
             }  
         });
 
@@ -52,17 +52,18 @@ export async function addToScheduler(anime_data : Anime) {
     await prisma.$disconnect();
 }
 
-export async function getAnimeInScheduler() : Promise<any> {
+export async function getAnimeInScheduler(searchQuery: string | null = null) : Promise<any> {
     
     const prisma = new PrismaClient();
 
     const result = await prisma.animeScheduler.findMany({
         where: {
-            soft_deleted: false
+            'soft_deleted': false,
+            ...(searchQuery ? { 'series_name': { contains: searchQuery.toLocaleLowerCase() } } : {})
         },
         include: {
-            references: true,
-        },
+            references: true
+        }
     });
 
     await prisma.$disconnect();

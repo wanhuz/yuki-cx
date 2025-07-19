@@ -3,12 +3,13 @@ import SeriesSchedulerCard from "./SeriesSchedulerCard";
 import { getAnimeInScheduler } from "@/lib/api/scheduler";
 
 
- export default function Content({ contentCard, isSearch }: { contentCard: Anime[], isSearch: boolean }) {
+ export default function Content({ searchQuery, isSearch }: { searchQuery: string, isSearch: boolean }) {
   const [listCards, setListCards] = useState<JSX.Element[]>([]);
 
   useEffect(() => {
     const fetchAndSetCards = async () => {
-      const result = await getAnimeInScheduler();
+      console.log(isSearch, searchQuery);
+      const result = isSearch ? await getAnimeInScheduler(searchQuery) : await getAnimeInScheduler();
 
       const cards = result.map((entry: { ab_id: number; last_fetched_episode: number; last_fetched_at: Date; filter_property: string; references: { series_name: string; studio_name: string; summary: string; tags: string; poster_url: string }[] }) => (
         <SeriesSchedulerCard
@@ -31,7 +32,7 @@ import { getAnimeInScheduler } from "@/lib/api/scheduler";
 
     const interval = setInterval(fetchAndSetCards, 15000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isSearch, searchQuery]);
 
   return (
     <div className="container px-5 sm:px-0 sm:mx-auto flex flex-wrap flex-1 md:gap-5">
