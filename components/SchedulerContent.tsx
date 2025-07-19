@@ -1,33 +1,29 @@
 import { useEffect, useState } from "react";
 import SeriesSchedulerCard from "./SeriesSchedulerCard";
+import { getAnimeInScheduler } from "@/lib/api/scheduler";
 
 
  export default function Content({ contentCard, isSearch }: { contentCard: Anime[], isSearch: boolean }) {
   const [listCards, setListCards] = useState<JSX.Element[]>([]);
-  
 
   useEffect(() => {
-    const content = contentCard;
+    getAnimeInScheduler().then((result) => {
 
-    if (content) {
-      const cards = content.map(entry => (
+      const cards = result.map((entry: { ab_id: number; references: { series_name: string; studio_name: string; summary: string; tags: string; poster_url: string }[] }) => (
         <SeriesSchedulerCard
-          key={entry.ID}
-          title={entry.SeriesName}
-          poster={entry.Image}
-          id={entry.ID}
-          type={entry.Type}
-          year={entry.Aired}
-          isOngoing={entry.Ongoing}
-          summary={entry.Description}
+          key={entry.ab_id}
+          id={entry.ab_id}
+          series_name={entry.references[0].series_name}
+          studio_name={entry.references[0].studio_name}
+          summary={entry.references[0].summary}
+          tags={entry.references[0].tags}
+          poster={entry.references[0].poster_url}
         />
       ));
-      setListCards(cards);
-    } else {
-      setListCards([]);
-    }
 
-  }, [contentCard]);
+      setListCards(cards);
+    });
+  })
 
   return (
     <div className="container px-5 sm:px-0 sm:mx-auto flex flex-wrap flex-1 md:gap-5">

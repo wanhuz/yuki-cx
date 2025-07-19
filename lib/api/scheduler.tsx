@@ -58,7 +58,17 @@ export async function getAnimeInScheduler() : Promise<any> {
 
     const result = await prisma.animeScheduler.findMany();
 
+    const animeSchedulerReferences = await prisma.animeSchedulerReference.findMany();
+
+    const combinedResult = result.map(scheduler => {
+        const references = animeSchedulerReferences.filter(ref => ref.scheduler_id === scheduler.id);
+        return {
+            ...scheduler,
+            references
+        };
+    });
+
     await prisma.$disconnect();
     
-    return result;
+    return combinedResult;
 }
