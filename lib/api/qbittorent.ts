@@ -1,9 +1,11 @@
+"use server";
+
 import { AddTorrentOptions, QBittorrent } from '@ctrl/qbittorrent';
 
 const client = new QBittorrent({
-  baseUrl: '',
-  username: '',
-  password: '',
+  baseUrl: process.env.QB_BASEURL,
+  username: process.env.QB_USERNAME,
+  password: process.env.QB_PASSWORD,
 });
 
 async function getBase64FromTorrentURL(url : string) {

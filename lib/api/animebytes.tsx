@@ -1,7 +1,8 @@
 "use server";
+
 const ANIMEBYTES_URL = "https://animebytes.tv/scrape.php"
-const PASSKEY = "";
-const USERNAME = "";
+const PASSKEY = process.env.AB_PASSKEY;
+const USERNAME = process.env.AB_USERNAME;
 
 
 export async function search(series_name : string, type : string) {

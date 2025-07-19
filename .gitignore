@@ -38,3 +38,4 @@ resources/yuki-cx.db
 anime-list.xml
 prisma/yuki-cx.db
 prisma/yuki-cx.db-journal
+.env
