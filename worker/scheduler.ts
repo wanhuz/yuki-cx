@@ -33,8 +33,9 @@ const parser = new Parser<{}, AnimeBytesItem>({
   }
 });
 
+const AB_PASSKEY = process.env.AB_PASSKEY;
 const prisma = new PrismaClient();
-const RSS_FEED_URL = 'https://animebytes.tv/feed/rss_torrents_airing_anime/';  // Do not hardcode token
+const RSS_FEED_URL = 'https://animebytes.tv/feed/rss_torrents_airing_anime/' + AB_PASSKEY; 
 
 async function processMatchedLink(ab_id: number, downloadLink: string, torrentId: number) {
   console.log(`Matched ab_id=${ab_id}. Download link: ${downloadLink}`);
