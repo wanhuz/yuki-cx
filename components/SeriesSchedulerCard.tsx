@@ -59,7 +59,7 @@ export default function SeriesCard({
     return (
             <div className="flex flex-row rounded-md overflow-hidden shadow bg-white max-w-md hover:bg-gray-100 mx-3">
                 <Link href={seriesLink} >
-                    <div className="w-full min-w-[160px] max-w-[160px] relative rounded-md ">
+                    <div className="w-full h-full min-w-[160px] max-w-[160px] relative rounded-md ">
                         <Image
                             src={poster}
                             alt={series_name}

@@ -37,7 +37,7 @@ const AB_PASSKEY = process.env.AB_PASSKEY;
 const prisma = new PrismaClient();
 const RSS_FEED_URL = 'https://animebytes.tv/feed/rss_torrents_airing_anime/' + AB_PASSKEY; 
 
-async function processMatchedLink(ab_id: number, downloadLink: string, torrentId: number) {
+async function processMatchedLink(ab_id: number, downloadLink: string, torrentId: number, item: AnimeBytesItem) {
   console.log(`Matched ab_id=${ab_id}. Download link: ${downloadLink}`);
 
   const existing = await prisma.processedTorrent.findUnique({
@@ -57,6 +57,8 @@ async function processMatchedLink(ab_id: number, downloadLink: string, torrentId
           processedAt: new Date(Date.now())
       }
   });
+  
+  await updateSeriesScheduler(ab_id, item);
 }
 
 async function updateSeriesScheduler(ab_id: number, item: AnimeBytesItem) {
@@ -97,8 +99,7 @@ async function fetchAndProcessRSS() {
       const matchedSeriesProperty = matchedSeries.filter_property;    
 
       if (item.torrentProperty.includes(matchedSeriesProperty)) {
-          await processMatchedLink(matchedSeries.ab_id, item.link, torrentId);
-          await updateSeriesScheduler(matchedSeries.ab_id, item);
+          await processMatchedLink(matchedSeries.ab_id, item.link, torrentId, item);
       }
     }
   }
