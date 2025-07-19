@@ -2,33 +2,6 @@
 const regex = /^(?<source>.+?) \| (?<extension>.+?) \| (?:(?<aspectRatio>\d+:\d+) \| )?(?:(?<videoCodec>(?:h265|h264|XviD|DivX|MPEG-1\/2|VP9|RAW)(?: [a-zA-Z0-9\-./]+)?) \| )?(?:(?<dimensions>\d+[xX]\d+)(?: \| )?)?(?:(?<resolution>\d+[pi])(?: \| )?)?(?<audioCodec>[^\|]+?)(?: \| (?<dualAudio>Dual Audio))?(?: \| (?<subtitleType>(?:Softsubs|Hardsubs|RAW))(?: \((?<subgroup>.+?)\))?)?(?: \| Episode (?<episodeNo>\d+))?(?: \| (?<freeleechStatus>Freeleech))?$/;
 
 
-export function extractTorrent(torrentResult: { ID: number; Property: string; Seeders: number; Leechers: number; Size: number; Link: string; FileList: [{filename : string, size : number}] }[]) : Torrent[] {
-    const torrent_extracted: Torrent[] = [];
-
-
-    torrentResult.map((entry: { ID: number; Property: string; Seeders: number; Leechers: number; Size: number; Link: string; FileList: [{filename : string, size : number}]}) => {
-        torrent_extracted.push({
-            ID: entry.ID, 
-            Source: extractSource(entry.Property),
-            Group: extractGroup(entry.Property), 
-            Resolution: extractResolution(entry.Property), 
-            Codec: extractCodecs(entry.Property),
-            Extension: extractExtension(entry.Property),
-            Subtitle: extractSubtitle(entry.Property),
-            Seeders: entry.Seeders,
-            Leechers: entry.Leechers,
-            Size: formatBytes(entry.Size),
-            EpisodeNo: extractEpisodeNo(entry.Property),
-            FreeleechStatus: extractFreeleechStatus(entry.Property),
-            Link: entry.Link,
-            Property: entry.Property,
-            FileList: entry.FileList.map(item => ({filename : item.filename, size: item.size} as FileData))
-        } as Torrent);
-    });
-    
-    return torrent_extracted;
-}
-
 export function extractExtension(property : string) : string {
     const match = property.match(regex);
     
@@ -138,7 +111,7 @@ function extractAudioCodecs(property : string) {
     return "";
 }
 
-function extractEpisodeNo(property: string) {
+export function extractEpisodeNo(property: string) {
     const match = property.match(regex);
     
     if (match?.groups) {
@@ -149,7 +122,7 @@ function extractEpisodeNo(property: string) {
     return null;
 }
 
-function extractFreeleechStatus(property: string): boolean {
+export function extractFreeleechStatus(property: string): boolean {
     const match = property.match(regex);
     
     if (match?.groups) {

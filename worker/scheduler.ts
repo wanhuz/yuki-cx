@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import cron from 'node-cron';
 import Parser from 'rss-parser';
 import { addTorrent } from '../lib/api/qbittorent';
+import {extractEpisodeNo} from '../lib/util/animebytes';
 
 type AnimeBytesItem = {
   title: string;
@@ -10,20 +11,24 @@ type AnimeBytesItem = {
   guid: string;
   content: string;
   categories: string[];
+  description: string;
   isoDate: string;
   groupId?: string;        // custom field
   groupTitle?: string;     // custom field
-  torrentProperty?: string; // custom field
+  torrentProperty: string; // custom field
   torrentId?: string;       // custom field
+  poster_url?: string;      // custom field
 };
 
 const parser = new Parser<{}, AnimeBytesItem>({
   customFields: {
     item: [
+      ['description', 'description'],
       ['ab:groupId', 'groupId'],
       ['ab:groupTitle', 'groupTitle'],
       ['ab:torrentProperty', 'torrentProperty'],
       ['ab:torrentId', 'torrentId'],
+      ['ab:cover', 'poster_url']
     ]
   }
 });
@@ -47,31 +52,53 @@ async function processMatchedLink(ab_id: number, downloadLink: string, torrentId
 
   await prisma.processedTorrent.create({
       data: {
-          torrent_id: torrentId
+          torrent_id: torrentId,
+          processedAt: new Date(Date.now())
       }
   });
+}
+
+async function updateSeriesScheduler(ab_id: number, item: AnimeBytesItem) {
+  const seriesToUpdate = await prisma.animeScheduler.update({
+    where: { ab_id },
+    data: {
+      last_fetched_episode: extractEpisodeNo(item.torrentProperty) || 0,
+      last_fetched_at: new Date(Date.now())
+    }
+  });
+
+  await prisma.animeSchedulerReference.updateMany({
+    where: { scheduler_id: seriesToUpdate.id },
+    data: {
+      summary: item.description,
+      poster_url: item.poster_url
+    }
+  })
 }
 
 async function fetchAndProcessRSS() {
   console.log('Fetching RSS feed...');
 
-  const seriesList = await prisma.animeScheduler.findMany();
+  const seriesList = await prisma.animeScheduler.findMany({where: {soft_deleted: false}});
   const feed = await parser.parseURL(RSS_FEED_URL);
 
   for (const item of feed.items) {
 
     const groupId = parseInt(item.groupId ?? '', 10);
 
-    //console.log(`Processing RSS item with ab:groupId=${groupIdStr}`);
     if (!groupId) continue;
 
     // Match by ab_id
     const matchedSeries = seriesList.find(series => series.ab_id === groupId);
-
+    
     if (matchedSeries && item.link) {
       const torrentId = parseInt(item.torrentId || '0', 10);
+      const matchedSeriesProperty = matchedSeries.filter_property;    
 
-      await processMatchedLink(matchedSeries.ab_id, item.link, torrentId);
+      if (item.torrentProperty.includes(matchedSeriesProperty)) {
+          await processMatchedLink(matchedSeries.ab_id, item.link, torrentId);
+          await updateSeriesScheduler(matchedSeries.ab_id, item);
+      }
     }
   }
 

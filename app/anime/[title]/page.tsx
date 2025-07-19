@@ -6,7 +6,8 @@ import SeriesPoster from "@/components/SeriesPoster";
 import TorrentTable from "@/components/TorrentTable";
 import { getAnime } from "@/lib/api/animebytes";
 import { addToScheduler } from "@/lib/api/scheduler";
-import { extractOngoingStatus, extractTorrent } from "@/lib/util/animebytes";
+import { extractOngoingStatus} from "@/lib/util/animebytes";
+import {extractTorrent} from "@/lib/util/torrent";
 import {removeUnderscoreFromTitle, normalizeDictToArray} from "@/lib/util/util";
 
 export default async function Page({

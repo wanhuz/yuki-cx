@@ -34,21 +34,22 @@ export default function SeriesCard({
     const seriesLink = generateSeriesLink(series_name, id);
 
     return (
-        <Link href={seriesLink} >
             <div className="flex flex-row rounded-md overflow-hidden shadow bg-white max-w-md hover:bg-gray-100 mx-3">
-                <div className="w-full min-w-[160px] max-w-[160px] relative rounded-md ">
-                    <Image
-                        src={poster}
-                        alt={series_name}
-                        width={160} 
-                        height={180}
-                        className="w-full h-full object-cover rounded-md"
-                    />
-                    <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs px-2 py-3 flex flex-col justify-between">
-                        <div><b>{series_name}</b></div>
-                        <div className="font-bold text-xs text-yellow-600">{studio_name}</div>
+                <Link href={seriesLink} >
+                    <div className="w-full min-w-[160px] max-w-[160px] relative rounded-md ">
+                        <Image
+                            src={poster}
+                            alt={series_name}
+                            width={160} 
+                            height={180}
+                            className="w-full h-full object-cover rounded-md"
+                        />
+                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs px-2 py-3 flex flex-col justify-between">
+                            <div><b>{series_name}</b></div>
+                            <div className="font-bold text-xs text-yellow-600">{studio_name}</div>
+                        </div>
                     </div>
-                </div>
+                </Link>
 
                 <div className="flex flex-col gap-2 justify-between">
                     <div className="flex flex-col p-3 gap-2">
@@ -79,6 +80,5 @@ export default function SeriesCard({
                     </div>
                 </div>
             </div>
-        </Link>
     );
   }
