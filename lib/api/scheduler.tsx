@@ -56,19 +56,24 @@ export async function getAnimeInScheduler() : Promise<any> {
     
     const prisma = new PrismaClient();
 
-    const result = await prisma.animeScheduler.findMany();
-
-    const animeSchedulerReferences = await prisma.animeSchedulerReference.findMany();
-
-    const combinedResult = result.map(scheduler => {
-        const references = animeSchedulerReferences.filter(ref => ref.scheduler_id === scheduler.id);
-        return {
-            ...scheduler,
-            references
-        };
+    const result = await prisma.animeScheduler.findMany({
+        where: {
+            soft_deleted: false
+        },
+        include: {
+            references: true,
+        },
     });
 
     await prisma.$disconnect();
     
-    return combinedResult;
+    return result;
+}
+
+export async function deleteFromScheduler(id : number) {
+    const prisma = new PrismaClient();
+    
+    await prisma.animeScheduler.update({where: {ab_id: id}, data: {soft_deleted: true}});
+    
+    await prisma.$disconnect();
 }
