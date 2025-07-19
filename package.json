@@ -2,10 +2,13 @@
   "name": "anime-ui",
   "private": true,
   "scripts": {
-    "--": "npx prisma migrate --name init && npx tsx scripts/services_mapping.ts",
+    "setup": "npx prisma migrate && npx tsx scripts/services_mapping.ts",
     "dev": "next dev",
     "build": "next build",
+    "build:worker" : "tsc --project tsconfig.worker.json",
     "start": "next start",
+    "start:worker" : "node dist/worker/scheduler.js",
+    "start:prod": "node entrypoint.js",
     "lint": "next lint",
     "test": "jest"
   },
