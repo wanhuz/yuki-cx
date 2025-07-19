@@ -3,9 +3,19 @@
 import { deleteFromScheduler } from "@/lib/api/scheduler";
 import Image from "next/image";
 import Link from "next/link";
+import { toast } from "react-toastify";
 
 function generateSeriesLink(title : string, id : number) {
     return "/anime/" + encodeURIComponent(title) + "?id=" + id;
+}
+
+async function deleteFromSchedulerHandler(id: number) {
+    try {
+        await deleteFromScheduler(id);
+        toast.success("Successfully deleted from scheduler", {position: "bottom-right"});
+    } catch (error) {
+        toast.error("Failed to delete from scheduler", {position: "bottom-right"});
+    }
 }
 
 
@@ -71,7 +81,7 @@ export default function SeriesCard({
                                 </span>
                             ))}
                         </div>
-                        <button onClick={() => deleteFromScheduler(id)} className="px-3 text-red-500">
+                        <button onClick={() => deleteFromSchedulerHandler(id)} className="px-3 text-red-500">
                             <svg width="22" height="22" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                                 <circle cx="50" cy="50" r="45" stroke="black" strokeWidth="5" fill="none" />
                                 <line x1="30" y1="50" x2="70" y2="50" stroke="black" strokeWidth="5" strokeLinecap="round" />

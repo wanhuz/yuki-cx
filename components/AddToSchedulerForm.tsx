@@ -14,9 +14,9 @@ export function AddToSchedulerForm({ anime_data }: { anime_data: Anime}) {
         const formData = new FormData(event.currentTarget);
         try {
             await addToScheduler(anime_data);
-            toast.success(`Added ${anime_data.SeriesName} to scheduler`);
+            toast.success(`Added ${anime_data.SeriesName} to scheduler`, {position: "bottom-right"});
         } catch (error) {
-            toast.error(`Failed to add ${anime_data.SeriesName} to scheduler`);
+            toast.error(`Failed to add ${anime_data.SeriesName} to scheduler`, {position: "bottom-right"});
         }
     };
 
