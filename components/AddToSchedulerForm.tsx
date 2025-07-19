@@ -1,7 +1,6 @@
 // AddToSchedulerForm.tsx (Client Component)
 'use client';
 
-import { useFormStatus } from 'react-dom';
 import { addToScheduler } from '@/lib/api/scheduler';
 import { toast } from 'react-toastify';
 
@@ -10,7 +9,6 @@ export function AddToSchedulerForm({ anime_data }: { anime_data: Anime}) {
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        const formData = new FormData(event.currentTarget);
         try {
             await addToScheduler(anime_data);
             toast.success(`Added ${anime_data.SeriesName} to scheduler`, {position: "bottom-right"});

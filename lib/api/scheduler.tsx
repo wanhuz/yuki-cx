@@ -1,6 +1,6 @@
 "use server";
 
-import { PrismaClient } from "@prisma/client";
+import { AnimeScheduler, AnimeSchedulerReference, PrismaClient } from "@prisma/client";
 
 
 function getFirstStudioOnly(studioList : string) : string {
@@ -58,7 +58,7 @@ export async function addToScheduler(anime_data : Anime) {
     await prisma.$disconnect();
 }
 
-export async function getAnimeInScheduler(searchQuery: string | null = null) : Promise<any> {
+export async function getAnimeInScheduler(searchQuery: string | null = null) :Promise<(AnimeScheduler & { references: AnimeSchedulerReference[] })[]> {
     
     const prisma = new PrismaClient();
 
