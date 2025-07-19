@@ -9,6 +9,15 @@ function generateSeriesLink(title : string, id : number) {
     return "/anime/" + encodeURIComponent(title) + "?id=" + id;
 }
 
+function hashToColor(input: string) {
+    let hash = 0;
+    for (let i = 0; i < input.length; i++) {
+        hash = input.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const color = `hsl(${hash % 360}, 60%, 70%)`;
+    return color;
+}
+
 async function deleteFromSchedulerHandler(id: number, triggerUpdate: () => void) {
     try {
         await deleteFromScheduler(id);
@@ -58,9 +67,9 @@ export default function SeriesCard({
                             height={180}
                             className="w-full h-full object-cover rounded-md"
                         />
-                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs px-2 py-3 flex flex-col justify-between">
-                            <div><b>{series_name}</b></div>
-                            <div className="font-bold text-xs text-yellow-600">{studio_name}</div>
+                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs px-2 py-1 flex flex-col justify-between">
+                            <div className="text-xs my-1"><b>{series_name}</b></div>
+                            <div className="font-bold text-xs text-red-300 my-1">{studio_name}</div>
                         </div>
                     </div>
                 </Link>
@@ -80,7 +89,7 @@ export default function SeriesCard({
                     <div className="flex flex-row gap-2 mt-2 bg-gray-50 rounded w-full py-2 justify-between">
                         <div className="px-3 flex flex-row gap-2">
                             {tags.split(",").slice(0,2).map((tag, index) => (
-                                <span key={index} className={`px-2 py-1 rounded text-xs bg-rose-500 text-white`}>
+                                <span key={index} style={{ backgroundColor: hashToColor(poster) }} className={`px-2 py-1 rounded text-xs bg-rose-500 text-white`}>
                                     {tag}
                                 </span>
                             ))}
