@@ -1,4 +1,4 @@
-const { spawn } = require('child_process');
+import {spawn} from 'child_process';
 
 function startProcess(command, args, name) {
   const process = spawn(command, args, { stdio: 'inherit', shell: true });

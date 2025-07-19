@@ -1,5 +1,6 @@
 {
   "name": "anime-ui",
+  "type": "module",
   "private": true,
   "scripts": {
     "setup": "npx prisma migrate && npx tsx scripts/services_mapping.ts",

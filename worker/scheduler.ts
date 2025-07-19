@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import cron from 'node-cron';
 import Parser from 'rss-parser';
-import { addTorrent } from '../lib/api/qbittorent';
-import {extractEpisodeNo} from '../lib/util/animebytes';
+import { addTorrent } from '../lib/api/qbittorent.js';
+import {extractEpisodeNo} from '../lib/util/animebytes.js';
 
 type AnimeBytesItem = {
   title: string;
