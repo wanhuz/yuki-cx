@@ -7,7 +7,6 @@ import { toast } from 'react-toastify';
 
 export function AddToSchedulerForm({ anime_data }: { anime_data: Anime}) {
 
-
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 

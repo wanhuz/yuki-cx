@@ -2,6 +2,14 @@
 
 import { PrismaClient } from "@prisma/client";
 
+
+function getFirstStudioOnly(studioList : string) : string {
+    const cleanedStudioList = studioList ? studioList.split("///") : null;
+
+    return cleanedStudioList ? cleanedStudioList[0] : "";
+}
+
+
 export async function addToScheduler(anime_data : Anime) {
     const ab_id = anime_data.ID;
     const series_name = anime_data.SeriesName;
@@ -18,11 +26,9 @@ export async function addToScheduler(anime_data : Anime) {
             }
         });
 
-        const animeSchedulerReference = await prisma.animeSchedulerReference.updateMany({
+        await prisma.animeSchedulerReference.updateMany({
             where: { scheduler_id: existingItem.id },
             data: {
-                series_name: series_name,
-                studio_name: anime_data.StudioList,
                 summary: anime_data.Description,
                 tags: anime_data.Tags.join(", "),
                 poster_url: anime_data.Image
@@ -41,7 +47,7 @@ export async function addToScheduler(anime_data : Anime) {
             data: {
                 scheduler_id: createdItem.id,
                 series_name: series_name,
-                studio_name: anime_data.StudioList,
+                studio_name: getFirstStudioOnly(anime_data.StudioList),
                 summary: anime_data.Description,
                 tags: anime_data.Tags.join(", "),
                 poster_url: anime_data.Image
