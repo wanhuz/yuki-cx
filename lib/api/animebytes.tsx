@@ -18,6 +18,11 @@ export async function search(series_name : string, type : string) {
     return search_result_groups;
 }
 
+/*
+    This is pretty hackish way of getting anime metadata from AB to display anime page, as AB API didn't provide direct way to do it.
+    Works by first searching title and then matching the ID from the search result link
+    As a result, link to the page need to have title and ID
+*/
 export async function getAnime(anime_title: string, id : number) {
     const search_query = generateSearchQuery(anime_title, "", 10);
 
