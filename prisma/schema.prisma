@@ -31,6 +31,8 @@ model AnimeScheduler {
   ab_id                   Int     @unique
   series_name             String
   filter_property         String  @default("720p")
+  last_fetched_episode    Int     @default(0)
+  last_fetched_at         DateTime @default(now())
   soft_deleted            Boolean    @default(false)
   references              AnimeSchedulerReference[]
 }

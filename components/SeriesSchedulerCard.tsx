@@ -5,31 +5,6 @@ function generateSeriesLink(title : string, id : number) {
     return "/anime/" + encodeURIComponent(title) + "?id=" + id;
 }
 
-function generateTagLabel(type : string) {
-    let style = "inline-block px-2 text-xxs  text-white  rounded-full "
-    
-    switch(type) {
-        case "TV Series":
-            style += "bg-blue-500";
-            break;
-        case "Movie":
-            style += "bg-green-500";
-            break;
-        case "TV Special":
-            style += "bg-purple-500";
-            break;
-        case "OVA":
-            style += "bg-orange-500";
-            break;
-        case "Airing":
-            style += "bg-pink-500";
-            break;
-        default:
-            style += "bg-gray-500";
-    }
-
-    return (<span className={style}>{type}</span>);
-}
 
 export default function SeriesCard({
     series_name,
@@ -38,6 +13,9 @@ export default function SeriesCard({
     id,
     summary,
     tags,
+    filter_property,
+    last_fetched_episode,
+    last_fetched_at
 }: {
     series_name: string;
     studio_name: string;
@@ -45,7 +23,11 @@ export default function SeriesCard({
     id: number;
     summary: string;
     tags: string;
+    filter_property: string;
+    last_fetched_episode: number;
+    last_fetched_at: Date;
 }) {
+
     const seriesLink = generateSeriesLink(series_name, id);
 
     return (
@@ -67,21 +49,23 @@ export default function SeriesCard({
 
         <div className="flex flex-col gap-2 justify-between">
             <div className="flex flex-col p-3 gap-2">
-                <div className="text-sm font-bold">Episode 6</div>
+                <div className="text-sm font-bold">Episode {last_fetched_episode}</div>
                 <div className="text-xs text-gray-500">
-                    Fetched on 12/12/2022
+                    Fetched on {last_fetched_at.toLocaleString()}
                 </div>
                 <div className="text-xs text-gray-500">
-                    720p - 30fps
+                    {filter_property}
                 </div>
                 <p className="text-xs text-gray-700 line-clamp-4">{summary}</p>
             </div>
             
             <div className="flex flex-row gap-2 mt-2 bg-gray-50 rounded w-full py-2 justify-between">
-                <div className="px-3">
-                    <span className="px-2 py-1 bg-rose-100 rounded text-xs">
-                    Comedy
-                    </span>
+                <div className="px-3 flex flex-row gap-2">
+                    {tags.split(",").slice(0,2).map((tag, index) => (
+                        <span key={index} className={`px-2 py-1 rounded text-xs bg-rose-500 text-white`}>
+                            {tag}
+                        </span>
+                    ))}
                 </div>
                 <button className="px-3 text-red-500">
                     <svg width="22" height="22" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
