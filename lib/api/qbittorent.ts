@@ -30,8 +30,10 @@ async function getBase64FromTorrentURL(url : string) {
 
 export async function addTorrent(url : string) {
     const base64Torrent = await getBase64FromTorrentURL(url)
+    const pausedOpt = process.env.DEV_MODE === "true" ? "true" : "false"
+
     const torrentOption: Partial<AddTorrentOptions> = {
-      paused: "true",
+      paused: pausedOpt,
       category: "Anime"
     }
 
