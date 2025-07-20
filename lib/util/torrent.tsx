@@ -25,3 +25,29 @@ export function extractTorrent(torrentResult: { ID: number; Property: string; Se
     
     return torrent_extracted;
 }
+
+export function extractTorrentFilter(torrentResult : Torrent[]) {
+    const distinct_quality: string[] = [];
+    const distinct_extension: string[] = [];
+    const distinct_group: string[] = [];
+
+    torrentResult.map((entry: Torrent) => {
+        if (!distinct_group.includes(entry.Group)) {
+            distinct_group.push(entry.Group)
+        }
+        if (!distinct_extension.includes(entry.Extension)) {
+            distinct_extension.push(entry.Extension)
+        }
+        if (!distinct_quality.includes(entry.Resolution)) {
+            distinct_quality.push(entry.Resolution)
+        }
+    });
+    
+    const filters: Filters = {
+        quality: distinct_quality,
+        subgroup: distinct_group,
+        extension: distinct_extension
+    }
+
+    return filters;
+}

@@ -6,15 +6,16 @@
     "setup": "npx prisma migrate && npx tsx scripts/services_mapping.ts",
     "dev": "next dev",
     "build": "next build",
-    "build:worker" : "tsc --project tsconfig.worker.json",
+    "build:worker": "tsc --project tsconfig.worker.json",
     "start": "next start",
-    "start:worker" : "node dist/worker/scheduler.js",
+    "start:worker": "node dist/worker/scheduler.js",
     "start:prod": "node entrypoint.js",
     "lint": "next lint",
     "test": "jest"
   },
   "dependencies": {
     "@ctrl/qbittorrent": "^9.1.0",
+    "@headlessui/react": "^2.2.4",
     "@prisma/client": "^5.22.0",
     "better-sqlite3": "^11.5.0",
     "dotenv": "^16.4.5",
@@ -48,7 +49,7 @@
     "tsx": "^4.19.2",
     "typescript": "^5.6.3"
   },
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).",
   "main": "index.js",
   "directories": {
