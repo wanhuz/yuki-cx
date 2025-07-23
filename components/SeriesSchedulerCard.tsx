@@ -86,7 +86,7 @@ export default function SeriesCard({
 
                         <div className="text-xs text-gray-500 flex flex-wrap gap-1 mt-1 mb-2">
                             {filters
-                                .sort((a, b) => (a.mode === "ACCEPT" ? -1 : 1))
+                                .sort((a) => (a.mode === "ACCEPT" ? -1 : 1))
                                 .map((filter, index) => (
                                     <span
                                         key={index}

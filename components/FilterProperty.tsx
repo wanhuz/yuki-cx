@@ -1,6 +1,6 @@
 'use client';
 
-import { useState} from 'react';
+import { useEffect, useState} from 'react';
 import { PopoverPanel } from '@headlessui/react';
 import { RawFilters } from '@/lib/interface/rawfilter';
 
@@ -29,6 +29,10 @@ const FilterProperty: React.FC<FilterPropertyProps> = ({
     };
   });
 
+  useEffect(() => {
+    onFiltersChange?.(filters);
+  }, [filters, onFiltersChange]);
+
   const toggleFilter = (category: FilterCategory, item: string) => {
     setFilters(prev => {
       const current = prev[category]?.[item] ?? 'neutral';
@@ -47,7 +51,6 @@ const FilterProperty: React.FC<FilterPropertyProps> = ({
         [category]: updatedCategory,
       };
 
-      onFiltersChange?.(newFilters);
       return newFilters;
     });
   };
