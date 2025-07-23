@@ -22,16 +22,19 @@ export function AddToSchedulerComponent({ anime_data }: { anime_data: Anime }) {
                         filters={filters}
                     /> : null
                 }
+                {
+                    anime_data?.Ongoing ? 
+                    <Popover className="relative">
+                        <PopoverButton className="ms-1 mt-1 bg-white text-gray-500 border border-gray-300 rounded-full p-2 hover:bg-gray-100 transition focus:outline-none">
+                            ⚙️
+                        </PopoverButton>
+                            <FilterProperty
+                                filters={seriesFilter}
+                                onFiltersChange={setFilters}
+                            />
+                    </Popover> : null
+                }
 
-                <Popover className="relative">
-                    <PopoverButton className="bg-gray-200 p-2 rounded-full hover:bg-gray-300">
-                        ⚙️
-                    </PopoverButton>
-                        <FilterProperty
-                            filters={seriesFilter}
-                            onFiltersChange={setFilters}
-                        />
-                </Popover>
               </div>
 
 
