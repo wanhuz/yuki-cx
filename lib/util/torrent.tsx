@@ -33,14 +33,14 @@ export function extractTorrentFilter(torrentResult : Torrent[]) {
     const distinct_group: string[] = [];
 
     torrentResult.map((entry: Torrent) => {
-        if (!distinct_group.includes(entry.Group)) {
-            distinct_group.push(entry.Group)
+        if (entry.Group.trim() && !distinct_group.includes(entry.Group)) {
+            distinct_group.push(entry.Group);
         }
-        if (!distinct_extension.includes(entry.Extension)) {
-            distinct_extension.push(entry.Extension)
+        if (entry.Extension.trim() && !distinct_extension.includes(entry.Extension)) {
+            distinct_extension.push(entry.Extension);
         }
-        if (!distinct_quality.includes(entry.Resolution)) {
-            distinct_quality.push(entry.Resolution)
+        if (entry.Resolution.trim() && !distinct_quality.includes(entry.Resolution)) {
+            distinct_quality.push(entry.Resolution);
         }
     });
     
