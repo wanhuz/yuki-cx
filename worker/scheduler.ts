@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import cron from 'node-cron';
 import Parser from 'rss-parser';
 import { addTorrent } from '../lib/api/qbittorent.js';
-import {extractEpisodeNo} from '../lib/util/animebytes.js';
+import {extractEpisodeNo, validateSeriesFilter} from '../lib/util/animebytes.js';
 
 type AnimeBytesItem = {
   title: string;
@@ -34,20 +34,12 @@ const parser = new Parser<{}, AnimeBytesItem>({
 });
 
 const AB_PASSKEY = process.env.AB_PASSKEY;
+const DEV_MODE = process.env.DEV_MODE === "true" ? true : false;
 const prisma = new PrismaClient();
 const RSS_FEED_URL = 'https://animebytes.tv/feed/rss_torrents_airing_anime/' + AB_PASSKEY; 
 
 async function processMatchedLink(ab_id: number, downloadLink: string, torrentId: number, item: AnimeBytesItem) {
   console.log(`Matched ab_id=${ab_id}. Download link: ${downloadLink}`);
-
-  const existing = await prisma.processedTorrent.findUnique({
-    where: { torrent_id: torrentId }  // ab:torrentId from RSS
-  });
-
-  if (existing) {
-      console.log(`Torrent ${torrentId} already processed, skipping.`);
-      return;  // Already processed
-  }
 
   addTorrent(downloadLink);
 
@@ -96,15 +88,25 @@ async function fetchAndProcessRSS() {
     
     if (matchedSeries && item.link) {
       const torrentId = parseInt(item.torrentId || '0', 10);
-      const matchedSeriesProperty = matchedSeries.filter_property;    
+      const seriesFilter = await prisma.animeSchedulerFilter.findMany({where: {scheduler_id: matchedSeries.id}});
+      
+      const isMatchingFilter = validateSeriesFilter(seriesFilter, item.torrentProperty);
+      const isTorrentProcessed = await prisma.processedTorrent.findUnique({where: {torrent_id: torrentId}});
 
-      if (item.torrentProperty.includes(matchedSeriesProperty)) {
+      if (isMatchingFilter && !isTorrentProcessed) {
           await processMatchedLink(matchedSeries.ab_id, item.link, torrentId, item);
       }
     }
   }
 
   console.log('RSS processing completed.');
+}
+
+if (DEV_MODE) {
+  fetchAndProcessRSS().catch(console.error);
+  
+  console.log('AnimeBytes RSS watcher exited in Dev Mode.');
+  process.exit(0);
 }
 
 // Run every 5 minutes
