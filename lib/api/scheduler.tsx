@@ -1,6 +1,6 @@
 "use server";
 
-import { AnimeScheduler, AnimeSchedulerReference, PrismaClient } from "@prisma/client";
+import { AnimeScheduler, AnimeSchedulerFilter, AnimeSchedulerReference, PrismaClient } from "@prisma/client";
 import {getFirstStudioOnly} from "../util/animebytes";
 
 
@@ -89,7 +89,12 @@ export async function addToScheduler(anime_data: Anime, filters: Filters) {
     await prisma.$disconnect();
 }
 
-export async function getAnimeInScheduler(searchQuery: string | null = null) :Promise<(AnimeScheduler & { references: AnimeSchedulerReference[] })[]> {
+export async function getAnimeInScheduler(searchQuery: string | null = null) : 
+    Promise<(AnimeScheduler & 
+    { 
+        references: AnimeSchedulerReference[]; 
+        filter: AnimeSchedulerFilter[] 
+    } )[]> {
     
     const prisma = new PrismaClient();
 
@@ -99,7 +104,8 @@ export async function getAnimeInScheduler(searchQuery: string | null = null) :Pr
             ...(searchQuery ? { 'series_name': { contains: searchQuery.toLocaleLowerCase() } } : {})
         },
         include: {
-            references: true
+            references: true,
+            filter: true
         }
     });
 

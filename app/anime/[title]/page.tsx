@@ -66,12 +66,12 @@ export default async function Page({
           </div>
 
 
-          <div className="flex flex-col sm:w-full lg:flex-row  lg:gap-4 sm:gap-2">
+          <div className="flex flex-col sm:w-full lg:flex-row lg:gap-4 sm:gap-2">
             <div className="mt-8 sm:min-w-full lg:min-w-[230px]">
               {<SeriesMetadata series={anime_data}/>}
             </div>
 
-            <div className="flex flex-col w-full ">
+            <div className="flex flex-col w-full ms-0 lg:ms-5 ">
                 {<SeriesDescription description={anime_data? anime_data.Description : ""}/>}
                 {<TorrentTable torrent_data={anime_data? anime_data.Torrents : []} isOngoing={anime_data? anime_data.Ongoing : false}/>}
             </div>
