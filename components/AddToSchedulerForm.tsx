@@ -3,13 +3,13 @@
 import { toast } from 'react-toastify';
 import { addToScheduler } from '@/lib/api/scheduler';
 
-export function AddToSchedulerForm({ anime_data }: { anime_data: Anime }) {
+export function AddToSchedulerForm({ anime_data, filters }: { anime_data: Anime, filters: Filters }) {
     
-
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
-            await addToScheduler(anime_data);
+            const result = await addToScheduler(anime_data, filters);
+            console.log(result);
             toast.success(`Added ${anime_data.SeriesName} to scheduler`, { position: "bottom-right" });
         } catch (error) {
             toast.error(`Failed to add ${anime_data.SeriesName} to scheduler`, { position: "bottom-right" });

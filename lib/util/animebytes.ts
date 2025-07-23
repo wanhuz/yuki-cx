@@ -137,3 +137,8 @@ export function generateABTorrentLink(id : number) : string {
     return "https://animebytes.tv/torrents.php?id=" + id.toString();
 }
 
+export function getFirstStudioOnly(studioList : string) : string {
+    const cleanedStudioList = studioList ? studioList.split("///") : null;
+
+    return cleanedStudioList ? cleanedStudioList[0] : "";
+}

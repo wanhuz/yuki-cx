@@ -1,66 +1,50 @@
 'use client';
 
-import { Popover } from '@headlessui/react';
-import { useState, useEffect } from 'react';
-
-type FilterState = 'neutral' | 'include' | 'exclude';
-
-interface Filters {
-  [category: string]: {
-    [item: string]: FilterState;
-  };
-}
+import { useState} from 'react';
+import { PopoverPanel } from '@headlessui/react';
+import { RawFilters } from '@/lib/interface/rawfilter';
 
 interface FilterPropertyProps {
-  quality?: string[];
-  subgroup?: string[];
-  extension?: string[];
+  filters?: RawFilters;
   onFiltersChange?: (filters: Filters) => void;
 }
 
 const FilterProperty: React.FC<FilterPropertyProps> = ({
-  quality = [],
-  subgroup = [],
-  extension = [],
+  filters: { quality = [], subgroup = [], extension = [] } = {},
   onFiltersChange
 }) => {
-  const [filters, setFilters] = useState<Filters>({});
+  const [filters, setFilters] = useState<Filters>(() => {
+    const init = (items: string[]) => {
+      const obj: FilterState = {};
+      items.forEach(item => {
+        obj[item] = 'neutral';
+      });
+      return obj;
+    };
 
-  useEffect(() => {
-    const initialFilters: Filters = {};
-    if (quality.length > 0) {
-      initialFilters.quality = {};
-      quality.forEach(item => {
-        initialFilters.quality[item] = 'neutral';
-      });
-    }
-    if (subgroup.length > 0) {
-      initialFilters.subgroup = {};
-      subgroup.forEach(item => {
-        initialFilters.subgroup[item] = 'neutral';
-      });
-    }
-    if (extension.length > 0) {
-      initialFilters.extension = {};
-      extension.forEach(item => {
-        initialFilters.extension[item] = 'neutral';
-      });
-    }
-    setFilters(initialFilters);
-  }, [quality, subgroup, extension]);
+    return {
+      quality: quality.length ? init(quality) : undefined,
+      subgroup: subgroup.length ? init(subgroup) : undefined,
+      extension: extension.length ? init(extension) : undefined,
+    };
+  });
 
-  const toggleFilter = (category: string, item: string): void => {
+  const toggleFilter = (category: FilterCategory, item: string) => {
     setFilters(prev => {
-      const current = prev[category]?.[item] || 'neutral';
-      const next: FilterState =
-        current === 'neutral' ? 'include' : current === 'include' ? 'exclude' : 'neutral';
+      const current = prev[category]?.[item] ?? 'neutral';
+      const next: FilterValue =
+        current === 'neutral' ? 'include' :
+        current === 'include' ? 'exclude' :
+        'neutral';
 
-      const newFilters = {
+      const updatedCategory: FilterState = {
+        ...prev[category],
+        [item]: next,
+      };
+
+      const newFilters: Filters = {
         ...prev,
-        [category]: {
-          ...prev[category],
-          [item]: next
-        }
+        [category]: updatedCategory,
       };
 
       onFiltersChange?.(newFilters);
@@ -68,7 +52,7 @@ const FilterProperty: React.FC<FilterPropertyProps> = ({
     });
   };
 
-  const getButtonStyle = (state: FilterState): string => {
+  const getButtonStyle = (state: FilterValue): string => {
     switch (state) {
       case 'include':
         return 'bg-green-200 border-green-400 text-green-800';
@@ -79,70 +63,32 @@ const FilterProperty: React.FC<FilterPropertyProps> = ({
     }
   };
 
+  const renderGroup = (title: string, items: string[], category: FilterCategory) => (
+    <div className="mb-4">
+      <h3 className="text-xs font-medium mb-2 text-gray-600">{title}</h3>
+      <div className="flex flex-wrap gap-2">
+        {items.map(item => (
+          <button
+            key={item}
+            onClick={() => toggleFilter(category, item)}
+            className={`px-3 py-1 rounded-full border text-xs font-medium transition-all ${getButtonStyle(
+              filters[category]?.[item] ?? 'neutral'
+            )}`}
+          >
+            {item}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
-        <>
-
-      <Popover.Panel className="absolute z-50 mt-2 left-1/2 transform -translate-x-1/2 w-72 bg-white rounded-lg shadow-lg p-4 border border-gray-200">
-        <h2 className="text-sm font-semibold mb-5">Filter Settings</h2>
-
-        {quality.length > 0 && (
-          <div className="mb-4">
-            <h3 className="text-xs font-medium mb-2 text-gray-600">Quality</h3>
-            <div className="flex flex-wrap gap-2">
-              {quality.map(item => (
-                <button
-                  key={item}
-                  onClick={() => toggleFilter('quality', item)}
-                  className={`px-3 py-1 rounded-full border text-xs font-medium transition-all ${getButtonStyle(
-                    filters.quality?.[item] || 'neutral'
-                  )}`}
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {subgroup.length > 0 && (
-          <div className="mb-4">
-            <h3 className="text-xs font-medium mb-2 text-gray-600">Subgroup</h3>
-            <div className="flex flex-wrap gap-2">
-              {subgroup.map(item => (
-                <button
-                  key={item}
-                  onClick={() => toggleFilter('subgroup', item)}
-                  className={`px-3 py-1 rounded-full border text-xs font-medium transition-all ${getButtonStyle(
-                    filters.subgroup?.[item] || 'neutral'
-                  )}`}
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {extension.length > 0 && (
-          <div className="mb-4">
-            <h3 className="text-xs font-medium mb-2 text-gray-600">Extension</h3>
-            <div className="flex flex-wrap gap-2">
-              {extension.map(item => (
-                <button
-                  key={item}
-                  onClick={() => toggleFilter('extension', item)}
-                  className={`px-3 py-1 rounded-full border text-xs font-medium transition-all ${getButtonStyle(
-                    filters.extension?.[item] || 'neutral'
-                  )}`}
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-      </Popover.Panel>
-    </>
+    <PopoverPanel className="absolute z-50 mt-2 left-1/2 transform -translate-x-1/2 w-72 bg-white rounded-lg shadow-lg p-4 border border-gray-200">
+      <h2 className="text-sm font-semibold mb-5">Filter Settings</h2>
+      {quality.length > 0 && renderGroup('Quality', quality, 'quality')}
+      {subgroup.length > 0 && renderGroup('Subgroup', subgroup, 'subgroup')}
+      {extension.length > 0 && renderGroup('Extension', extension, 'extension')}
+    </PopoverPanel>
   );
 };
 

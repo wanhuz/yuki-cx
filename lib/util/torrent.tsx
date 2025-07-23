@@ -1,4 +1,5 @@
 import {formatBytes, extractSource, extractGroup, extractResolution, extractCodecs, extractExtension, extractSubtitle, extractEpisodeNo, extractFreeleechStatus} from "@/lib/util/animebytes";
+import { RawFilters } from "../interface/rawfilter";
 
 export function extractTorrent(torrentResult: { ID: number; Property: string; Seeders: number; Leechers: number; Size: number; Link: string; FileList: [{filename : string, size : number}] }[]) : Torrent[] {
     const torrent_extracted: Torrent[] = [];
@@ -43,7 +44,7 @@ export function extractTorrentFilter(torrentResult : Torrent[]) {
         }
     });
     
-    const filters: Filters = {
+    const filters: RawFilters = {
         quality: distinct_quality,
         subgroup: distinct_group,
         extension: distinct_extension

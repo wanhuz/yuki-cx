@@ -3,12 +3,12 @@
 import { useState } from "react";
 import {AddToSchedulerForm} from "./AddToSchedulerForm";
 import FilterProperty from "./FilterProperty";
-import { Popover } from "@headlessui/react";
+import { Popover, PopoverButton } from "@headlessui/react";
 import { extractTorrentFilter } from "@/lib/util/torrent";
 
 
 export function AddToSchedulerComponent({ anime_data }: { anime_data: Anime }) {
-    const [filters, setFilters] = useState<Filters>({ quality: [], subgroup: [], extension: [] });
+    const [filters, setFilters] = useState<Filters>({  });
     const seriesFilter = extractTorrentFilter(anime_data.Torrents);
 
     return (
@@ -19,18 +19,17 @@ export function AddToSchedulerComponent({ anime_data }: { anime_data: Anime }) {
                   anime_data?.Ongoing ? 
                     <AddToSchedulerForm
                         anime_data={anime_data}
+                        filters={filters}
                     /> : null
                 }
 
                 <Popover className="relative">
-                    <Popover.Button className="bg-gray-200 p-2 rounded-full hover:bg-gray-300">
+                    <PopoverButton className="bg-gray-200 p-2 rounded-full hover:bg-gray-300">
                         ⚙️
-                    </Popover.Button>
+                    </PopoverButton>
                         <FilterProperty
-                            subgroup={seriesFilter.subgroup}
-                            quality={seriesFilter.quality}
-                            extension={seriesFilter.extension}
-                            onFiltersChange={(filters) => console.log(filters)}
+                            filters={seriesFilter}
+                            onFiltersChange={setFilters}
                         />
                 </Popover>
               </div>
