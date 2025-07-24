@@ -1,3 +1,4 @@
+import jsdom from "jsdom";
 
 const regex = /^(?<source>.+?) \| (?<extension>.+?) \| (?:(?<aspectRatio>\d+:\d+) \| )?(?:(?<videoCodec>(?:h265|h264|XviD|DivX|MPEG-1\/2|VP9|RAW)(?: [a-zA-Z0-9\-./]+)?) \| )?(?:(?<dimensions>\d+[xX]\d+)(?: \| )?)?(?:(?<resolution>\d+[pi])(?: \| )?)?(?<audioCodec>[^\|]+?)(?: \| (?<dualAudio>Dual Audio))?(?: \| (?<subtitleType>(?:Softsubs|Hardsubs|RAW))(?: \((?<subgroup>.+?)\))?)?(?: \| Episode (?<episodeNo>\d+))?(?: \| (?<freeleechStatus>Freeleech))?$/;
 
@@ -185,3 +186,10 @@ export function validateSeriesFilter(
 
   return true; // Passed all filters
 }
+
+export function stripHTML(html : string) : string{
+    const { JSDOM } = jsdom;
+
+    const dom = new JSDOM(html);
+    return dom.window.document.body.textContent || "";
+ }
