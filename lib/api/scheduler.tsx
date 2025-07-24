@@ -1,7 +1,7 @@
 "use server";
 
 import { AnimeScheduler, AnimeSchedulerFilter, AnimeSchedulerReference, PrismaClient } from "@prisma/client";
-import {getFirstStudioOnly} from "../util/animebytes";
+import {getFirstStudioOnly, stripHTML} from "../util/animebytes";
 
 
 export async function addToScheduler(anime_data: Anime, filters: Filters) {
@@ -24,7 +24,7 @@ export async function addToScheduler(anime_data: Anime, filters: Filters) {
         await prisma.animeSchedulerReference.updateMany({
             where: { scheduler_id: existingItem.id },
             data: {
-                summary: anime_data.Description,
+                summary: stripHTML(anime_data.Description),
                 tags: anime_data.Tags.join(", "),
                 poster_url: anime_data.Image
             }

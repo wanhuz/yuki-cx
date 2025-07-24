@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import cron from 'node-cron';
 import Parser from 'rss-parser';
 import { addTorrent } from '../lib/api/qbittorent.js';
-import {extractEpisodeNo, validateSeriesFilter} from '../lib/util/animebytes.js';
+import {extractEpisodeNo, validateSeriesFilter, stripHTML} from '../lib/util/animebytes.js';
 
 type AnimeBytesItem = {
   title: string;
@@ -65,7 +65,7 @@ async function updateSeriesScheduler(ab_id: number, item: AnimeBytesItem) {
   await prisma.animeSchedulerReference.updateMany({
     where: { scheduler_id: seriesToUpdate.id },
     data: {
-      summary: item.description,
+      summary: stripHTML(item.description),
       poster_url: item.poster_url
     }
   })
@@ -104,7 +104,7 @@ async function fetchAndProcessRSS() {
 
 if (DEV_MODE) {
   fetchAndProcessRSS().catch(console.error);
-  
+
   console.log('AnimeBytes RSS watcher exited in Dev Mode.');
   process.exit(0);
 }
