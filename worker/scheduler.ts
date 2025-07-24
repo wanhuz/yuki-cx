@@ -3,6 +3,7 @@ import cron from 'node-cron';
 import Parser from 'rss-parser';
 import { addTorrent } from '../lib/api/qbittorent.js';
 import {extractEpisodeNo, validateSeriesFilter} from '../lib/util/animebytes.js';
+import { decode } from 'entities';
 
 type AnimeBytesItem = {
   title: string;
@@ -19,6 +20,11 @@ type AnimeBytesItem = {
   torrentId?: string;       // custom field
   poster_url?: string;      // custom field
 };
+
+export function stripHTML(html: string): string {
+  const noTags = html.replace(/<[^>]*>/g, "");
+  return decode(noTags);
+}
 
 const parser = new Parser<{}, AnimeBytesItem>({
   customFields: {
@@ -65,7 +71,7 @@ async function updateSeriesScheduler(ab_id: number, item: AnimeBytesItem) {
   await prisma.animeSchedulerReference.updateMany({
     where: { scheduler_id: seriesToUpdate.id },
     data: {
-      summary: item.description,
+      summary: stripHTML(item.description),
       poster_url: item.poster_url
     }
   })
