@@ -37,7 +37,7 @@ export default function SeriesCard({
     id,
     summary,
     tags,
-    filter_property,
+    filters,
     last_fetched_episode,
     last_fetched_at,
     triggerUpdate
@@ -48,7 +48,10 @@ export default function SeriesCard({
     id: number;
     summary: string;
     tags: string;
-    filter_property: string;
+    filters: {
+        mode: string;
+        value: string;
+    }[];
     last_fetched_episode: number;
     last_fetched_at: Date;
     triggerUpdate: () => void;
@@ -57,7 +60,7 @@ export default function SeriesCard({
     const seriesLink = generateSeriesLink(series_name, id);
 
     return (
-            <div className="flex flex-row rounded-md overflow-hidden shadow bg-white max-w-md hover:bg-gray-100 mx-3">
+            <div className="flex flex-row rounded-md overflow-hidden shadow bg-white max-w-md hover:bg-gray-100">
                 <Link href={seriesLink} >
                     <div className="w-full h-full min-w-[160px] max-w-[160px] relative rounded-md ">
                         <Image
@@ -78,12 +81,27 @@ export default function SeriesCard({
                     <div className="flex flex-col p-3 gap-2">
                         <div className="text-sm font-bold">Episode {last_fetched_episode}</div>
                         <div className="text-xs text-gray-500">
-                            Fetched on {last_fetched_at.toLocaleString().replace(',', ' -')}
+                            {last_fetched_episode === 0 ? "Added on" : "Fetched on"} {last_fetched_at.toLocaleString().replace(',', ' -')}
                         </div>
-                        <div className="text-xs text-gray-500">
-                            {filter_property}
+
+                        <div className="text-xs text-gray-500 flex flex-wrap gap-1 mt-1 mb-2">
+                            {filters
+                                .sort((a) => (a.mode === "ACCEPT" ? -1 : 1))
+                                .map((filter, index) => (
+                                    <span
+                                        key={index}
+                                        className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                                            filter.mode === "ACCEPT"
+                                            ? "text-green-600 bg-green-50 border border-green-300"
+                                            : "text-red-600 bg-red-50 border border-red-300"
+                                        }`}
+                                        >
+                                        {filter.value.trim()}
+                                    </span>
+                                ))}
                         </div>
-                        <p className="text-xs text-gray-700 line-clamp-4">{summary}</p>
+
+                        <p className="text-xs text-gray-700 line-clamp-5">{summary}</p>
                     </div>
                     
                     <div className="flex flex-row gap-2 mt-2 bg-gray-50 rounded w-full py-2 justify-between">
@@ -94,7 +112,7 @@ export default function SeriesCard({
                                 </span>
                             ))}
                         </div>
-                        <button onClick={() => deleteFromSchedulerHandler(id, triggerUpdate)} className="px-3 hover:text-rose-500 transition-colors duration-200">
+                        <button onClick={() => deleteFromSchedulerHandler(id, triggerUpdate)} className="pe-2 md:pe-0 md:px-3 hover:text-rose-500 transition-colors duration-200">
                             <svg width="22" height="22" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="stroke-current">
                                 <circle cx="50" cy="50" r="45"  strokeWidth="5" fill="none" />
                                 <line x1="30" y1="50" x2="70" y2="50" strokeWidth="5" strokeLinecap="round" />

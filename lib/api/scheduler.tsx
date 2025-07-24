@@ -1,16 +1,10 @@
 "use server";
 
-import { AnimeScheduler, AnimeSchedulerReference, PrismaClient } from "@prisma/client";
+import { AnimeScheduler, AnimeSchedulerFilter, AnimeSchedulerReference, PrismaClient } from "@prisma/client";
+import {getFirstStudioOnly} from "../util/animebytes";
 
 
-function getFirstStudioOnly(studioList : string) : string {
-    const cleanedStudioList = studioList ? studioList.split("///") : null;
-
-    return cleanedStudioList ? cleanedStudioList[0] : "";
-}
-
-
-export async function addToScheduler(anime_data : Anime) {
+export async function addToScheduler(anime_data: Anime, filters: Filters) {
     const ab_id = anime_data.ID;
     const series_name = anime_data.SeriesName;
 
@@ -19,6 +13,7 @@ export async function addToScheduler(anime_data : Anime) {
     const existingItem = await prisma.animeScheduler.findUnique({where: {ab_id: ab_id}});
 
     if (existingItem) {
+
         await prisma.animeScheduler.update({
             where: { id: existingItem.id },
             data: {
@@ -34,6 +29,24 @@ export async function addToScheduler(anime_data : Anime) {
                 poster_url: anime_data.Image
             }
         });
+
+        const filterPromises = Object.entries(filters).flatMap(([category, items]) =>
+            Object.entries(items)
+                .filter(([, mode]) => mode !== 'neutral') // ignore neutral
+                .map(([value, mode]) => 
+                prisma.animeSchedulerFilter.create({
+                    data: {
+                    scheduler_id: existingItem.id,
+                    category: category.toUpperCase(), // QUALITY, GROUP, EXTENSION
+                    mode: mode === 'include' ? 'ACCEPT' : 'REJECT',
+                    value,
+                    },
+                })
+                )
+            );
+
+        await Promise.all(filterPromises);
+
     }
     else {
         const createdItem = await prisma.animeScheduler.create({       
@@ -53,12 +66,35 @@ export async function addToScheduler(anime_data : Anime) {
                 poster_url: anime_data.Image
             }
         });
+
+        const filterPromises = Object.entries(filters).flatMap(([category, items]) =>
+            Object.entries(items)
+                .filter(([, mode]) => mode !== 'neutral') // ignore neutral
+                .map(([value, mode]) => 
+                prisma.animeSchedulerFilter.create({
+                    data: {
+                    scheduler_id: createdItem.id,
+                    category: category.toUpperCase(), // QUALITY, GROUP, EXTENSION
+                    mode: mode === 'include' ? 'ACCEPT' : 'REJECT',
+                    value,
+                    },
+                })
+                )
+            );
+
+        await Promise.all(filterPromises);
+
     }
 
     await prisma.$disconnect();
 }
 
-export async function getAnimeInScheduler(searchQuery: string | null = null) :Promise<(AnimeScheduler & { references: AnimeSchedulerReference[] })[]> {
+export async function getAnimeInScheduler(searchQuery: string | null = null) : 
+    Promise<(AnimeScheduler & 
+    { 
+        references: AnimeSchedulerReference[]; 
+        filter: AnimeSchedulerFilter[] 
+    } )[]> {
     
     const prisma = new PrismaClient();
 
@@ -68,7 +104,8 @@ export async function getAnimeInScheduler(searchQuery: string | null = null) :Pr
             ...(searchQuery ? { 'series_name': { contains: searchQuery.toLocaleLowerCase() } } : {})
         },
         include: {
-            references: true
+            references: true,
+            filter: true
         }
     });
 
@@ -79,8 +116,12 @@ export async function getAnimeInScheduler(searchQuery: string | null = null) :Pr
 
 export async function deleteFromScheduler(id : number) {
     const prisma = new PrismaClient();
-    
-    await prisma.animeScheduler.update({where: {ab_id: id}, data: {soft_deleted: true}});
+
+    const deletedItem = await prisma.animeScheduler.update({where: {ab_id: id}, data: {soft_deleted: true}});
+
+    await prisma.animeSchedulerFilter.deleteMany({
+        where: { scheduler_id: deletedItem.id }
+    });
     
     await prisma.$disconnect();
 }

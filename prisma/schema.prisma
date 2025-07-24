@@ -35,6 +35,7 @@ model AnimeScheduler {
   last_fetched_at         DateTime @default(now())
   soft_deleted            Boolean    @default(false)
   references              AnimeSchedulerReference[]
+  filter                  AnimeSchedulerFilter[]
 }
 
 model ProcessedTorrent {
@@ -53,4 +54,14 @@ model AnimeSchedulerReference {
   poster_url      String
 
   animeScheduler  AnimeScheduler  @relation(fields: [scheduler_id], references: [id])
+}
+
+model AnimeSchedulerFilter {
+  id              Int     @id @default(autoincrement())
+  scheduler_id    Int
+  category        String  // values: "QUALITY", "GROUP", "EXTENSION"
+  mode            String  // values: "ACCEPT", "REJECT"
+  value           String  
+
+  animeScheduler  AnimeScheduler @relation(fields: [scheduler_id], references: [id])
 }

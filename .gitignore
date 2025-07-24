@@ -40,3 +40,4 @@ prisma/yuki-cx.db
 prisma/yuki-cx.db-journal
 .env
 dist/*
+resources/yuki-cx.db-journal

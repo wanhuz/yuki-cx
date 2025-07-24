@@ -1,4 +1,4 @@
-import { AddToSchedulerForm } from "@/components/AddToSchedulerForm";
+import {AddToSchedulerComponent} from "@/components/AddToSchedulerComponent";
 import SeriesBackground from "@/components/SeriesBackground";
 import SeriesDescription from "@/components/SeriesDescription";
 import SeriesMetadata from "@/components/SeriesMetadata";
@@ -61,24 +61,17 @@ export default async function Page({
                 </h1>
               </div>
 
-              <div className="flex flex-row space-x-3 font-bold ">
-                <button disabled className="bg-sky-500 text-white py-1 px-3 hover:bg-sky-600 h-12 rounded-xl text-sm sm:text-md disabled:bg-sky-300"> Add to Download </button>
-                {
-                  anime_data?.Ongoing ? 
-                  <AddToSchedulerForm anime_data={anime_data} />:
-                  null
-                }
-              </div>
+              <AddToSchedulerComponent anime_data={anime_data}/>
             </div>
           </div>
 
 
-          <div className="flex flex-col sm:w-full lg:flex-row  lg:gap-4 sm:gap-2">
+          <div className="flex flex-col sm:w-full lg:flex-row lg:gap-4 sm:gap-2">
             <div className="mt-8 sm:min-w-full lg:min-w-[230px]">
               {<SeriesMetadata series={anime_data}/>}
             </div>
 
-            <div className="flex flex-col w-full ">
+            <div className="flex flex-col w-full ms-0 lg:ms-5 ">
                 {<SeriesDescription description={anime_data? anime_data.Description : ""}/>}
                 {<TorrentTable torrent_data={anime_data? anime_data.Torrents : []} isOngoing={anime_data? anime_data.Ongoing : false}/>}
             </div>

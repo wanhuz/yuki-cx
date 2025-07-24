@@ -137,3 +137,51 @@ export function generateABTorrentLink(id : number) : string {
     return "https://animebytes.tv/torrents.php?id=" + id.toString();
 }
 
+export function getFirstStudioOnly(studioList : string) : string {
+    const cleanedStudioList = studioList ? studioList.split("///") : null;
+
+    return cleanedStudioList ? cleanedStudioList[0] : "";
+}
+
+export function validateSeriesFilter(
+  seriesFilter: {
+    id: number;
+    scheduler_id: number;
+    category: string;
+    mode: string; // "ACCEPT" or "REJECT"
+    value: string;
+  }[],
+  torrentProperty: string
+): boolean {
+  const resolution = extractResolution(torrentProperty);
+  const group = extractGroup(torrentProperty);
+  const extension = extractExtension(torrentProperty);
+
+  for (const filter of seriesFilter) {
+    let target: string | undefined;
+
+    switch (filter.category) {
+      case "QUALITY":
+        target = resolution;
+        break;
+      case "SUBGROUP":
+        target = group;
+        break;
+      case "EXTENSION":
+        target = extension;
+        break;
+      default:
+        continue; // Unknown category: skip
+    }
+
+    if (filter.mode === "ACCEPT" && filter.value !== target) {
+      return false; // Doesn't match accepted value
+    }
+
+    if (filter.mode === "REJECT" && filter.value === target) {
+      return false; // Matches a rejected value
+    }
+  }
+
+  return true; // Passed all filters
+}
