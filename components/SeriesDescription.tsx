@@ -1,4 +1,10 @@
-import { stripHTML } from "@/lib/util/animebytes";
+import jsdom from "jsdom";
+const { JSDOM } = jsdom;
+
+function stripHTML(html : string) : string{
+    const dom = new JSDOM(html);
+    return dom.window.document.body.textContent || "";
+ }
 
 export default function SeriesDescription({description} : {description : string}) {
     return (
