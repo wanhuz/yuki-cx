@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import cron from 'node-cron';
 import Parser from 'rss-parser';
-import { addTorrent } from '../lib/api/qbittorent.js';
+import { addTorrent, healthCheck } from '../lib/api/qbittorent.js';
 import {extractEpisodeNo, validateSeriesFilter} from '../lib/util/animebytes.js';
 import { decode } from 'entities';
 
@@ -80,6 +80,13 @@ async function updateSeriesScheduler(ab_id: number, item: AnimeBytesItem) {
 async function fetchAndProcessRSS() {
   console.log('Fetching RSS feed...');
 
+  const health = await healthCheck();
+
+  if (!health.ok) {
+    console.error('Skipping RSS fetch: qBittorrent not reachable:', health.message);
+    return; 
+  }
+
   const seriesList = await prisma.animeScheduler.findMany({where: {soft_deleted: false}});
   const feed = await parser.parseURL(RSS_FEED_URL);
 
@@ -109,7 +116,7 @@ async function fetchAndProcessRSS() {
 }
 
 if (DEV_MODE) {
-  fetchAndProcessRSS().catch(console.error);
+  await fetchAndProcessRSS().catch(console.error);
 
   console.log('AnimeBytes RSS watcher exited in Dev Mode.');
   process.exit(0);
@@ -117,7 +124,11 @@ if (DEV_MODE) {
 
 // Run every 5 minutes
 cron.schedule('*/5 * * * *', () => {
-  fetchAndProcessRSS().catch(console.error);
+  try {
+    fetchAndProcessRSS().catch(console.error);
+  } catch (error) {
+    console.error('Error processing RSS feed:', error);
+  }
 });
 
 console.log('AnimeBytes RSS watcher started.');
