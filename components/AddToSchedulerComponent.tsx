@@ -9,7 +9,7 @@ import { extractTorrentFilter } from "@/lib/util/torrent";
 
 export function AddToSchedulerComponent({ anime_data }: { anime_data: Anime }) {
     const [filters, setFilters] = useState<Filters>({  });
-    const seriesFilter = extractTorrentFilter(anime_data.Torrents);
+    const seriesFilter = anime_data?.Ongoing ? extractTorrentFilter(anime_data.Torrents) : {};
 
     return (
         <>
