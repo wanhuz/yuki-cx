@@ -1,10 +1,4 @@
-import jsdom from "jsdom";
-const { JSDOM } = jsdom;
-
-function stripHTML(html : string) : string{
-    const dom = new JSDOM(html);
-    return dom.window.document.body.textContent || "";
- }
+import { stripHTML } from "@/lib/util/util";
 
 export default function SeriesDescription({description} : {description : string}) {
     return (

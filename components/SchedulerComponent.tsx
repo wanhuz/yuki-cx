@@ -4,7 +4,7 @@ import { useState } from "react";
 import SchedulerSearchBar from "@/components/SchedulerSearchBar";
 import SchedulerContent from "@/components/SchedulerContent";
 
-export default function SearchComponent() {
+export default function SchedulerComponent() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isSearch, setIsSearch] = useState<boolean>(false);
 

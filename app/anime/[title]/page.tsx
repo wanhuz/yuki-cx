@@ -8,6 +8,7 @@ import { getAnime } from "@/lib/api/animebytes";
 import { extractOngoingStatus} from "@/lib/util/animebytes";
 import {extractTorrent} from "@/lib/util/torrent";
 import {removeUnderscoreFromTitle, normalizeDictToArray} from "@/lib/util/util";
+import { notFound } from "next/navigation";
 
 export default async function Page({
     params, 
@@ -20,27 +21,31 @@ export default async function Page({
   const title = (await params).title;
   const filters = await searchParams;
   const id = Number(filters.id);
+  
+  const result = await getAnime(removeUnderscoreFromTitle(title), id);
 
-  const searchResult = getAnime(removeUnderscoreFromTitle(title), id);
-  let anime_data!: Anime;
+  if (!result) {
+    notFound();
+  }
+  
+  const anime_data: Anime = {
+    ID: result.ID,
+    SeriesName: result.SeriesName,
+    Description: result.DescriptionHTML,
+    Image: result.Image,
+    StudioList: result.StudioList,
+    AlternativeName: normalizeDictToArray(result.Synonymns),
+    Type: result.GroupName,
+    Episode: result.EpCount,
+    Aired: result.Year,
+    Tags: result.Tags,
+    Ongoing: extractOngoingStatus(result.Torrents[0].Property),
+    Links: normalizeDictToArray(result.Links),
+    Torrents: extractTorrent(result.Torrents),
+    FullName: ""
+  };
 
-  await searchResult.then((result) => { 
-    anime_data = {
-      ID: result.ID, 
-      SeriesName: result.SeriesName, 
-      Description: result.DescriptionHTML, 
-      Image: result.Image,
-      StudioList: result.StudioList,
-      AlternativeName: normalizeDictToArray(result.Synonymns),
-      Type: result.GroupName,
-      Episode: result.EpCount,
-      Aired: result.Year,
-      Tags: result.Tags,
-      Ongoing: extractOngoingStatus(result.Torrents[0].Property),
-      Links: normalizeDictToArray(result.Links),
-      Torrents: extractTorrent(result.Torrents)
-    } as Anime;
-  });
+  
 
   return (
 

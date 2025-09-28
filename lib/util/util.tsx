@@ -1,3 +1,5 @@
+import { decode } from "entities";
+
 export function removeUnderscoreFromTitle(title : string) {
     return title.replaceAll("_", " ");
 }
@@ -12,3 +14,7 @@ export function normalizeDictToArray(dict: object) {
     }
 }
 
+export function stripHTML(html: string): string {
+  const noTags = html.replace(/<[^>]*>/g, "");
+  return decode(noTags);
+}

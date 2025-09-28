@@ -9,9 +9,9 @@ export default function Loading() {
           <SeriesBackground imgUrl={"/placeholder.png"}></SeriesBackground>
   
           <main className="container flex flex-col w-80 sm:w-full mx-auto sm:items-start sm:mx-auto mb-10">
-            <div className="flex flex-col sm:flex-row gap-5 sm:gap-24 mt-28 ">
+            <div className="flex flex-col sm:flex-row gap-5 sm:gap-18 mt-28 ">
   
-              <div className="mt-5">
+              <div className="mt-5 sm:px-2 md:px-4">
                 {<SeriesPoster posterURL={"/placeholder.png"} />}
               </div>
   
@@ -30,7 +30,7 @@ export default function Loading() {
             </div>
   
   
-            <div className="flex flex-col sm:w-full sm:flex-row sm:gap-24">
+            <div className="flex flex-col sm:w-full lg:flex-row lg:gap-4 sm:gap-2">
               <div className="mt-8 sm:min-w-[230px]">
                 <div className="sm:max-w-64 overflow-hidden" >
                   <div id="title">
@@ -68,7 +68,7 @@ export default function Loading() {
                 </div>
               </div>
   
-              <div className="flex flex-col w-full ">
+              <div className="flex flex-col w-full ms-0 lg:ms-8">
                 <div className="flex flex-col mt-8">
                   <b>Synopsis</b>
                   <hr></hr>

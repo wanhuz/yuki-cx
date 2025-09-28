@@ -32,6 +32,10 @@ export async function getAnime(anime_title: string, id : number) {
     });
 
     const search_result = await data.json();
+
+    if (!search_result["Groups"]) {
+        return null;
+    }
     
     const search_result_groups = await search_result["Groups"];
 
