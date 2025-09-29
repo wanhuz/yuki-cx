@@ -10,7 +10,7 @@ export async function search(series_name : string, type : string) {
     const search_query = generateSearchQuery(series_name, type, 25);
 
     const data = await fetch(search_query, {
-        cache: "no-cache",
+        cache: 'no-store',
     });
 
     const search_result = await data.json();
@@ -28,7 +28,7 @@ export async function getAnime(anime_title: string, id : number) {
     const search_query = generateSearchQuery(anime_title, "", 10);
 
     const data = await fetch(search_query, {
-        cache: "no-cache",
+        cache: 'no-store',
     });
 
     const search_result = await data.json();
