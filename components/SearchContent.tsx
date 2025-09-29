@@ -34,7 +34,7 @@ import SeriesCard from "./SeriesCard";
       {isSearch ? (
         // Show Skeleton
         <div className="flex flex-wrap gap-3">
-          {[...Array(15)].map((_, index) => (
+          {[...Array(25)].map((_, index) => (
             <div key={index} className="flex flex-col gap-2">
               <div className="w-32 h-48 bg-gray-300 animate-pulse rounded-md"></div>
               <div className="mt-2 h-3 bg-gray-300 w-32 animate-pulse"></div>
