@@ -10,7 +10,7 @@
 
 ## Yuki-CX
 
-Yuki-CX is a automated media downloader for Anime inspired by Sonarr and Radarr. It integrate with qBittorrent to get anime to your disk. Also support scheduler to automatically download newly aired anime. 
+Yuki-CX is a automated media downloader for Anime inspired by Sonarr and Radarr. It integrate with qBittorrent to automatically download anime to your preferred location. Also support adding to scheduler to automatically download newly aired anime. 
 
 ## Current features
 
@@ -30,4 +30,4 @@ Create a environment files from env.example. Then run the app in background usin
 
 ## License
 
-This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This NextJS project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
