@@ -5,7 +5,6 @@ import ServiceCheckComponent from "./ServiceCheckComponent";
 import { animeBytesStatusHealth } from "@/lib/api/animebytes";
 import { healthCheck } from "@/lib/api/qbittorent";
 import { schedulerHealthCheck } from "@/lib/api/scheduler";
-import { clear } from "console";
 
 type ServiceStatus = {
   ok: boolean;
