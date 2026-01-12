@@ -9,7 +9,7 @@ export default function Header() {
                 <div className="space-x-3 sm:space-x-12">
                     <Link href="/" className="text-white hover:text-gray-400">Home</Link>
                     <Link href="/scheduler" className="text-white hover:text-gray-400">Scheduler</Link>
-                    <Link href="#services" className="text-white hover:text-gray-400">Seasonal</Link>
+                    <Link href="/status" className="text-white hover:text-gray-400">Status</Link>
                     <Link href="#contact" className="text-white hover:text-gray-400">Calendar</Link>
                     <Link href="/search" className="text-white hover:text-gray-400">Search</Link>
                 </div>

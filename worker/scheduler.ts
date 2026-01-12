@@ -4,6 +4,9 @@ import Parser from 'rss-parser';
 import { addTorrent, healthCheck } from '../lib/api/qbittorent.js';
 import {extractEpisodeNo, validateSeriesFilter} from '../lib/util/animebytes.js';
 import { decode } from 'entities';
+import http from 'http';
+
+let isRunning = false;
 
 type AnimeBytesItem = {
   title: string;
@@ -132,3 +135,15 @@ cron.schedule('*/5 * * * *', () => {
 });
 
 console.log('AnimeBytes RSS watcher started.');
+
+http.createServer((req, res) => {
+  if (req.url === '/status') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ running: true }));
+  } else {
+    res.writeHead(404);
+    res.end('Not found');
+  }
+}).listen(4000, () => {
+  console.log('Scheduler status API running on http://localhost:4000/status');
+});

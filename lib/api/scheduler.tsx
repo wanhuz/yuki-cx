@@ -127,3 +127,13 @@ export async function deleteFromScheduler(id : number) {
     
     await prisma.$disconnect();
 }
+
+export async function schedulerHealthCheck() {
+    try {
+        const result = await fetch('http://localhost:4000/status', { method: 'GET' });
+        const status = await result.json();
+        return { ok: status.running ? true : false };
+    } catch (error) {
+        return { ok: false };
+    }
+}
