@@ -6,8 +6,6 @@ import {extractEpisodeNo, validateSeriesFilter} from '../lib/util/animebytes.js'
 import { decode } from 'entities';
 import http from 'http';
 
-let isRunning = false;
-
 type AnimeBytesItem = {
   title: string;
   link: string;
@@ -44,6 +42,7 @@ const parser = new Parser<{}, AnimeBytesItem>({
 
 const AB_PASSKEY = process.env.AB_PASSKEY;
 const DEV_MODE = process.env.DEV_MODE === "true" ? true : false;
+const SCHEDULER_PORT = process.env.SCHEDULER_PORT ? process.env.SCHEDULER_PORT : 4000;
 const prisma = new PrismaClient();
 const RSS_FEED_URL = 'https://animebytes.tv/feed/rss_torrents_airing_anime/' + AB_PASSKEY; 
 
@@ -144,6 +143,6 @@ http.createServer((req, res) => {
     res.writeHead(404);
     res.end('Not found');
   }
-}).listen(4000, () => {
-  console.log('Scheduler status API running on http://localhost:4000/status');
+}).listen(SCHEDULER_PORT, () => {
+  console.log('Scheduler status API running on http://localhost:' + SCHEDULER_PORT + '/status');
 });

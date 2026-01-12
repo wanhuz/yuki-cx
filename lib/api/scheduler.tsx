@@ -4,7 +4,7 @@ import { AnimeScheduler, AnimeSchedulerFilter, AnimeSchedulerReference, PrismaCl
 import {getFirstStudioOnly} from "../util/animebytes";
 import { stripHTML } from "../util/util";
 
-
+const SCHEDULER_PORT = process.env.SCHEDULER_PORT || 4000;
 
 export async function addToScheduler(anime_data: Anime, filters: Filters) {
     const ab_id = anime_data.ID;
@@ -130,7 +130,7 @@ export async function deleteFromScheduler(id : number) {
 
 export async function schedulerHealthCheck() {
     try {
-        const result = await fetch('http://localhost:4000/status', { method: 'GET' });
+        const result = await fetch('http://localhost:' + SCHEDULER_PORT + '/status', { method: 'GET' });
         const status = await result.json();
         return { ok: status.running ? true : false };
     } catch (error) {
