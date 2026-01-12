@@ -125,9 +125,9 @@ if (DEV_MODE) {
 }
 
 // Run every 5 minutes
-cron.schedule('*/5 * * * *', () => {
+cron.schedule('*/5 * * * *', async () => {
   try {
-    fetchAndProcessRSS().catch(console.error);
+    await fetchAndProcessRSS();
   } catch (error) {
     console.error('Error processing RSS feed:', error);
   }

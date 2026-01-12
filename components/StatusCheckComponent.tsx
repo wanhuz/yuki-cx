@@ -18,7 +18,7 @@ export default function StatusCheckComponent() {
 
   const listOfServices = [
     { name: "AnimeBytes", status: animeBytesStatus },
-    { name: "QBittorrent", status: qbStatus }, // placeholder
+    { name: "qBittorrent", status: qbStatus }, // placeholder
     { name: "Yuki Scheduler", status: yukiSchedulerStatus }, // placeholder
   ];
 
