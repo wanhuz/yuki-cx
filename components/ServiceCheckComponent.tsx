@@ -13,7 +13,7 @@ export default function ServiceCheckComponent({
   const statusMeaning = status ? "online" : "offline";
 
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between border border-gray-400 rounded-md py-6 px-4">
       <div>{name}</div>
 
       <div className="flex items-center">

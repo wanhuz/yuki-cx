@@ -138,7 +138,9 @@ console.log('AnimeBytes RSS watcher started.');
 http.createServer((req, res) => {
   if (req.url === '/status') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ running: true }));
+    res.end(JSON.stringify({ 
+      running: true
+    }));
   } else {
     res.writeHead(404);
     res.end('Not found');

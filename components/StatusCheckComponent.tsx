@@ -79,7 +79,9 @@ export default function StatusCheckComponent() {
   }, []);
 
   return (
-    <div className="flex flex-col flex-wrap w-full">
+    <>
+    <h1 className="text-3xl font-semibold pb-3 text-gray-700">System Status</h1>
+    <div className="flex flex-col gap-3 flex-wrap w-full">
       {listOfServices.map((service, index) => (
         <div key={index}>
           <ServiceCheckComponent
@@ -88,11 +90,9 @@ export default function StatusCheckComponent() {
             status={service.status.ok}
             reason={service.status.reason}
           />
-          {index !== listOfServices.length - 1 && (
-            <hr className="my-5"/>
-          )}
         </div>
       ))}
     </div>
+    </>
   );
 }
