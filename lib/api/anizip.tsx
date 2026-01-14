@@ -8,9 +8,9 @@ async function getAnimeInformation(anidb_id: number) {
     return data;
 }
 
-export async function getNextAnimeAiringDate(
+export async function getAnimeAiringData(
     anidb_id: number
-): Promise<{ episode: number; airdate: Date } | null> {
+): Promise<{ title: string, episode: number; airdate: Date }[] | null> {
     const data = await getAnimeInformation(anidb_id);
 
     if (!data?.episodes) return null;
@@ -20,11 +20,12 @@ export async function getNextAnimeAiringDate(
     const futureEpisodes = Object.values(data.episodes)
         .filter((ep: any) => ep.airdate) 
         .map((ep: any) => ({
+            title: ep.title.en,
             episode: Number(ep.episode), 
             airdate: new Date(ep.airdate + "T00:00:00Z"),
         }))
         .filter(ep => ep.airdate > now) 
         .sort((a, b) => a.airdate.getTime() - b.airdate.getTime()); 
 
-    return futureEpisodes.length > 0 ? futureEpisodes[0] : null;
+    return futureEpisodes.length > 0 ? futureEpisodes : null;
 }

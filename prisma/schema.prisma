@@ -53,8 +53,7 @@ model AnimeSchedulerReference {
   summary                   String
   tags                      String
   poster_url                String
-  next_airing_episode       Int?
-  next_airing_episode_date  DateTime?
+  episodes                  AnimeSchedulerEpisodeReference[]
 
   animeScheduler  AnimeScheduler  @relation(fields: [scheduler_id], references: [id])
 }
@@ -67,4 +66,14 @@ model AnimeSchedulerFilter {
   value           String  
 
   animeScheduler  AnimeScheduler @relation(fields: [scheduler_id], references: [id])
+}
+
+model AnimeSchedulerEpisodeReference {
+  id                Int             @id @default(autoincrement())
+  episode_title     String?
+  episode_number    Int?
+  episode_date      DateTime?
+
+  scheduler_ref_id  Int
+  animeSchedulerReference   AnimeSchedulerReference @relation(fields: [scheduler_ref_id], references: [id])
 }

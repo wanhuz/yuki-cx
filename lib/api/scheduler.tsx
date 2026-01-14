@@ -3,7 +3,7 @@
 import { AnimeScheduler, AnimeSchedulerFilter, AnimeSchedulerReference, PrismaClient } from "@prisma/client";
 import {getFirstStudioOnly} from "../util/animebytes";
 import { extractAniDBIDFromLinks, stripHTML } from "../util/util";
-import { getNextAnimeAiringDate } from "./anizip";
+import { getAnimeAiringData } from "./anizip";
 
 const SCHEDULER_PORT = process.env.SCHEDULER_PORT || 4000;
 
@@ -61,20 +61,30 @@ export async function addToScheduler(anime_data: Anime, filters: Filters) {
             }  
         });
 
-        const next_airing_date = anidb_id ? await getNextAnimeAiringDate(anidb_id) : null;
+        const episodes = anidb_id ? await getAnimeAiringData(anidb_id) : null;
 
-        await prisma.animeSchedulerReference.create({
+        const schedulerReference = await prisma.animeSchedulerReference.create({
             data: {
                 scheduler_id: createdItem.id,
                 series_name: series_name,
                 studio_name: getFirstStudioOnly(anime_data.StudioList),
                 summary: anime_data.Description,
                 tags: anime_data.Tags.join(", "),
-                poster_url: anime_data.Image,
-                next_airing_episode: next_airing_date?.episode ?? null,
-                next_airing_episode_date: next_airing_date?.airdate ?? null,
+                poster_url: anime_data.Image
             }
         });
+
+        await prisma.animeSchedulerEpisodeReference.createMany({
+            data: episodes
+                ? episodes.map(episode => ({
+                    scheduler_ref_id: schedulerReference.id,
+                    episode_title: episode.title,
+                    episode_number: episode.episode,
+                    episode_date: episode.airdate,
+                }))
+            : [],
+        })
+
 
         const filterPromises = Object.entries(filters).flatMap(([category, items]) =>
             Object.entries(items)
