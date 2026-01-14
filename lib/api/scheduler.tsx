@@ -2,13 +2,15 @@
 
 import { AnimeScheduler, AnimeSchedulerFilter, AnimeSchedulerReference, PrismaClient } from "@prisma/client";
 import {getFirstStudioOnly} from "../util/animebytes";
-import { stripHTML } from "../util/util";
+import { extractAniDBIDFromLinks, stripHTML } from "../util/util";
+import { getNextAnimeAiringDate } from "./anizip";
 
 const SCHEDULER_PORT = process.env.SCHEDULER_PORT || 4000;
 
 export async function addToScheduler(anime_data: Anime, filters: Filters) {
     const ab_id = anime_data.ID;
     const series_name = anime_data.SeriesName;
+    const anidb_id = extractAniDBIDFromLinks(anime_data.Links);
 
     const prisma = new PrismaClient();
 
@@ -54,9 +56,12 @@ export async function addToScheduler(anime_data: Anime, filters: Filters) {
         const createdItem = await prisma.animeScheduler.create({       
             data: {
                 ab_id: ab_id,
+                anidb_id: anidb_id,
                 series_name: series_name.toLowerCase(),
             }  
         });
+
+        const next_airing_date = anidb_id ? await getNextAnimeAiringDate(anidb_id) : null;
 
         await prisma.animeSchedulerReference.create({
             data: {
@@ -65,7 +70,9 @@ export async function addToScheduler(anime_data: Anime, filters: Filters) {
                 studio_name: getFirstStudioOnly(anime_data.StudioList),
                 summary: anime_data.Description,
                 tags: anime_data.Tags.join(", "),
-                poster_url: anime_data.Image
+                poster_url: anime_data.Image,
+                next_airing_episode: next_airing_date?.episode ?? null,
+                next_airing_episode_date: next_airing_date?.airdate ?? null,
             }
         });
 

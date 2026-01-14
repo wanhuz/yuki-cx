@@ -10,7 +10,7 @@ export default function Header() {
                     <Link href="/" className="text-white hover:text-gray-400">Home</Link>
                     <Link href="/scheduler" className="text-white hover:text-gray-400">Scheduler</Link>
                     <Link href="/status" className="text-white hover:text-gray-400">Status</Link>
-                    <Link href="#contact" className="text-white hover:text-gray-400">Calendar</Link>
+                    <Link href="/calendar" className="text-white hover:text-gray-400">Calendar</Link>
                     <Link href="/search" className="text-white hover:text-gray-400">Search</Link>
                 </div>
 

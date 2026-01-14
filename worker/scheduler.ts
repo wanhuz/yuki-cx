@@ -5,6 +5,7 @@ import { addTorrent, healthCheck } from '../lib/api/qbittorent.js';
 import {extractEpisodeNo, validateSeriesFilter} from '../lib/util/animebytes.js';
 import { decode } from 'entities';
 import http from 'http';
+import { getNextAnimeAiringDate } from '../lib/api/anizip.js';
 
 type AnimeBytesItem = {
   title: string;
@@ -70,11 +71,18 @@ async function updateSeriesScheduler(ab_id: number, item: AnimeBytesItem) {
     }
   });
 
+  const anidb_id = seriesToUpdate.anidb_id ? seriesToUpdate.anidb_id : null;
+  const next_airing_episode_data = anidb_id ? await getNextAnimeAiringDate(anidb_id) : null;
+
   await prisma.animeSchedulerReference.updateMany({
     where: { scheduler_id: seriesToUpdate.id },
     data: {
       summary: stripHTML(item.description),
-      poster_url: item.poster_url
+      poster_url: item.poster_url,
+      ...(next_airing_episode_data ? {
+        next_airing_episode: next_airing_episode_data.episode,
+        next_airing_episode_date: next_airing_episode_data.airdate
+      } : {})
     }
   })
 }
