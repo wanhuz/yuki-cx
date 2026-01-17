@@ -9,7 +9,9 @@ interface AnimeRow {
 const dbLocalFilePath = "resources/yuki-cx.db";
 const loginEndpoint = "https://api4.thetvdb.com/v4/login";
 const artworkEndpoint = "https://api4.thetvdb.com/v4/series/{id}/artworks";
-const apikey = "";
+const seriesEndpoint = "https://api4.thetvdb.com/v4/series/{id}";
+const seriesEpisodeEndpoint = "https://api4.thetvdb.com/v4/series/{id}/episodes";
+const apikey = process.env.TVDB_APIKEY;
 
 export default async function authorize() {
     try {
@@ -80,7 +82,7 @@ export async function getBackgroundArtwork(id : number, token : string) {
 }
 
 
-export async function getTVDBId(anidbId : number) {
+export function getTVDBId(anidbId : number) {
     try {
         const db = new Database(dbLocalFilePath, { readonly: true });
 
@@ -94,4 +96,54 @@ export async function getTVDBId(anidbId : number) {
         console.error("Error querying the database:", error);
         throw error; 
     }
+}
+
+export async function getSeriesMetadata(tvdbid: string) {
+    const seriesEndpointWithId = seriesEndpoint.replace("{id}", tvdbid.toString());
+
+    try {
+        const response = await fetch(seriesEndpointWithId, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+  
+        const data = await response.json();
+  
+        if (!response.ok) {
+          return 500;
+        }
+  
+        return data.data;
+      } catch (error) {
+        console.error('Login error:', error);
+        return 500;
+      }
+
+}
+
+export async function getSeriesEpisodeMetdata(tvdbid: string) {
+    const seriesEpisodeEndpointWithId = seriesEpisodeEndpoint.replace("{id}", tvdbid.toString());
+
+    try {
+        const response = await fetch(seriesEpisodeEndpointWithId, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+  
+        const data = await response.json();
+  
+        if (!response.ok) {
+          return 500;
+        }
+  
+        return data.data;
+      } catch (error) {
+        console.error('Login error:', error);
+        return 500;
+      }
+
 }

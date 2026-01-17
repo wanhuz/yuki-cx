@@ -1,31 +1,5 @@
-
 const regex = /^(?<source>.+?) \| (?<extension>.+?) \| (?:(?<aspectRatio>\d+:\d+) \| )?(?:(?<videoCodec>(?:h265|h264|XviD|DivX|MPEG-1\/2|VP9|RAW)(?: [a-zA-Z0-9\-./]+)?) \| )?(?:(?<dimensions>\d+[xX]\d+)(?: \| )?)?(?:(?<resolution>\d+[pi])(?: \| )?)?(?<audioCodec>[^\|]+?)(?: \| (?<dualAudio>Dual Audio))?(?: \| (?<subtitleType>(?:Softsubs|Hardsubs|RAW))(?: \((?<subgroup>.+?)\))?)?(?: \| Episode (?<episodeNo>\d+))?(?: \| (?<freeleechStatus>Freeleech))?$/;
 
-
-export function extractTorrent(torrentResult: { ID: number; Property: string; Seeders: number; Leechers: number; Size: number; Link: string; }[]) : Torrent[] {
-    const torrent_extracted: Torrent[] = [];
-
-    torrentResult.map((entry: { ID: number; Property: string; Seeders: number; Leechers: number; Size: number; Link: string}) => {
-        torrent_extracted.push({
-            ID: entry.ID, 
-            Source: extractSource(entry.Property),
-            Group: extractGroup(entry.Property), 
-            Resolution: extractResolution(entry.Property), 
-            Codec: extractCodecs(entry.Property),
-            Extension: extractExtension(entry.Property),
-            Subtitle: extractSubtitle(entry.Property),
-            Seeders: entry.Seeders,
-            Leechers: entry.Leechers,
-            Size: formatBytes(entry.Size),
-            EpisodeNo: extractEpisodeNo(entry.Property),
-            FreeleechStatus: extractFreeleechStatus(entry.Property),
-            Link: entry.Link,
-            Property: entry.Property
-        } as Torrent);
-    });
-
-    return torrent_extracted;
-}
 
 export function extractExtension(property : string) : string {
     const match = property.match(regex);
@@ -104,7 +78,7 @@ export function extractOngoingStatus(property : string) : boolean {
     return false;
 }
 
-function formatBytes(bytes : number) {
+export function formatBytes(bytes : number) {
     if (bytes < 1024 * 1024) {
         return (bytes / 1024).toFixed(2) + ' KB';
     } else if (bytes < 1024 * 1024 * 1024) {
@@ -136,7 +110,7 @@ function extractAudioCodecs(property : string) {
     return "";
 }
 
-function extractEpisodeNo(property: string) {
+export function extractEpisodeNo(property: string) {
     const match = property.match(regex);
     
     if (match?.groups) {
@@ -147,7 +121,7 @@ function extractEpisodeNo(property: string) {
     return null;
 }
 
-function extractFreeleechStatus(property: string): boolean {
+export function extractFreeleechStatus(property: string): boolean {
     const match = property.match(regex);
     
     if (match?.groups) {
@@ -162,3 +136,51 @@ export function generateABTorrentLink(id : number) : string {
     return "https://animebytes.tv/torrents.php?id=" + id.toString();
 }
 
+export function getFirstStudioOnly(studioList : string) : string {
+    const cleanedStudioList = studioList ? studioList.split("///") : null;
+
+    return cleanedStudioList ? cleanedStudioList[0] : "";
+}
+
+export function validateSeriesFilter(
+  seriesFilter: {
+    id: number;
+    scheduler_id: number;
+    category: string;
+    mode: string; // "ACCEPT" or "REJECT"
+    value: string;
+  }[],
+  torrentProperty: string
+): boolean {
+  const resolution = extractResolution(torrentProperty);
+  const group = extractGroup(torrentProperty);
+  const extension = extractExtension(torrentProperty);
+
+  for (const filter of seriesFilter) {
+    let target: string | undefined;
+
+    switch (filter.category) {
+      case "QUALITY":
+        target = resolution;
+        break;
+      case "SUBGROUP":
+        target = group;
+        break;
+      case "EXTENSION":
+        target = extension;
+        break;
+      default:
+        continue; // Unknown category: skip
+    }
+
+    if (filter.mode === "ACCEPT" && filter.value !== target) {
+      return false; // Doesn't match accepted value
+    }
+
+    if (filter.mode === "REJECT" && filter.value === target) {
+      return false; // Matches a rejected value
+    }
+  }
+
+  return true; // Passed all filters
+}

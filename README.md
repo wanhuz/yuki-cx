@@ -1,36 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
 
-First, run the development server:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+![image](https://raw.githubusercontent.com/wanhuz/yuki-cx/refs/heads/main/public/2.PNG)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+![image](https://raw.githubusercontent.com/wanhuz/yuki-cx/refs/heads/main/public/3.PNG)
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+## Yuki-CX
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Yuki-CX is a automated media downloader for Anime inspired by Sonarr and Radarr. It integrate with qBittorrent to automatically download anime to your preferred location. Also support adding to scheduler to automatically download newly aired anime. 
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Current features
 
-## Deploy on Vercel
+Yuki-CX a work in progress project. It start as Sonarr and Radarr replacement, with intention of becoming all-to-one anime media downloader.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- UI selection to select anime to download.
+- Filter by release type, resolution, sub quality.
+- Scheduler to monitor newly aired anime.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Setup
+Setup can be only be done with NodeJS for now.
+
+Create a environment files from env.example. Then run the app in background using pm2.
+
+## Upcoming feature
+- Display anime by season
+
+## License
+
+This NextJS project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

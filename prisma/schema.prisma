@@ -14,11 +14,65 @@ model Settings {
 }
 
 model ServiceMapping {
-  id      Int     @id @default(autoincrement())
-  anidbid Int?
-  tvdbid  Int?
-  tmdbid  Int?
-  imdbid  Int?
-  name    String?
-  studio  String?
+  id        Int     @id @default(autoincrement())
+  anidbid   Int?
+  tvdbid    Int?
+  tmdbid    Int?
+  imdbid    Int?
+  name      String?
+  studio    String?
+}
+
+model AnimeScheduler {
+  id                      Int     @id @default(autoincrement())
+  ab_id                   Int     @unique
+  anidb_id                Int?
+  series_name             String
+  filter_property         String  @default("720p")
+  last_fetched_episode    Int     @default(0)
+  last_fetched_at         DateTime @default(now())
+  soft_deleted            Boolean    @default(false)
+  references              AnimeSchedulerReference[]
+  filter                  AnimeSchedulerFilter[]
+}
+
+model ProcessedTorrent {
+  id          Int    @id @default(autoincrement())
+  torrent_id  Int    @unique
+  processedAt DateTime @default(now())
+}
+
+model AnimeSchedulerReference {
+  id                        Int             @id @default(autoincrement())
+  scheduler_id              Int
+  series_name               String
+  studio_name               String
+  summary                   String
+  tags                      String
+  poster_url                String
+  episodes                  AnimeSchedulerEpisodeReference[]
+
+  animeScheduler  AnimeScheduler  @relation(fields: [scheduler_id], references: [id])
+}
+
+model AnimeSchedulerFilter {
+  id              Int     @id @default(autoincrement())
+  scheduler_id    Int
+  category        String  // values: "QUALITY", "GROUP", "EXTENSION"
+  mode            String  // values: "ACCEPT", "REJECT"
+  value           String  
+
+  animeScheduler  AnimeScheduler @relation(fields: [scheduler_id], references: [id])
+}
+
+model AnimeSchedulerEpisodeReference {
+  id                Int      @id @default(autoincrement())
+  episode_title     String?
+  episode_number    Int
+  episode_date      DateTime?
+
+  scheduler_ref_id  Int
+  animeSchedulerReference AnimeSchedulerReference @relation(fields: [scheduler_ref_id], references: [id], onDelete: Cascade)
+
+  @@unique([scheduler_ref_id, episode_number])
 }

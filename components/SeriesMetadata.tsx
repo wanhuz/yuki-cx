@@ -3,7 +3,7 @@ import { generateABTorrentLink } from "@/lib/util/animebytes";
 
 function generateLinkList(links : string[]) : JSX.Element[] {
     const linksElement = links.map((link, index) => (
-        <p key={index}>{generateLink(link)}</p>
+        <p key={index + 1}>{generateLink(link)}</p>
     ));
 
     return linksElement;
@@ -18,7 +18,7 @@ function generateLink(link: string): JSX.Element {
         "animebytes.tv" : "AnimeBytes"
     };
 
-    const baseStyle = "text-blue-600 hover:text-blue-800";
+    const baseStyle = "text-sky-600 hover:text-sky-800";
 
     try {
         const url = new URL(link);
@@ -65,6 +65,7 @@ export default function SeriesMetadata({series} : {series : Anime}) {
     const altName = generateAltNameList(series.AlternativeName);
 
     const links = [generateABLinkList(generateABTorrentLink(series.ID))];
+    
     generateLinkList(series.Links).map(
         linkElement => links.push(linkElement)
     );
@@ -74,8 +75,8 @@ export default function SeriesMetadata({series} : {series : Anime}) {
     const studios = generateStudioList(series.StudioList);
 
     return (
-        <div className="sm:max-w-64 overflow-hidden flex flex-col gap-4" >
-            <div id="title">
+        <div className="sm:max-w-64 overflow-hidden flex flex-col sm:flex-row sm:min-w-full sm:px-4 lg:flex-col md:min-w-auto gap-4" >
+            <div id="title" className={series.AlternativeName.length ? "block" : "hidden"}>
                 <b>Alternative Title</b>
                 <hr></hr>
                 <ul className="mt-3 text-sm text-wrap">

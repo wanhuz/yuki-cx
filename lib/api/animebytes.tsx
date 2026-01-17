@@ -1,14 +1,17 @@
 "use server";
+
 const ANIMEBYTES_URL = "https://animebytes.tv/scrape.php"
-const PASSKEY = "";
-const USERNAME = "";
+const PASSKEY = process.env.AB_PASSKEY;
+const USERNAME = process.env.AB_USERNAME;
 
 
 export async function search(series_name : string, type : string) {
 
     const search_query = generateSearchQuery(series_name, type, 25);
 
-    const data = await fetch(search_query);
+    const data = await fetch(search_query, {
+        next: { revalidate: 3600 }, 
+    });
 
     const search_result = await data.json();
     const search_result_groups = search_result["Groups"];
@@ -16,12 +19,23 @@ export async function search(series_name : string, type : string) {
     return search_result_groups;
 }
 
+/*
+    This is pretty hackish way of getting anime metadata from AB to display anime page, as AB API didn't provide direct way to do it.
+    Works by first searching title and then matching the ID from the search result link
+    As a result, link to the page need to have title and ID
+*/
 export async function getAnime(anime_title: string, id : number) {
     const search_query = generateSearchQuery(anime_title, "", 10);
-    
-    const data = await fetch(search_query);
+
+    const data = await fetch(search_query, {
+        next: { revalidate: 3600 }, 
+    });
 
     const search_result = await data.json();
+
+    if (!search_result["Groups"]) {
+        return null;
+    }
     
     const search_result_groups = await search_result["Groups"];
 
@@ -64,4 +78,37 @@ function generateSearchQuery(title : string, type : string, maxItem : number) {
     const search_query = auth_params + "&searchstr=" + title + "&type=anime" + "&search_type=title" + "&sort=relevance" + filter_anime_type_params + "&limit=" + maxItem;
 
     return search_query
+}
+
+export async function animeBytesStatusHealth() {
+  try {
+    const res = await fetch(
+      "https://status.animebytes.tv/api/status",
+      { cache: "no-store" }
+    );
+
+    if (!res.ok) {
+      return { ok: false, reason: "HTTP_ERROR" };
+    }
+
+    const data = (await res.json()) as ABStatus;
+
+    if (!data.success) {
+      return { ok: false, reason: "API_ERROR" };
+    }
+
+    const siteStatus = data.status?.site?.status;
+
+    if (siteStatus === 0) {
+      return { ok: false, reason: "SITE_OFFLINE" };
+    }
+
+    if (siteStatus === 2) {
+      return { ok: false, reason: "MAINTENANCE" };
+    }
+
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, reason: "UNREACHABLE" };
+  }
 }
