@@ -29,6 +29,7 @@ model ServiceMapping {
 model AnimeScheduler {
   id                      Int     @id @default(autoincrement())
   ab_id                   Int     @unique
+  anidb_id                Int?
   series_name             String
   filter_property         String  @default("720p")
   last_fetched_episode    Int     @default(0)
@@ -45,13 +46,14 @@ model ProcessedTorrent {
 }
 
 model AnimeSchedulerReference {
-  id              Int             @id @default(autoincrement())
-  scheduler_id    Int
-  series_name     String
-  studio_name     String
-  summary         String
-  tags            String
-  poster_url      String
+  id                        Int             @id @default(autoincrement())
+  scheduler_id              Int
+  series_name               String
+  studio_name               String
+  summary                   String
+  tags                      String
+  poster_url                String
+  episodes                  AnimeSchedulerEpisodeReference[]
 
   animeScheduler  AnimeScheduler  @relation(fields: [scheduler_id], references: [id])
 }
@@ -64,4 +66,16 @@ model AnimeSchedulerFilter {
   value           String  
 
   animeScheduler  AnimeScheduler @relation(fields: [scheduler_id], references: [id])
+}
+
+model AnimeSchedulerEpisodeReference {
+  id                Int      @id @default(autoincrement())
+  episode_title     String?
+  episode_number    Int
+  episode_date      DateTime?
+
+  scheduler_ref_id  Int
+  animeSchedulerReference AnimeSchedulerReference @relation(fields: [scheduler_ref_id], references: [id], onDelete: Cascade)
+
+  @@unique([scheduler_ref_id, episode_number])
 }

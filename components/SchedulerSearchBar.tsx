@@ -8,7 +8,7 @@ export default function SchedulerSearchBar({
 }) {
     
     return (
-        <div className="container mx-auto my-8 px-2 md:px-0">
+        <div className="container mx-auto my-8 px-0 sm:px-5 md:px-0">
             <div className="flex items-center justify-center">
                 <div className="relative w-11/12 mx-auto sm:w-full">
                     <input 

@@ -55,7 +55,7 @@ import { getAnimeInScheduler } from "@/lib/api/scheduler";
   }, [isSearch, searchQuery]);
 
   return (
-    <div className="container px-5 sm:px-0 sm:mx-auto flex flex-wrap flex-1 gap-3 md:gap-5 mb-8">
+    <div className="container px-5 sm:px-5 md:px-0 sm:mx-auto flex flex-wrap flex-1 gap-3 md:gap-5 mb-8">
       {listCards.length > 0 ? (
         listCards
       )
