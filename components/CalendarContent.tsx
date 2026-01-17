@@ -1,65 +1,95 @@
 import { useEffect, useState } from "react";
-import SeriesSchedulerCard from "./SeriesSchedulerCard";
-import { getAnimeInScheduler } from "@/lib/api/scheduler";
+import { getUpcomingAnime } from "@/lib/api/scheduler";
+import EpisodeCalendarCard from "./EpisodeCalendarCard";
+import EpisodeCalendarCardContainer from "./EpisodeCalendarCardContainer";
 
-
- export default function Content({ searchQuery, isSearch }: { searchQuery: string, isSearch: boolean }) {
-  const [listCards, setListCards] = useState<JSX.Element[]>([]);
+ export default function CalendarContent() {
+  const [listContainers, setListContainers] = useState<JSX.Element[]>([]);
 
   useEffect(() => {
     const fetchAndSetCards = async () => {
-      const result = isSearch ? await getAnimeInScheduler(searchQuery) : await getAnimeInScheduler();
+      const result = await getUpcomingAnime();
 
-      const cards = result.map((
-        entry: { 
-          ab_id: number; 
-          last_fetched_episode: number; 
-          last_fetched_at: Date; 
-          filter_property: string; 
-          references: 
-            { 
-              series_name: string; 
-              studio_name: string; 
-              summary: string; 
-              tags: string; 
-              poster_url: string 
-            }[] 
-          filter:
-          {
-            mode: string;
-            value: string;
-          }[]
+      const episodes = result.flatMap(entry => {
+        const ref = entry.references?.[0];
+        if (!ref) return [];
+
+        return ref.episodes.map(episode => ({
+          entry,
+          ref,
+          episode,
+        }));
+      });
+
+      episodes.sort(
+        (a, b) =>
+          new Date(a.episode.episode_date ?? 0).getTime() -
+          new Date(b.episode.episode_date ?? 0).getTime()
+      );
+
+      const containers: JSX.Element[] = [];
+
+      let currentDateKey = "";
+      let currentCards: JSX.Element[] = [];
+      let currentAirdate: Date | null = null;
+
+      for (const { entry, ref, episode } of episodes) {
+        const airdate = episode.episode_date ?? new Date();
+        const dateKey = airdate.toISOString().split("T")[0];
+
+        // New date → push previous container
+        if (dateKey !== currentDateKey && currentCards.length > 0) {
+          containers.push(
+            <EpisodeCalendarCardContainer
+              key={currentDateKey}
+              airdate={currentAirdate!}
+              cards={currentCards}
+            />
+          );
+
+          currentCards = [];
         }
-        ) => (
-        <SeriesSchedulerCard
-          key={entry.ab_id}
-          id={entry.ab_id}
-          series_name={entry.references[0].series_name}
-          studio_name={entry.references[0].studio_name}
-          summary={entry.references[0].summary}
-          tags={entry.references[0].tags}
-          poster={entry.references[0].poster_url}
-          filters={entry.filter}
-          last_fetched_episode={entry.last_fetched_episode}
-          last_fetched_at={entry.last_fetched_at}
-          triggerUpdate={fetchAndSetCards}
-        />
-      ));
-      setListCards(cards);
+
+        currentDateKey = dateKey;
+        currentAirdate = airdate;
+
+        currentCards.push(
+          <EpisodeCalendarCard
+            key={`${entry.ab_id}-${episode.episode_number}`}
+            id={entry.ab_id}
+            series_name={ref.series_name}
+            summary={ref.summary}
+            tags={ref.tags}
+            poster={ref.poster_url}
+            number={episode.episode_number}
+            title={episode.episode_title || ""}
+          />
+        );
+      }
+
+      // Push last group
+      if (currentCards.length > 0 && currentAirdate) {
+        containers.push(
+          <EpisodeCalendarCardContainer
+            key={currentDateKey}
+            airdate={currentAirdate}
+            cards={currentCards}
+          />
+        );
+      }
+
+      setListContainers(containers);
     };
 
     fetchAndSetCards();
 
     const interval = setInterval(fetchAndSetCards, 15000);
     return () => clearInterval(interval);
-  }, [isSearch, searchQuery]);
+  }, []);
 
   return (
-    <div className="container px-5 sm:px-0 sm:mx-auto flex flex-wrap flex-1 gap-3 md:gap-5 mb-8">
-      {listCards.length > 0 ? (
-        listCards
-      )
-      : null}
+    <div className="container px-5 sm:px-0 sm:mx-auto flex flex-col gap-6 mb-8">
+      {listContainers}
     </div>
   );
 }

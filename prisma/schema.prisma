@@ -69,11 +69,13 @@ model AnimeSchedulerFilter {
 }
 
 model AnimeSchedulerEpisodeReference {
-  id                Int             @id @default(autoincrement())
+  id                Int      @id @default(autoincrement())
   episode_title     String?
-  episode_number    Int?
+  episode_number    Int
   episode_date      DateTime?
 
   scheduler_ref_id  Int
-  animeSchedulerReference   AnimeSchedulerReference @relation(fields: [scheduler_ref_id], references: [id])
+  animeSchedulerReference AnimeSchedulerReference @relation(fields: [scheduler_ref_id], references: [id], onDelete: Cascade)
+
+  @@unique([scheduler_ref_id, episode_number])
 }

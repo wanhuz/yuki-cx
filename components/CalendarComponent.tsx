@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import SchedulerSearchBar from "@/components/SchedulerSearchBar";
-import SchedulerContent from "@/components/SchedulerContent";
+import CalendarContent from "./CalendarContent";
 
 export default function SchedulerComponent() {
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -10,7 +9,7 @@ export default function SchedulerComponent() {
 
   return (
     <>
-        {<SchedulerContent searchQuery={searchQuery} isSearch={isSearch} />}
+        {<CalendarContent searchQuery={searchQuery} isSearch={isSearch} />}
     </>
   );
 }

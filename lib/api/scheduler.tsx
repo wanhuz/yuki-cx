@@ -1,6 +1,6 @@
 "use server";
 
-import { AnimeScheduler, AnimeSchedulerFilter, AnimeSchedulerReference, PrismaClient } from "@prisma/client";
+import { AnimeScheduler, AnimeSchedulerEpisodeReference, AnimeSchedulerFilter, AnimeSchedulerReference, PrismaClient } from "@prisma/client";
 import {getFirstStudioOnly} from "../util/animebytes";
 import { extractAniDBIDFromLinks, stripHTML } from "../util/util";
 import { getAnimeAiringData } from "./anizip";
@@ -126,6 +126,55 @@ export async function getAnimeInScheduler(searchQuery: string | null = null) :
             references: true,
             filter: true
         }
+    });
+
+    await prisma.$disconnect();
+    
+    return result;
+}
+
+export async function getUpcomingAnime(searchQuery: string | null = null) : 
+    Promise<(AnimeScheduler & 
+    { 
+        references: 
+        {
+            series_name: string;
+            studio_name: string;
+            summary: string;
+            tags: string;
+            poster_url: string
+            episodes: AnimeSchedulerEpisodeReference[]
+        }[];
+        filter: AnimeSchedulerFilter[] 
+    } )[]> {
+    
+    const prisma = new PrismaClient();
+
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); 
+
+    const result = await prisma.animeScheduler.findMany({
+        where: {
+            soft_deleted: false,
+            ...(searchQuery
+            ? { series_name: { contains: searchQuery.toLowerCase() } }
+            : {}),
+        },
+        include: {
+            references: {
+            include: {
+                episodes: {
+                where: {
+                    episode_date: {
+                    gte: today, 
+                    },
+                },
+                },
+            },
+            },
+            filter: true,
+        },
     });
 
     await prisma.$disconnect();
