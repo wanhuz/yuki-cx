@@ -35,6 +35,10 @@ export async function addToScheduler(anime_data: Anime, filters: Filters) {
             }
         });
 
+        await prisma.animeSchedulerFilter.deleteMany({
+            where: { scheduler_id: existingItem.id }
+        });
+
         const filterPromises = Object.entries(filters).flatMap(([category, items]) =>
             Object.entries(items)
                 .filter(([, mode]) => mode !== 'neutral') // ignore neutral
@@ -47,8 +51,8 @@ export async function addToScheduler(anime_data: Anime, filters: Filters) {
                     value,
                     },
                 })
-                )
-            );
+            )
+        );
 
         await Promise.all(filterPromises);
         
