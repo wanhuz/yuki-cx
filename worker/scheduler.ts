@@ -5,7 +5,7 @@ import { addTorrent, healthCheck } from '../lib/api/qbittorent.js';
 import {extractEpisodeNo, validateSeriesFilter} from '../lib/util/animebytes.js';
 import { decode } from 'entities';
 import http from 'http';
-import { getNextAnimeAiringDate } from '../lib/api/anizip.js';
+import { getAnimeAiringData } from '../lib/api/anizip.js';
 
 type AnimeBytesItem = {
   title: string;
@@ -71,18 +71,11 @@ async function updateSeriesScheduler(ab_id: number, item: AnimeBytesItem) {
     }
   });
 
-  const anidb_id = seriesToUpdate.anidb_id ? seriesToUpdate.anidb_id : null;
-  const next_airing_episode_data = anidb_id ? await getNextAnimeAiringDate(anidb_id) : null;
-
   await prisma.animeSchedulerReference.updateMany({
     where: { scheduler_id: seriesToUpdate.id },
     data: {
       summary: stripHTML(item.description),
-      poster_url: item.poster_url,
-      ...(next_airing_episode_data ? {
-        next_airing_episode: next_airing_episode_data.episode,
-        next_airing_episode_date: next_airing_episode_data.airdate
-      } : {})
+      poster_url: item.poster_url
     }
   })
 }
@@ -125,8 +118,49 @@ async function fetchAndProcessRSS() {
   console.log('RSS processing completed.');
 }
 
+async function updateSeriesUpcomingEpisodes() {
+  const seriesToUpdate = await prisma.animeScheduler.findMany({
+    where: { soft_deleted: false },
+    include: { references: true },
+  });
+
+  for (const series of seriesToUpdate) {
+    if (!series.anidb_id) continue;
+    if (!series.references.length) continue;
+
+    const airingData = await getAnimeAiringData(series.anidb_id);
+    if (!airingData?.length) continue;
+
+    const scheduler_ref_id = series.references[0].scheduler_id;
+
+    for (const episode of airingData) {
+      await prisma.animeSchedulerEpisodeReference.upsert({
+        where: {
+          scheduler_ref_id_episode_number: {
+            scheduler_ref_id,
+            episode_number: episode.episode,
+          },
+        },
+        update: {
+          episode_title: episode.title,
+          episode_date: episode.airdate,
+        },
+        create: {
+          scheduler_ref_id,
+          episode_number: episode.episode,
+          episode_title: episode.title,
+          episode_date: episode.airdate,
+        },
+      });
+    }
+  }
+}
+
+
+
 if (DEV_MODE) {
   await fetchAndProcessRSS().catch(console.error);
+  await updateSeriesUpcomingEpisodes().catch(console.error);
 
   console.log('AnimeBytes RSS watcher exited in Dev Mode.');
   process.exit(0);
@@ -138,6 +172,14 @@ cron.schedule('*/5 * * * *', async () => {
     await fetchAndProcessRSS();
   } catch (error) {
     console.error('Error processing RSS feed:', error);
+  }
+});
+
+cron.schedule('0 */6 * * *', async () => {
+  try {
+    await updateSeriesUpcomingEpisodes();
+  } catch (error) {
+    console.error('Update series upcoming episodes error:', error);
   }
 });
 
