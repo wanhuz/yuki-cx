@@ -1,11 +1,14 @@
 "use server";
 
 import { AddTorrentOptions, QBittorrent } from '@ctrl/qbittorrent';
+import { getQBClientSettings } from './settings';
+
+const qb_opts = await getQBClientSettings();
 
 const client = new QBittorrent({
-  baseUrl: process.env.QB_BASEURL,
-  username: process.env.QB_USERNAME,
-  password: process.env.QB_PASSWORD,
+  baseUrl: qb_opts.qb_url + ':' + qb_opts.qb_port,
+  username: qb_opts.qb_username,
+  password: qb_opts.qb_password,
 });
 
 const DEV_MODE = process.env.DEV_MODE === "true" ? true : false
@@ -13,6 +16,7 @@ const DEV_MODE = process.env.DEV_MODE === "true" ? true : false
 async function getBase64FromTorrentURL(url : string) {
     try {
       const response = await fetch(url);
+
       if (!response.ok) {
         throw new Error(`Failed to fetch file: ${response.statusText}`);
       }
@@ -32,11 +36,11 @@ async function getBase64FromTorrentURL(url : string) {
 
 export async function addTorrent(url : string) {
     const base64Torrent = await getBase64FromTorrentURL(url)
-    const pausedOpt = process.env.DEV_MODE === "true" ? "true" : "false"
+    const isPaused = qb_opts.qb_pause_torrent ? "true" : "false";
 
     const torrentOption: Partial<AddTorrentOptions> = {
-      paused: pausedOpt,
-      category: "Anime"
+      paused: isPaused,
+      category: qb_opts.qb_default_label
     }
 
     const status = await client.addTorrent(base64Torrent, torrentOption);
@@ -49,9 +53,9 @@ export async function addTorrent(url : string) {
 export async function healthCheck() {
   try {
     const client = new QBittorrent({
-      baseUrl: process.env.QB_BASEURL,
-      username: process.env.QB_USERNAME,
-      password: process.env.QB_PASSWORD,
+      baseUrl: qb_opts.qb_url + ':' + qb_opts.qb_port,
+      username: qb_opts.qb_username,
+      password: qb_opts.qb_password,
     });
 
     // Try to log in manually

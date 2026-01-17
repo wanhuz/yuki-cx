@@ -40,11 +40,16 @@ const parser = new Parser<{}, AnimeBytesItem>({
     ]
   }
 });
+const prisma = new PrismaClient();
 
-const AB_PASSKEY = process.env.AB_PASSKEY;
+const ab_key = await prisma.settings.findFirstOrThrow({
+  where: { key: "ab_key" }
+});
+
+const AB_PASSKEY = ab_key;
 const DEV_MODE = process.env.DEV_MODE === "true" ? true : false;
 const SCHEDULER_PORT = process.env.SCHEDULER_PORT ? process.env.SCHEDULER_PORT : 4000;
-const prisma = new PrismaClient();
+
 const RSS_FEED_URL = 'https://animebytes.tv/feed/rss_torrents_airing_anime/' + AB_PASSKEY; 
 
 async function processMatchedLink(ab_id: number, downloadLink: string, torrentId: number, item: AnimeBytesItem) {

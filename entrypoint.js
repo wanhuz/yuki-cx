@@ -8,6 +8,9 @@ function startProcess(command, args, name) {
   });
 }
 
+// Seeding
+startProcess('npx', ['tsx', 'prisma/seed.ts'], 'Prisma seed');
+
 // Start Next.js frontend
 startProcess('npx', ['next', 'start'], 'Next.js');
 
