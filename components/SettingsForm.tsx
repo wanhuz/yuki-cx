@@ -12,6 +12,7 @@ interface FieldDefinition {
   name: string;
   label: string;
   type: FieldType;
+  defaultValue?: string | boolean;
   options?: { key: string; value: string }[];
 }
 
@@ -29,7 +30,11 @@ export default function SettingsForm<T extends Record<string, any>>({
   const [formData, setFormData] = useState<Record<string, string | boolean>>(
     () =>
       fields.reduce((acc, field) => {
-        acc[field.name] = field.type === "checkbox" ? false : "";
+        if (field.type === "checkbox") {
+          acc[field.name] = field.defaultValue ?? false;
+        } else {
+          acc[field.name] = field.defaultValue ?? "";
+        }
         return acc;
       }, {} as Record<string, string | boolean>)
   );
@@ -57,42 +62,43 @@ export default function SettingsForm<T extends Record<string, any>>({
 
   return (
     <form className="px-8 pt-6 pb-8 mb-4" onSubmit={handleSubmit}>
-      {fields.map((field) => (
-        <div key={field.name} className="mb-6">
-          {field.type === "checkbox" ? (
-            <SettingsCheckbox
-              name={field.name}
-              id={field.name}
-              label={field.label}
-              checked={Boolean(formData[field.name])}
-              onChange={(checked: boolean) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  [field.name]: checked,
-                }))
-              }
-            />
-          ) : field.type === "select" ? (
-            <SettingsSelection
-              name={field.name}
-              id={field.name}
-              label={field.label}
-              options={field.options ?? []}
-              value={String(formData[field.name] ?? "")}
-              onChange={handleChange}
-            />
-          ) : (
-            <SettingsCard
-              name={field.name}
-              label={field.label}
-              id={field.name}
-              type={field.type}
-              value={String(formData[field.name] ?? "")}
-              onChange={handleChange}
-            />
-          )}
-        </div>
-      ))}
+   {fields.map((field) => (
+      <div key={field.name} className="mb-6">
+        {field.type === "checkbox" ? (
+          <SettingsCheckbox
+            name={field.name}
+            id={field.name}
+            label={field.label}
+            checked={Boolean(formData[field.name])}
+            onChange={(checked: boolean) =>
+              setFormData((prev) => ({
+                ...prev,
+                [field.name]: checked,
+              }))
+            }
+          />
+        ) : field.type === "select" ? (
+          <SettingsSelection
+            name={field.name}
+            id={field.name}
+            label={field.label}
+            options={field.options ?? []}
+            value={String(formData[field.name])}
+            onChange={handleChange}
+          />
+        ) : (
+          <SettingsCard
+            name={field.name}
+            label={field.label}
+            id={field.name}
+            type={field.type}
+            value={String(formData[field.name])}
+            onChange={handleChange}
+          />
+        )}
+      </div>
+    ))}
+
 
       <div className="flex items-center justify-between mt-4">
         <button

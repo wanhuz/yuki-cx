@@ -8,7 +8,7 @@ export default function SettingsSidebar() {
 
     const menuItems = [
         { name: "Client", href: "/settings/client" },
-        { name: "Downloads", href: "/settings/downloads" },
+        // { name: "Downloads", href: "/settings/downloads" },
         { name: "Scheduler", href: "/settings/scheduler" },
         { name: "AnimeBytes", href: "/settings/animebytes"}
       ];
