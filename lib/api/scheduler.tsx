@@ -21,6 +21,7 @@ export async function addToScheduler(anime_data: Anime, filters: Filters) {
         await prisma.animeScheduler.update({
             where: { id: existingItem.id },
             data: {
+                anidb_id: anidb_id, //ID won't change - This is for existing data before migration that does not have ID
                 soft_deleted: false
             }
         });
@@ -50,6 +51,39 @@ export async function addToScheduler(anime_data: Anime, filters: Filters) {
             );
 
         await Promise.all(filterPromises);
+        
+        const schedulerRef = await prisma.animeSchedulerReference.findFirst({
+            where: { scheduler_id: existingItem.id },
+            select: { id: true },
+        });
+
+        if (!schedulerRef) return;
+
+        const airingData = anidb_id ? await getAnimeAiringData(anidb_id) : null;
+
+        if (!airingData?.length) return;
+
+        for (const episode of airingData) {
+            await prisma.animeSchedulerEpisodeReference.upsert({
+                where: {
+                    scheduler_ref_id_episode_number: {
+                        scheduler_ref_id: schedulerRef.id,
+                        episode_number: episode.episode,
+                    },
+                },
+                update: {
+                    episode_title: episode.title,
+                    episode_date: episode.airdate,
+                },
+                create: {
+                    scheduler_ref_id: schedulerRef.id,
+                    episode_number: episode.episode,
+                    episode_title: episode.title,
+                    episode_date: episode.airdate,
+                },
+            });
+        }
+
 
     }
     else {
