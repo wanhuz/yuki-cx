@@ -15,7 +15,7 @@ export default function Header() {
                 </div>
 
                 <div className="text-white text-lg font-bold">
-                    <Link href="/settings/general">
+                    <Link href="/settings/client">
                         <Image src="/gear.svg" className="fill-white" alt="Settings page" width={20} height={20}></Image>
                     </Link>
                 </div>
