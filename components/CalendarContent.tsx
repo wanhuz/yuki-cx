@@ -88,7 +88,7 @@ import EpisodeCalendarCardContainer from "./EpisodeCalendarCardContainer";
   }, []);
 
   return (
-    <div className="container px-5 sm:px-0 sm:mx-auto flex flex-col gap-6 mb-8">
+    <div className="container px-5 sm:px-5 md:px-0 sm:mx-auto flex flex-col gap-6 mb-8">
       {listContainers}
     </div>
   );

@@ -21,7 +21,7 @@ export default function EpisodeCalendarCardContainer({
             
 
             <hr className="border-gray-200 dark:border-gray-700 mb-3"></hr>
-            <div className="flex flex-row gap-4">
+            <div className="flex flex-row gap-4 flex-wrap">
                 {cards.map(card => card)}
             </div>
         </div>
