@@ -101,6 +101,8 @@ if (DEV_MODE) {
 
 // Run every 5 minutes
 cron.schedule('*/5 * * * *', async () => {
+  console.log('Starting cron job...');
+
   try {
     if (await isSchedulerPaused()) {
       console.log("Scheduler is paused. Skipping run.");
@@ -111,6 +113,8 @@ cron.schedule('*/5 * * * *', async () => {
   } catch (error) {
     console.error('Error processing RSS feed:', error);
   }
+
+  console.log('End of cron job');
 });
 
 
