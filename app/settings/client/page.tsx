@@ -3,7 +3,7 @@
 import SettingsForm from "@/components/SettingsForm";
 import { getQBClientSettings, saveQBClientSettings } from "@/lib/api/settings";
 import { useEffect, useState } from "react";
-import { useSettings } from "../layout";
+import { useSettings } from "@/app/settings/SettingsContext";
 
 type FieldType = "text" | "password" | "checkbox" | "select";
 type ClientSettings = {
