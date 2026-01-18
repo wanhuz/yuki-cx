@@ -109,7 +109,7 @@ export async function saveQBClientSettings(settings: {
     qb_pause_torrent: boolean;
     qb_default_label: string;
 }) {
-
+  
   if (!settings.qb_url || !settings.qb_port) {
     throw new Error("Client type, URL, and port are required.");
   }
@@ -120,7 +120,7 @@ export async function saveQBClientSettings(settings: {
     create: { key: "qb_url", value: settings.qb_url },
   });
 
-  prisma.settings.upsert({
+  await prisma.settings.upsert({
     where: { key: "qb_port" },
     update: { value: settings.qb_port.toString() },
     create: { key: "qb_port", value: settings.qb_port.toString() },
