@@ -1,15 +1,6 @@
 "use server";
 
 import { AddTorrentOptions, QBittorrent } from '@ctrl/qbittorrent';
-import { getQBClientSettings } from './settings';
-
-const qb_opts = await getQBClientSettings();
-
-const client = new QBittorrent({
-  baseUrl: qb_opts.qb_url + ':' + qb_opts.qb_port,
-  username: qb_opts.qb_username,
-  password: qb_opts.qb_password,
-});
 
 const DEV_MODE = process.env.DEV_MODE === "true" ? true : false
 
@@ -34,28 +25,40 @@ async function getBase64FromTorrentURL(url : string) {
     }
   }
 
-export async function addTorrent(url : string) {
-    const base64Torrent = await getBase64FromTorrentURL(url)
-    const isPaused = qb_opts.qb_pause_torrent ? "true" : "false";
+export async function addTorrent(url : string, qb_url : string, qb_port : number, qb_username : string, qb_password : string, qb_pause_torrent : boolean, qb_default_label : string) {
 
-    const torrentOption: Partial<AddTorrentOptions> = {
-      paused: isPaused,
-      category: qb_opts.qb_default_label
-    }
+    try {
+      const client = new QBittorrent({
+        baseUrl: qb_url + ':' + qb_port,
+        username: qb_username,
+        password: qb_password,
+      });
 
-    const status = await client.addTorrent(base64Torrent, torrentOption);
+      const base64Torrent = await getBase64FromTorrentURL(url)
+      const isPaused = qb_pause_torrent ? "true" : "false";
 
-    if (status)
+      const torrentOption: Partial<AddTorrentOptions> = {
+        paused: isPaused,
+        category: qb_default_label
+      }
+
+      const status = await client.addTorrent(base64Torrent, torrentOption);
+
+      if (status)
         return 200
-    return 500
+      return 500
+    } catch (error) {
+      console.error(`Error creating QBittorrent client: `, error);
+      throw error;
+    }
 }
 
-export async function healthCheck() {
+export async function healthCheck(qb_url : string, qb_port : number, qb_username : string, qb_password : string) {
   try {
     const client = new QBittorrent({
-      baseUrl: qb_opts.qb_url + ':' + qb_opts.qb_port,
-      username: qb_opts.qb_username,
-      password: qb_opts.qb_password,
+      baseUrl: qb_url + ':' + qb_port,
+      username: qb_username,
+      password: qb_password,
     });
 
     // Try to log in manually
@@ -63,7 +66,7 @@ export async function healthCheck() {
 
     // Call a simple API endpoint to confirm connection
     const version = await client.getAppVersion();
-
+    
     if (DEV_MODE) {
       console.log(`qBittorrent is reachable. Version: ${version}`);
     }

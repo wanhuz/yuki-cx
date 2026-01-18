@@ -5,6 +5,7 @@ import ServiceCheckComponent from "./ServiceCheckComponent";
 import { animeBytesStatusHealth } from "@/lib/api/animebytes";
 import { healthCheck } from "@/lib/api/qbittorent";
 import { schedulerHealthCheck } from "@/lib/api/scheduler";
+import { getQBClientSettings } from "@/lib/api/settings";
 
 type ServiceStatus = {
   ok: boolean;
@@ -15,6 +16,7 @@ export default function StatusCheckComponent() {
   const [animeBytesStatus, setAnimeBytesStatus] = useState<ServiceStatus>({ ok: false});
   const [qbStatus, setQbStatus] = useState<ServiceStatus>({ ok: false });
   const [yukiSchedulerStatus, setYukiSchedulerStatus] = useState<ServiceStatus>({ ok: false });
+  
 
   const listOfServices = [
     { name: "AnimeBytes", status: animeBytesStatus },
@@ -33,7 +35,14 @@ export default function StatusCheckComponent() {
     }
 
     async function checkQbittorrent() {
-      const result = await healthCheck();
+      const qbSettings = await getQBClientSettings();
+
+      const result = await healthCheck(
+        qbSettings.qb_url || "",
+        qbSettings.qb_port || 0,
+        qbSettings.qb_username || "",
+        qbSettings.qb_password || ""
+      );
 
       if (mounted) {
         setQbStatus({
@@ -48,7 +57,7 @@ export default function StatusCheckComponent() {
       if (mounted) {
         setYukiSchedulerStatus({
           ok: result.ok,
-          reason: result.ok ? undefined : undefined,
+          reason: result.reason,
         });
       }
     }

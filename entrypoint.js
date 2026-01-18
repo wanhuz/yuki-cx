@@ -16,3 +16,5 @@ startProcess('npx', ['next', 'start'], 'Next.js');
 
 // Start worker (compiled to JS)
 startProcess('node', ['./dist/worker/scheduler.js'], 'Worker');
+
+startProcess('node', ['./dist/worker/episode_updater.js'], 'Worker');
