@@ -2,6 +2,7 @@ import { addTorrent, healthCheck } from '../lib/api/qbittorent.js';
 import { extractEpisodeNo, validateSeriesFilter } from '../lib/util/animebytes.js';
 import { decode } from 'entities';
 import { PrismaClient } from '@prisma/client';
+import { addToLog } from '../lib/api/settings.js';
 
 type AnimeBytesItem = {
   title: string;
@@ -96,7 +97,8 @@ export async function processMatchedLink(
     qbSettings.qb_password || "", 
     qbSettings.qb_pause_torrent || false, 
     qbSettings.qb_default_label || "",
-    [item.title]
+    [item.title],
+    addToLog
   );
 
   await prisma.processedTorrent.create({

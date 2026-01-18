@@ -1,7 +1,6 @@
 "use server";
 
 import { AddTorrentOptions, QBittorrent } from '@ctrl/qbittorrent';
-import { addToLog } from './settings';
 const DEV_MODE = process.env.DEV_MODE === "true" ? true : false
 
 async function getBase64FromTorrentURL(url : string) {
@@ -33,7 +32,8 @@ export async function addTorrent(
       qb_password : string, 
       qb_pause_torrent : boolean, 
       qb_default_label : string,
-      file_names: string[]
+      file_names: string[],
+      Log: (name: string, date: Date) => Promise<void> = async () => {}
   ) 
   {
 
@@ -56,7 +56,7 @@ export async function addTorrent(
 
       if (status) {
         file_names.map(async (name) => {
-          await addToLog(name, new Date());
+          await Log(name, new Date());
         })
 
         return 200

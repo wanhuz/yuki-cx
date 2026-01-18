@@ -1,6 +1,6 @@
 import { NextResponse} from 'next/server';
 import { addTorrent } from "@/lib/api/qbittorent";
-import { getQBClientSettings } from '@/lib/api/settings';
+import { addToLog, getQBClientSettings } from '@/lib/api/settings';
 
 
 export async function POST(request: Request) {
@@ -26,7 +26,8 @@ export async function POST(request: Request) {
         qbSettings.qb_password || "", 
         qbSettings.qb_pause_torrent || false, 
         qbSettings.qb_default_label || "",
-        torrentName
+        torrentName,
+        addToLog
     );
     
     return NextResponse.json({
