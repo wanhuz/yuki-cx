@@ -3,6 +3,7 @@
 import SettingsForm from "@/components/SettingsForm";
 import { getABSettings, saveABSettings } from "@/lib/api/settings";
 import { useEffect, useState } from "react";
+import { useSettings } from "../layout";
 
 type FieldType = "text" | "password" | "checkbox" | "select";
 type ABSettings = {
@@ -13,13 +14,15 @@ type ABSettings = {
 
 
 export default function ABSettingsPage() {
+  const { setActiveIndex } = useSettings();
   const [defaultSettings, setDefaultSettings] = useState<ABSettings | null>(null);
 
   useEffect(() => {
+    setActiveIndex(2);
     getABSettings().then((data) => setDefaultSettings(data as ABSettings));
-  }, []);
+  }, [setActiveIndex]);
 
-  if (!defaultSettings) return <p className="px-8 py-6">Loading settings...</p>;
+  if (!defaultSettings) return <p className="px-8 py-6">...</p>;
 
   const fields = [
     {name: "ab_username", label: "AnimeBytes Username", type: "text" as FieldType, defaultValue: defaultSettings.ab_username},

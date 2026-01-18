@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 
-export default function SettingsSidebar() {
-    const [activeIndex, setActiveIndex] = useState(0);
+export default function SettingsSidebar( { activeIndex, setActiveIndex }: Readonly<{ activeIndex: number; setActiveIndex: (index: number) => void; }>) {
+    
 
     const menuItems = [
         { name: "Client", href: "/settings/client" },

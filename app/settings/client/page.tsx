@@ -3,6 +3,8 @@
 import SettingsForm from "@/components/SettingsForm";
 import { getQBClientSettings, saveQBClientSettings } from "@/lib/api/settings";
 import { useEffect, useState } from "react";
+import { useSettings } from "../layout";
+
 type FieldType = "text" | "password" | "checkbox" | "select";
 type ClientSettings = {
   qb_url: string;
@@ -15,14 +17,16 @@ type ClientSettings = {
 
 
 export default function ClientSettingsPage() {
+  const { setActiveIndex } = useSettings();
 
   useEffect(() => {
+    setActiveIndex(0);
     getQBClientSettings().then((data) => setDefaultSettings(data as ClientSettings));
-  }, []);
+  }, [setActiveIndex]);
 
   const [defaultSettings, setDefaultSettings] = useState<ClientSettings | null>(null);
 
-  if (!defaultSettings) return <p className="px-8 py-6">Loading settings...</p>;
+  if (!defaultSettings) return <p className="px-8 py-6">...</p>;
 
   const fields = [
     { name: "qb_url", label: "URL", type: "text" as FieldType, defaultValue: defaultSettings.qb_url },
