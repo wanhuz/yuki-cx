@@ -1,7 +1,6 @@
 "use server";
 
 import { AddTorrentOptions, QBittorrent } from '@ctrl/qbittorrent';
-import parseTorrent from "parse-torrent";
 import { addToLog } from './settings';
 const DEV_MODE = process.env.DEV_MODE === "true" ? true : false
 
