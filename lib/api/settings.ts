@@ -155,14 +155,25 @@ export async function saveQBClientSettings(settings: {
   return  { success: true };
 }
 
-export async function getDownloadedTorrent() {
+export async function getDownloadedTorrent(page: number = 1, pageSize: number = 10) {
+  const skip = (page - 1) * pageSize;
+
+  // Fetch the page of logs
   const downloadedTorrent = await prisma.downloadLogs.findMany({
+    skip,
+    take: pageSize,
     orderBy: {
-      download_at: "desc"
-    }
+      download_at: "desc",
+    },
   });
 
-  return downloadedTorrent;
+  // Get total count for pagination
+  const totalCount = await prisma.downloadLogs.count();
+
+  return {
+    data: downloadedTorrent,
+    totalCount,
+  };
 }
 
 export async function addToLog(title: string, download_at: Date) {
