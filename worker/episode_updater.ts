@@ -54,3 +54,5 @@ cron.schedule('0 */6 * * *', async () => {
 
     console.log('Series upcoming episodes updated.');
 });
+
+console.log('Episode updater started.');
