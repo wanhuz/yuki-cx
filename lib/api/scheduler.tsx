@@ -236,7 +236,14 @@ export async function schedulerHealthCheck() {
     try {
         const result = await fetch('http://localhost:' + SCHEDULER_PORT + '/status', { method: 'GET' });
         const status = await result.json();
-        return { ok: status.running ? true : false };
+
+        const paused = status.paused === true || status.paused === "true";
+        const ok = status.running && !paused;
+        
+        return { 
+            ok: ok,
+            reason: status.paused ? "PAUSED" : undefined
+        };
     } catch (error) {
         return { ok: false };
     }

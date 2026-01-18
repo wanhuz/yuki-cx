@@ -4,6 +4,7 @@ import { useState } from "react";
 import SettingsCard from "./SettingsCard";
 import SettingsSelection from "./SettingsSelection";
 import SettingsCheckbox from "./SettingsCheckbox";
+import { toast } from 'react-toastify';
 
 
 type FieldType = "text" | "password" | "checkbox" | "select";
@@ -16,13 +17,13 @@ interface FieldDefinition {
   options?: { key: string; value: string }[];
 }
 
-interface SettingsFormProps<T extends Record<string, any>> {
+interface SettingsFormProps<T extends Record<string, unknown>> {
   fields: FieldDefinition[];
   initialValues?: Partial<T>;
   onSubmit: (data: T) => Promise<void>;
 }
 
-export default function SettingsForm<T extends Record<string, any>>({
+export default function SettingsForm<T extends Record<string, unknown>>({
   fields,
   onSubmit,
 }: SettingsFormProps<T>) {
@@ -40,7 +41,6 @@ export default function SettingsForm<T extends Record<string, any>>({
   );
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [feedback, setFeedback] = useState<string | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -57,7 +57,12 @@ export default function SettingsForm<T extends Record<string, any>>({
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSubmit(formData as T);
+    setIsSubmitting(true);
+
+    await onSubmit(formData as T).then(() => {
+      setIsSubmitting(false);
+      toast.success("Settings saved!", {position: "bottom-right"});
+    });
   };
 
   return (
@@ -110,7 +115,6 @@ export default function SettingsForm<T extends Record<string, any>>({
           {isSubmitting ? "Saving..." : "Save"}
         </button>
       </div>
-      {feedback && <p className="mt-4 text-sm">{feedback}</p>}
     </form>
   );
 }

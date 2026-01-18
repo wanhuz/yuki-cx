@@ -1,8 +1,12 @@
 "use server";
 
+import { getABSettings } from "./settings";
+
+const ab_settings = await getABSettings();
+
+const PASSKEY = ab_settings.ab_key;
+const USERNAME = ab_settings.ab_username;
 const ANIMEBYTES_URL = "https://animebytes.tv/scrape.php"
-const PASSKEY = process.env.AB_PASSKEY;
-const USERNAME = process.env.AB_USERNAME;
 
 
 export async function search(series_name : string, type : string) {

@@ -9,13 +9,17 @@ export async function getABSettings() {
     where: { key: "ab_key" },
   });
 
+  const ab_username = await prisma.settings.findFirst({
+    where: { key: "ab_username" },
+  });
+
   return {
-    ab_key: ab_key?.value ?? "",
+    ab_key: ab_key?.value,
+    ab_username: ab_username?.value
   }
 }
 
 export async function getSchedulerSettings() {
-
   const settingSchedulerPaused = await prisma.settings.findFirst({
     where: { key: "yuki_scheduler_paused" },
   });
@@ -51,24 +55,32 @@ export async function getQBClientSettings() {
   });
 
   return {
-    qb_url: settingUrl?.value ?? "",
-    qb_port: parseInt(settingPort?.value ?? "0"),
-    qb_username: settingUsername?.value ?? "",
-    qb_password: settingPassword?.value ?? "",
+    qb_url: settingUrl?.value,
+    qb_port: settingPort?.value ? parseInt(settingPort.value) : 80,
+    qb_username: settingUsername?.value ? settingUsername.value : "",
+    qb_password: settingPassword?.value ? settingPassword.value : "",
     qb_pause_torrent: settingPauseTorrent?.value === "true",
     qb_default_label: settingDefaultLabel?.value ?? "",
   };
 }
 
-export async function saveABSettings(settings: { ab_key: string}) {
-  if (!settings.ab_key) {
-    throw new Error("API keys are required.");
-  }
+export async function saveABSettings(settings: { 
+  ab_key: string,
+  ab_username: string
+}) {
 
-  await prisma.settings.upsert({
+  if (settings.ab_key) {
+    await prisma.settings.upsert({
     where: { key: "ab_key" },
     update: { value: settings.ab_key },
     create: { key: "ab_key", value: settings.ab_key },
+  });
+  }
+
+  await prisma.settings.upsert({
+    where: { key: "ab_username" },
+    update: { value: settings.ab_username },
+    create: { key: "ab_username", value: settings.ab_username},
   });
 
   return { success: true };
@@ -97,8 +109,7 @@ export async function saveQBClientSettings(settings: {
     qb_pause_torrent: boolean;
     qb_default_label: string;
 }) {
-
-
+  
   if (!settings.qb_url || !settings.qb_port) {
     throw new Error("Client type, URL, and port are required.");
   }
@@ -109,7 +120,7 @@ export async function saveQBClientSettings(settings: {
     create: { key: "qb_url", value: settings.qb_url },
   });
 
-  prisma.settings.upsert({
+  await prisma.settings.upsert({
     where: { key: "qb_port" },
     update: { value: settings.qb_port.toString() },
     create: { key: "qb_port", value: settings.qb_port.toString() },
@@ -121,11 +132,13 @@ export async function saveQBClientSettings(settings: {
     create: { key: "qb_username", value: settings.qb_username },
   });
 
-  await prisma.settings.upsert({
-    where: { key: "qb_password" },
-    update: { value: settings.qb_password },
-    create: { key: "qb_password", value: settings.qb_password },
-  });
+  if (settings.qb_password) {
+    await prisma.settings.upsert({
+      where: { key: "qb_password" },
+      update: { value: settings.qb_password },
+      create: { key: "qb_password", value: settings.qb_password },
+    });
+  }
 
   await prisma.settings.upsert({
     where: { key: "qb_pause_torrent" },

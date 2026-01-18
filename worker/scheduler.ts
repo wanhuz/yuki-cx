@@ -1,11 +1,18 @@
-import { PrismaClient } from '@prisma/client';
-import cron from 'node-cron';
-import Parser from 'rss-parser';
-import { addTorrent, healthCheck } from '../lib/api/qbittorent.js';
-import {extractEpisodeNo, validateSeriesFilter} from '../lib/util/animebytes.js';
-import { decode } from 'entities';
 import http from 'http';
-import { getAnimeAiringData } from '../lib/api/anizip.js';
+import cron from 'node-cron';
+import { PrismaClient } from '@prisma/client';
+import { getABSettings, getQBClientSettings } from '../lib/api/settings.js';
+import { getActiveSeries, isQBHealthy, processFeedItem } from '../worker/scheduler-helper.js';
+import Parser from 'rss-parser';
+
+type qbSettings = {
+  qb_url: string;
+  qb_port: number;
+  qb_username: string;
+  qb_password: string;
+  qb_pause_torrent: boolean;
+  qb_default_label: string;
+};
 
 type AnimeBytesItem = {
   title: string;
@@ -23,11 +30,6 @@ type AnimeBytesItem = {
   poster_url?: string;      // custom field
 };
 
-export function stripHTML(html: string): string {
-  const noTags = html.replace(/<[^>]*>/g, "");
-  return decode(noTags);
-}
-
 const parser = new Parser<{}, AnimeBytesItem>({
   customFields: {
     item: [
@@ -41,126 +43,57 @@ const parser = new Parser<{}, AnimeBytesItem>({
   }
 });
 
-const AB_PASSKEY = process.env.AB_PASSKEY;
+const prisma = new PrismaClient();
+const abSettings = await getABSettings();
+
+const AB_PASSKEY = abSettings.ab_key;
 const DEV_MODE = process.env.DEV_MODE === "true" ? true : false;
 const SCHEDULER_PORT = process.env.SCHEDULER_PORT ? process.env.SCHEDULER_PORT : 4000;
-const prisma = new PrismaClient();
 const RSS_FEED_URL = 'https://animebytes.tv/feed/rss_torrents_airing_anime/' + AB_PASSKEY; 
 
-async function processMatchedLink(ab_id: number, downloadLink: string, torrentId: number, item: AnimeBytesItem) {
-  console.log(`Matched ab_id=${ab_id}. Download link: ${downloadLink}`);
-
-  addTorrent(downloadLink);
-
-  await prisma.processedTorrent.create({
-      data: {
-          torrent_id: torrentId,
-          processedAt: new Date(Date.now())
-      }
-  });
-  
-  await updateSeriesScheduler(ab_id, item);
-}
-
-async function updateSeriesScheduler(ab_id: number, item: AnimeBytesItem) {
-  const seriesToUpdate = await prisma.animeScheduler.update({
-    where: { ab_id },
-    data: {
-      last_fetched_episode: extractEpisodeNo(item.torrentProperty) || 0,
-      last_fetched_at: new Date(Date.now())
-    }
-  });
-
-  await prisma.animeSchedulerReference.updateMany({
-    where: { scheduler_id: seriesToUpdate.id },
-    data: {
-      summary: stripHTML(item.description),
-      poster_url: item.poster_url
-    }
-  })
-}
-
 async function fetchAndProcessRSS() {
+  const qbSettings = await getQBClientSettings() as qbSettings;
+
   console.log('Fetching RSS feed...');
 
-  const health = await healthCheck();
+  let feed;
+
+  try {
+    feed = await parser.parseURL(RSS_FEED_URL);
+  } catch (error) {
+    console.error('Error parsing RSS feed:', error);
+    return;
+  }
+
+  if (!feed) {
+    console.error('Error parsing RSS feed: No items found.');
+    return;
+  }
+
+  const health = await isQBHealthy(qbSettings);
 
   if (!health.ok) {
-    console.error('Skipping RSS fetch: qBittorrent not reachable:', health.message);
-    return; 
+    console.error('Skipping Processing RSS: qBittorrent not reachable:', health.message);
+    return;
   }
 
-  const seriesList = await prisma.animeScheduler.findMany({where: {soft_deleted: false}});
-  const feed = await parser.parseURL(RSS_FEED_URL);
+  const seriesList = await getActiveSeries();
 
-  for (const item of feed.items) {
-
-    const groupId = parseInt(item.groupId ?? '', 10);
-
-    if (!groupId) continue;
-
-    // Match by ab_id
-    const matchedSeries = seriesList.find(series => series.ab_id === groupId);
-    
-    if (matchedSeries && item.link) {
-      const torrentId = parseInt(item.torrentId || '0', 10);
-      const seriesFilter = await prisma.animeSchedulerFilter.findMany({where: {scheduler_id: matchedSeries.id}});
-      
-      const isMatchingFilter = validateSeriesFilter(seriesFilter, item.torrentProperty);
-      const isTorrentProcessed = await prisma.processedTorrent.findUnique({where: {torrent_id: torrentId}});
-
-      if (isMatchingFilter && !isTorrentProcessed) {
-          await processMatchedLink(matchedSeries.ab_id, item.link, torrentId, item);
-      }
-    }
-  }
+  processFeedItem(qbSettings, feed, seriesList);
 
   console.log('RSS processing completed.');
 }
 
-async function updateSeriesUpcomingEpisodes() {
-  const seriesToUpdate = await prisma.animeScheduler.findMany({
-    where: { soft_deleted: false },
-    include: { references: true },
+async function isSchedulerPaused(): Promise<boolean> {
+  const setting = await prisma.settings.findFirst({
+    where: { key: "yuki_scheduler_paused" },
   });
 
-  for (const series of seriesToUpdate) {
-    if (!series.anidb_id) continue;
-    if (!series.references.length) continue;
-
-    const airingData = await getAnimeAiringData(series.anidb_id);
-    if (!airingData?.length) continue;
-
-    const scheduler_ref_id = series.references[0].scheduler_id;
-
-    for (const episode of airingData) {
-      await prisma.animeSchedulerEpisodeReference.upsert({
-        where: {
-          scheduler_ref_id_episode_number: {
-            scheduler_ref_id,
-            episode_number: episode.episode,
-          },
-        },
-        update: {
-          episode_title: episode.title,
-          episode_date: episode.airdate,
-        },
-        create: {
-          scheduler_ref_id,
-          episode_number: episode.episode,
-          episode_title: episode.title,
-          episode_date: episode.airdate,
-        },
-      });
-    }
-  }
+  return setting?.value === "true";
 }
-
-
 
 if (DEV_MODE) {
   await fetchAndProcessRSS().catch(console.error);
-  await updateSeriesUpcomingEpisodes().catch(console.error);
 
   console.log('AnimeBytes RSS watcher exited in Dev Mode.');
   process.exit(0);
@@ -168,33 +101,43 @@ if (DEV_MODE) {
 
 // Run every 5 minutes
 cron.schedule('*/5 * * * *', async () => {
+  console.log('Starting cron job...');
+
   try {
+    if (await isSchedulerPaused()) {
+      console.log("Scheduler is paused. Skipping run.");
+      return;
+    }
+
     await fetchAndProcessRSS();
   } catch (error) {
     console.error('Error processing RSS feed:', error);
   }
+
+  console.log('End of cron job');
 });
 
-cron.schedule('0 */6 * * *', async () => {
-  try {
-    await updateSeriesUpcomingEpisodes();
-  } catch (error) {
-    console.error('Update series upcoming episodes error:', error);
-  }
-});
 
 console.log('AnimeBytes RSS watcher started.');
 
-http.createServer((req, res) => {
+http.createServer(async (req, res) => {
   if (req.url === '/status') {
+    const paused = await isSchedulerPaused();
+
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ 
-      running: true
+    res.end(JSON.stringify({
+      running: true,
+      paused
     }));
-  } else {
-    res.writeHead(404);
-    res.end('Not found');
+    return;
   }
+
+  res.writeHead(404);
+  res.end('Not found');
 }).listen(SCHEDULER_PORT, () => {
-  console.log('Scheduler status API running on http://localhost:' + SCHEDULER_PORT + '/status');
+  console.log(
+    'Scheduler status API running on http://localhost:' +
+    SCHEDULER_PORT +
+    '/status'
+  );
 });
