@@ -1,7 +1,8 @@
 "use server";
 
 import { AddTorrentOptions, QBittorrent } from '@ctrl/qbittorrent';
-
+import parseTorrent from "parse-torrent";
+import { addToLog } from './settings';
 const DEV_MODE = process.env.DEV_MODE === "true" ? true : false
 
 async function getBase64FromTorrentURL(url : string) {
@@ -25,7 +26,17 @@ async function getBase64FromTorrentURL(url : string) {
     }
   }
 
-export async function addTorrent(url : string, qb_url : string, qb_port : number, qb_username : string, qb_password : string, qb_pause_torrent : boolean, qb_default_label : string) {
+export async function addTorrent(
+      url : string, 
+      qb_url : string, 
+      qb_port : number, 
+      qb_username : string, 
+      qb_password : string, 
+      qb_pause_torrent : boolean, 
+      qb_default_label : string,
+      file_names: string[]
+  ) 
+  {
 
     try {
       const client = new QBittorrent({
@@ -44,8 +55,14 @@ export async function addTorrent(url : string, qb_url : string, qb_port : number
 
       const status = await client.addTorrent(base64Torrent, torrentOption);
 
-      if (status)
+      if (status) {
+        file_names.map(async (name) => {
+          await addToLog(name, new Date());
+        })
+
         return 200
+      }
+        
       return 500
     } catch (error) {
       console.error(`Error creating QBittorrent client: `, error);

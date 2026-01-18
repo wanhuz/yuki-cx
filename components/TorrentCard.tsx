@@ -7,9 +7,11 @@ import Image from "next/image";
 import ExpandableTableRow from "./ExpandableTableRow";
 
 
-async function handleSubmit(torrentUrl: string, setDownloadIcon: (iconUrl: string) => void) {
+async function handleSubmit(torrentUrl: string, torrentFileList: FileData[], setDownloadIcon: (iconUrl: string) => void) {
     try {
         setDownloadIcon("/spinner.svg");
+
+        const fileNameArray = torrentFileList.map(item => item.filename);
 
         const response = await fetch("/api/torrent/add", {
             method: "POST",
@@ -18,6 +20,7 @@ async function handleSubmit(torrentUrl: string, setDownloadIcon: (iconUrl: strin
             },
             body: JSON.stringify({
                 torrentLink: torrentUrl,
+                torrentName: fileNameArray,
             }),
         });
 
@@ -86,7 +89,10 @@ export function TorrentCard({torrent} : {torrent : Torrent}) {
             <td className="hidden sm:table-cell text-leechers font-semibold"><span className="">{torrent.Leechers}</span></td>
             <td>
                 <div className="text-white text-lg font-bold" >
-                    <button onClick={() => handleSubmit(torrent.Link, setDownloadIcon)}>
+                    <button onClick={(e) => {
+                        e.preventDefault();
+                        handleSubmit(torrent.Link, torrent.FileList || [], setDownloadIcon)
+                    }}>
                         <Image src={downloadIcon} alt="Download" width={25} height={25}></Image>
                     </button>
                 </div>

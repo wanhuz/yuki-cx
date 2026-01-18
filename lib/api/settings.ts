@@ -155,3 +155,16 @@ export async function saveQBClientSettings(settings: {
   return  { success: true };
 }
 
+export async function getDownloadedTorrent() {
+  const downloadedTorrent = await prisma.downloadLogs.findMany({
+    orderBy: {
+      download_at: "desc"
+    }
+  });
+
+  return downloadedTorrent;
+}
+
+export async function addToLog(title: string, download_at: Date) {
+  await prisma.downloadLogs.create({data: {title, download_at}});
+}

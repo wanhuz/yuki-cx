@@ -9,7 +9,8 @@ export default function SettingsSidebar( { activeIndex, setActiveIndex }: Readon
         { name: "Client", href: "/settings/client" },
         // { name: "Downloads", href: "/settings/downloads" },
         { name: "Scheduler", href: "/settings/scheduler" },
-        { name: "AnimeBytes", href: "/settings/animebytes"}
+        { name: "AnimeBytes", href: "/settings/animebytes"},
+        { name: "Logs", href: "/settings/logs"},
       ];
 
     return (

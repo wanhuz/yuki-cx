@@ -5,7 +5,7 @@ import { getQBClientSettings } from '@/lib/api/settings';
 
 export async function POST(request: Request) {
     const body = await request.json();
-    const { torrentLink } = body;
+    const { torrentLink, torrentName } = body;
 
     if (!torrentLink) {
         return NextResponse.json({ error: 'Missing parameters torrent link' }, { status: 400 });
@@ -18,13 +18,15 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Invalid torrent link' }, { status: 403 });
     }
 
-    status = await addTorrent(torrentLink, 
+    status = await addTorrent(
+        torrentLink, 
         qbSettings.qb_url || "", 
         qbSettings.qb_port || 0, 
         qbSettings.qb_username || "", 
         qbSettings.qb_password || "", 
         qbSettings.qb_pause_torrent || false, 
-        qbSettings.qb_default_label || ""
+        qbSettings.qb_default_label || "",
+        torrentName
     );
     
     return NextResponse.json({

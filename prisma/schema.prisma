@@ -76,3 +76,10 @@ model AnimeSchedulerEpisodeReference {
 
   @@unique([scheduler_ref_id, episode_number])
 }
+
+model DownloadLogs {
+  id                    Int @id @default(autoincrement())
+  title                 String
+  scheduler_torrent_id  Int?
+  download_at           DateTime
+}

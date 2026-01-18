@@ -80,7 +80,13 @@ export async function updateSeriesScheduler(ab_id: number, item: AnimeBytesItem)
   });
 }
 
-export async function processMatchedLink(qbSettings : qbSettings, ab_id: number, downloadLink: string, torrentId: number, item: AnimeBytesItem) {
+export async function processMatchedLink(
+    qbSettings : qbSettings, 
+    ab_id: number, 
+    downloadLink: string, 
+    torrentId: number, 
+    item: AnimeBytesItem
+  ) {
   console.log(`Matched ab_id=${ab_id}. Download link: ${downloadLink}`);
 
   addTorrent(downloadLink, 
@@ -89,7 +95,8 @@ export async function processMatchedLink(qbSettings : qbSettings, ab_id: number,
     qbSettings.qb_username || "", 
     qbSettings.qb_password || "", 
     qbSettings.qb_pause_torrent || false, 
-    qbSettings.qb_default_label || ""
+    qbSettings.qb_default_label || "",
+    [item.title]
   );
 
   await prisma.processedTorrent.create({

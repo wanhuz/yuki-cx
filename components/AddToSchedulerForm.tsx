@@ -9,7 +9,7 @@ export function AddToSchedulerForm({ anime_data, filters }: { anime_data: Anime,
         event.preventDefault();
         try {
             const result = await addToScheduler(anime_data, filters);
-            console.log(result);
+
             toast.success(`Added ${anime_data.SeriesName} to scheduler`, { position: "bottom-right" });
         } catch (error) {
             toast.error(`Failed to add ${anime_data.SeriesName} to scheduler`, { position: "bottom-right" });
