@@ -2,7 +2,8 @@
 
 import { AnimeScheduler, AnimeSchedulerEpisodeReference, AnimeSchedulerFilter, AnimeSchedulerReference, PrismaClient } from "@prisma/client";
 import {getFirstStudioOnly} from "../util/animebytes";
-import { extractAniDBIDFromLinks, stripHTML } from "../util/util";
+import { extractAniDBIDFromLinks, extractMalIDFromLinks, stripHTML } from "../util/util";
+import { getAnimeAiringTime, getAnilistID  } from "./anilist";
 import { getAnimeAiringData } from "./anizip";
 
 const SCHEDULER_PORT = process.env.SCHEDULER_PORT || 4000;
@@ -10,7 +11,10 @@ const SCHEDULER_PORT = process.env.SCHEDULER_PORT || 4000;
 export async function addToScheduler(anime_data: Anime, filters: Filters) {
     const ab_id = anime_data.ID;
     const series_name = anime_data.SeriesName;
+
     const anidb_id = extractAniDBIDFromLinks(anime_data.Links);
+    const mal_id = extractMalIDFromLinks(anime_data.Links);
+    const anilist_id = mal_id ? await getAnilistID(mal_id) : null;
 
     const prisma = new PrismaClient();
 
@@ -22,16 +26,21 @@ export async function addToScheduler(anime_data: Anime, filters: Filters) {
             where: { id: existingItem.id },
             data: {
                 anidb_id: anidb_id, //ID won't change - This is for existing data before migration that does not have ID
+                mal_id: mal_id,
+                anilist_id: anilist_id,
                 soft_deleted: false
             }
         });
+
+        const airingTime = await getAnimeAiringTime(anilist_id);
 
         await prisma.animeSchedulerReference.updateMany({
             where: { scheduler_id: existingItem.id },
             data: {
                 summary: stripHTML(anime_data.Description), 
                 tags: anime_data.Tags.join(", "),
-                poster_url: anime_data.Image
+                poster_url: anime_data.Image,
+                airing_time: airingTime
             }
         });
 
@@ -94,12 +103,16 @@ export async function addToScheduler(anime_data: Anime, filters: Filters) {
         const createdItem = await prisma.animeScheduler.create({       
             data: {
                 ab_id: ab_id,
+                mal_id: mal_id,
                 anidb_id: anidb_id,
+                anilist_id: anilist_id,
                 series_name: series_name.toLowerCase(),
             }  
         });
 
         const episodes = anidb_id ? await getAnimeAiringData(anidb_id) : null;
+
+        const airingTime = await getAnimeAiringTime(anilist_id);
 
         const schedulerReference = await prisma.animeSchedulerReference.create({
             data: {
@@ -108,7 +121,8 @@ export async function addToScheduler(anime_data: Anime, filters: Filters) {
                 studio_name: getFirstStudioOnly(anime_data.StudioList),
                 summary: anime_data.Description,
                 tags: anime_data.Tags.join(", "),
-                poster_url: anime_data.Image
+                poster_url: anime_data.Image,
+                airing_time: airingTime
             }
         });
 

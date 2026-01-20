@@ -32,3 +32,17 @@ export function extractAniDBIDFromLinks(links: string[]): number | null {
 
     return null;
 }
+
+export function extractMalIDFromLinks(links: string[]): number | null {
+    for (const link of links) {
+        if (!link.startsWith("https://myanimelist.net/anime/")) continue;
+
+        const match = link.match(/myanimelist\.net\/anime\/(\d+)/);
+
+        if (match) {
+            return Number(match[1]);
+        }
+    }
+
+    return null;
+}
