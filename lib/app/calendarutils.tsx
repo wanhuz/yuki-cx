@@ -14,7 +14,7 @@ export function buildDailyContainers(
       summary: string; 
       tags: string; 
       poster_url: string; 
-      airing_time: Date
+      airing_time: Date | null
     }; 
     episode: { 
       episode_number: number; 
@@ -57,7 +57,7 @@ export function buildDailyContainers(
         poster={ref.poster_url}
         number={episode.episode_number}
         title={episode.episode_title || ""}
-        airtime={ref.airing_time}
+        airtime={ref.airing_time || null}
       />
     );
   }

@@ -33,19 +33,23 @@ export default function EpisodeCalendarCard({
     tags: string;
     number: number;
     title: string;
-    airtime: Date;
+    airtime: Date | null;
 }) {
 
     const seriesLink = generateSeriesLink(series_name, id);
+    let time = null
 
-    const airing_time = new Date(airtime);
+    if (airtime !== null) {
+        const airing_time = new Date(airtime);
 
-    const time = airing_time.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-        hourCycle: "h12",
-    }).replace(/^0/, "");
+        time = airing_time.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+            hourCycle: "h12",
+        }).replace(/^0/, "");
+    }
+
     
 
     return (

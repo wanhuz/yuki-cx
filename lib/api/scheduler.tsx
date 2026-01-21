@@ -190,6 +190,7 @@ export async function getUpcomingAnime(searchQuery: string | null = null) :
     { 
         references: 
         {
+            airing_time: Date | null;
             series_name: string;
             studio_name: string;
             summary: string;
