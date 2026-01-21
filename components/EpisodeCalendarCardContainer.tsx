@@ -8,11 +8,23 @@ export default function EpisodeCalendarCardContainer({
     airdate: Date;
 }) {
 
+    function isSameDay(a: Date, b: Date) {
+        return (
+            a.getDate() === b.getDate() &&
+            a.getMonth() === b.getMonth() &&
+            a.getFullYear() === b.getFullYear()
+        );
+    }
+
     const day = airdate.getDate();
     const today = new Date();
 
-    const isToday = day === today.getDate();
-    const isTomorrow = day === today.getDate() + 1;
+    const isToday = isSameDay(airdate, today);
+
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    const isTomorrow = isSameDay(airdate, tomorrow);
 
     const weekday = airdate.toLocaleString('en-GB', { weekday: 'long' });
     const month = airdate.toLocaleString('en-GB', { month: 'long' });
