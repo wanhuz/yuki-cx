@@ -219,7 +219,7 @@ export async function getUpcomingAnime(searchQuery: string | null = null) :
                 episodes: {
                 where: {
                     episode_date: {
-                    gte: today, 
+                        gte: today, 
                     },
                 },
                 },

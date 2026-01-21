@@ -24,6 +24,7 @@ export default function EpisodeCalendarCard({
     tags,
     number,
     title,
+    airtime,
 }: {
     series_name: string;
     poster: string;
@@ -32,40 +33,53 @@ export default function EpisodeCalendarCard({
     tags: string;
     number: number;
     title: string;
+    airtime: Date;
 }) {
 
     const seriesLink = generateSeriesLink(series_name, id);
+
+    const airing_time = new Date(airtime);
+
+    const time = airing_time.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+        hourCycle: "h12",
+    }).replace(/^0/, "");
+    
 
     return (
         <div>
 
             {/* <hr className="border-gray-200 dark:border-gray-700 mb-3"></hr> */}
 
-            <div className="flex flex-row rounded-md overflow-hidden shadow bg-white max-w-md hover:bg-gray-100">
+            <div className="flex flex-row rounded-sm overflow-hidden shadow bg-white max-w-md hover:bg-gray-100 max-h-[226px]">
                 <Link href={seriesLink} >
-                    <div className="w-full h-full min-w-[160px] max-w-[160px] relative rounded-md ">
+                    <div className="w-full h-full min-w-[160px] max-w-[160px] max-h-[226px] max-w-[300px] relative ">
                         <Image
                             src={poster}
                             alt={series_name}
                             width={160} 
                             height={180}
-                            className="w-full h-full object-cover rounded-md"
+                            className="w-full h-full object-cover rounded-sm"
                         />
                     </div>
                 </Link>
 
                 <div className="flex flex-col gap-2 justify-between">
                     <div className="flex flex-col p-3 gap-2">
-                        <div className="text-sm font-bold">Episode {number}</div>
+                        <div className="text-sm font-semibold">
+                            {time}
+                        </div>
                         <div className="text-xs text-gray-500">
-                            {title ? title : "Untitled"}
+                           Episode {number}  {title ? " • " + title : ""}
                         </div>
 
                         <div className="text-xs text-gray-500 flex flex-wrap gap-1 mt-1 mb-2">
 
                         </div>
 
-                        <p className="text-xs text-gray-700 line-clamp-5">{summary}</p>
+                        <p className="text-xs text-gray-700 line-clamp-4">{summary}</p>
                     </div>
                     
                     <div className="flex flex-row gap-2 mt-2 bg-gray-50 rounded w-full py-2 justify-between">
