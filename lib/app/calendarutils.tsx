@@ -2,7 +2,27 @@ import EpisodeCalendarCard from "../../components/EpisodeCalendarCard";
 import EpisodeCalendarCardContainer from "../../components/EpisodeCalendarCardContainer";
 import EpisodeCalendarCardMonthlyContainer from "../../components/EpisodeCalendarCardMonthlyContainer";
 
-export function buildDailyContainers(episodes: any[]): JSX.Element[] {
+export function buildDailyContainers(
+  episodes: { 
+    entry: { 
+      ab_id: number; 
+      series_name: string
+    }; 
+    ref: { 
+      series_name: string; 
+      studio_name: string; 
+      summary: string; 
+      tags: string; 
+      poster_url: string; 
+      airing_time: Date
+    }; 
+    episode: { 
+      episode_number: number; 
+      episode_title: string; 
+      episode_date: Date;
+    } 
+  }[]): JSX.Element[] {
+
   const containers: JSX.Element[] = [];
 
   let currentDateKey = "";

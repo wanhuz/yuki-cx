@@ -197,7 +197,6 @@ export async function getUpcomingAnime(searchQuery: string | null = null) :
             poster_url: string
             episodes: AnimeSchedulerEpisodeReference[]
         }[];
-        filter: AnimeSchedulerFilter[] 
     } )[]> {
     
     const prisma = new PrismaClient();
@@ -224,8 +223,7 @@ export async function getUpcomingAnime(searchQuery: string | null = null) :
                 },
                 },
             },
-            },
-            filter: true,
+            }
         },
     });
 

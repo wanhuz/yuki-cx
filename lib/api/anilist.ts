@@ -3,7 +3,7 @@
 
 export async function getAnilistID(mal_id: number) {
 
-    let query = `
+    const query = `
         query ($idMal: Int) { # Define which variables will be used in the query (id)
             Media (idMal: $idMal, type: ANIME) { # Insert our variables into the query arguments (id) (type: ANIME is hard-coded in the query)
                 id
@@ -11,11 +11,11 @@ export async function getAnilistID(mal_id: number) {
         }
         `;
 
-    var variables = {
+    const variables = {
         idMal: mal_id
     };
 
-    var url = 'https://graphql.anilist.co',
+    const url = 'https://graphql.anilist.co',
         options = {
             method: 'POST',
             headers: {
@@ -42,7 +42,7 @@ export async function getAnilistID(mal_id: number) {
 }
 
 export async function getAnimeAiringTime(anilist_id: number): Promise<Date | null> {
-    let query = `
+    const query = `
         query ($id: Int) {
             Media(id: $id, type: ANIME) {
                 nextAiringEpisode {
@@ -52,11 +52,11 @@ export async function getAnimeAiringTime(anilist_id: number): Promise<Date | nul
         }
     `
 
-    let variables = {
+    const variables = {
         id: anilist_id
     };
 
-    var url = 'https://graphql.anilist.co',
+    const url = 'https://graphql.anilist.co',
         options = {
             method: 'POST',
             headers: {

@@ -72,7 +72,7 @@ model AnimeSchedulerEpisodeReference {
   id                Int      @id @default(autoincrement())
   episode_title     String?
   episode_number    Int
-  episode_date      DateTime?
+  episode_date      DateTime
 
   scheduler_ref_id  Int
   animeSchedulerReference AnimeSchedulerReference @relation(fields: [scheduler_ref_id], references: [id], onDelete: Cascade)

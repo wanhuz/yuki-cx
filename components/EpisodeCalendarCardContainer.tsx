@@ -16,7 +16,6 @@ export default function EpisodeCalendarCardContainer({
 
     const weekday = airdate.toLocaleString('en-GB', { weekday: 'long' });
     const month = airdate.toLocaleString('en-GB', { month: 'long' });
-    const year = airdate.getFullYear();
 
     return (
         <div className="flex flex-col gap-2 w-full">
