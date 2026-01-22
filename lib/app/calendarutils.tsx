@@ -30,8 +30,15 @@ export function buildDailyContainers(
   let currentAirdate: Date | null = null;
 
   for (const { entry, ref, episode } of episodes) {
-    const airdate = episode.episode_date ?? new Date();
-    const dateKey = airdate.toISOString().split("T")[0];
+    if (!episode.episode_date) continue;
+
+    const airdate = new Date(episode.episode_date);
+    const dateKey =
+      airdate.getFullYear() +
+      "-" +
+      String(airdate.getMonth() + 1).padStart(2, "0") +
+      "-" +
+      String(airdate.getDate()).padStart(2, "0");
 
     if (dateKey !== currentDateKey && currentCards.length > 0) {
       containers.push(
@@ -57,7 +64,7 @@ export function buildDailyContainers(
         poster={ref.poster_url}
         number={episode.episode_number}
         title={episode.episode_title || ""}
-        airtime={ref.airing_time || null}
+        airtime={episode.episode_date || null}
       />
     );
   }

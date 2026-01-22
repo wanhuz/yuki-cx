@@ -42,17 +42,27 @@ async function updateSeriesUpcomingEpisodes() {
   }
 }
 
-// Run every 6 hours
-cron.schedule('0 */6 * * *', async () => {
+async function main() {
+  console.log('Updating series upcoming episodes once');
+  await updateSeriesUpcomingEpisodes();
+
+  // Run every 6 hours
+  cron.schedule('0 */6 * * *', async () => {
     console.log('Updating series upcoming episodes...');
 
     try {
-        await updateSeriesUpcomingEpisodes();
+      await updateSeriesUpcomingEpisodes();
     } catch (error) {
-        console.error('Update series upcoming episodes error:', error);
+      console.error('Update series upcoming episodes error:', error);
     }
 
     console.log('Series upcoming episodes updated.');
-});
+  });
 
-console.log('Episode updater started.');
+  console.log('Episode updater started.');
+}
+
+main().catch(err => {
+  console.error('Fatal startup error:', err);
+  process.exit(1);
+});

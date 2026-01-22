@@ -3,6 +3,7 @@
 type AniZipEpisode = {
     episode: string | number;
     airdate?: string;
+    airDateUtc?: string;
     title: {
         en?: string;
     };
@@ -28,9 +29,11 @@ export async function getAnimeAiringData(
     const futureEpisodes = Object.values(data.episodes as Record<string, AniZipEpisode>)
         .filter(ep => ep.airdate)
         .map(ep => ({
-            title: ep.title.en ?? "",
+            title: ep.title?.en ?? "",
             episode: Number(ep.episode),
-            airdate: new Date(`${ep.airdate}T00:00:00Z`),
+            airdate: ep.airDateUtc
+                ? new Date(ep.airDateUtc)
+                : new Date(`${ep.airdate}T00:00:00Z`), // fallback only
         }))
         .filter(ep => ep.airdate > now)
         .sort((a, b) => a.airdate.getTime() - b.airdate.getTime());
