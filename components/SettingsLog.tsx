@@ -72,7 +72,7 @@ export function SettingsLogs() {
                         key={index}
                         className="border rounded-lg p-4 shadow-sm bg-white flex flex-col"
                     >
-                        <div className="text-gray-700 break-words">
+                        <div className="text-sm text-gray-700 break-words">
                             {item.title}
                         </div>
                         <div className="text-gray-500 text-sm mt-4">

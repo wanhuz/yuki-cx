@@ -52,17 +52,23 @@ export async function addTorrent(
         category: qb_default_label
       }
 
-      const status = await client.addTorrent(base64Torrent, torrentOption);
+      try {
+        const status = await client.addTorrent(base64Torrent, torrentOption);
 
-      if (status) {
-        file_names.map(async (name) => {
-          await Log(name, new Date());
-        })
+        if (status) {
+          file_names.map(async (name) => {
+            await Log(name, new Date());
+          });
+        }
 
-        return 200
+        return 200;
+
+      } catch (error) {
+        console.error(`Error adding torrent to qBittorrent:`, error);
+        throw error;
       }
-        
-      return 500
+
+
     } catch (error) {
       console.error(`Error creating QBittorrent client: `, error);
       throw error;
