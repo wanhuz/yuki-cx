@@ -56,16 +56,16 @@ export async function addTorrent(
         const status = await client.addTorrent(base64Torrent, torrentOption);
 
         if (status) {
-          file_names.map(async (name) => {
+          for (const name of file_names) {
             await Log(name, new Date());
-          });
+          }
         }
 
         return 200;
 
       } catch (error) {
         console.error(`Error adding torrent to qBittorrent:`, error);
-        throw error;
+        return 500;
       }
 
 
