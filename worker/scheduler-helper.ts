@@ -59,10 +59,6 @@ export async function isQBHealthy(qbSettings : qbSettings): Promise<{ ok: boolea
   }
 
 export async function updateSeriesScheduler(ab_id: number, item: AnimeBytesItem) {
-  function stripHTML(html: string): string {
-    const noTags = html.replace(/<[^>]*>/g, "");
-    return decode(noTags);
-  }
 
   const seriesToUpdate = await prisma.animeScheduler.update({
     where: { ab_id },
@@ -73,9 +69,10 @@ export async function updateSeriesScheduler(ab_id: number, item: AnimeBytesItem)
   });
 
   await prisma.animeSchedulerReference.updateMany({
-    where: { scheduler_id: seriesToUpdate.id },
+    where: { 
+      scheduler_id: seriesToUpdate.id 
+    },
     data: {
-      summary: stripHTML(item.description),
       poster_url: item.poster_url
     }
   });
