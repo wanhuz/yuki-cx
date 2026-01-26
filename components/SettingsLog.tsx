@@ -41,7 +41,7 @@ export function SettingsLogs() {
                         <tr className="text-sm font-medium text-gray-700 uppercase bg-gray-200">
                             <th className="px-4 py-3">No.</th>
                             <th className="px-4 py-3">Title</th>
-                            <th className="px-4 py-3">Download Time</th>
+                            <th className="px-4 py-3">Date</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -49,7 +49,7 @@ export function SettingsLogs() {
                             <tr key={index} className="text-sm">
                                 <td className="border px-4 py-2 text-center">{(currentPage - 1) * pageSize + index + 1}</td>
                                 <td className="border px-4 py-2">{item.title}</td>
-                                <td className="border px-4 py-2 text-center">
+                                <td className="border px-4 py-2 text-center whitespace-nowrap">
                                     {new Intl.DateTimeFormat("default", {
                                         year: "numeric",
                                         month: "2-digit",

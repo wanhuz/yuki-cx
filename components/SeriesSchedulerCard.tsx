@@ -4,6 +4,7 @@ import { deleteFromScheduler } from "@/lib/api/scheduler";
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "react-toastify";
+import { useState } from "react";
 
 function generateSeriesLink(title : string, id : number) {
     return "/anime/" + encodeURIComponent(title) + "?id=" + id;
@@ -56,13 +57,14 @@ export default function SeriesCard({
     last_fetched_at: Date;
     triggerUpdate: () => void;
 }) {
+    const [showCardTitle, setShowCardTitle] = useState(false);
 
     const seriesLink = generateSeriesLink(series_name, id);
 
     return (
-            <div className="flex flex-row rounded-md overflow-hidden shadow bg-white max-w-md hover:bg-gray-100">
+            <div className="flex flex-row rounded-md overflow-hidden shadow bg-white max-w-md hover:bg-gray-100 hover:cursor-pointer" onMouseEnter={() => setShowCardTitle(true)} onMouseLeave={() => setShowCardTitle(false)}>
                 <Link href={seriesLink} >
-                    <div className="w-full h-full min-w-[160px] max-w-[160px] relative rounded-md ">
+                    <div className="w-full h-full min-w-[160px] max-w-[160px] relative rounded-md" >
                         <Image
                             src={poster}
                             alt={series_name}
@@ -70,7 +72,7 @@ export default function SeriesCard({
                             height={180}
                             className="w-full h-full object-cover rounded-md"
                         />
-                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs px-2 py-1 flex flex-col justify-between">
+                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-xs px-2 py-1 flex flex-col justify-between" style={{ display: showCardTitle ? "block" : "none" }}>
                             <div className="text-xs my-1"><b>{series_name}</b></div>
                             <div className="font-bold text-xs text-red-300 my-1">{studio_name}</div>
                         </div>

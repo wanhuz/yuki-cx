@@ -8,7 +8,7 @@ export default function SettingsCard({label, id, placeholder, type, addClass, na
             <label className="block text-gray-700 text-sm mb-2" htmlFor={id}>
                 {label}
             </label>
-            <input name={name} onChange={onChange} value={value} className="text-sm max-w-xs shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id={id} type={type} placeholder={placeholder ?? ""}/>
+            <input name={name} onChange={onChange} value={value} className="text-sm max-w-xs shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id={id} type={type} placeholder={type === "password" ? "Leave blank to use default" : placeholder ?? ""}/>
         </div>
     );
 }
