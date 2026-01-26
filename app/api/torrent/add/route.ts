@@ -12,13 +12,12 @@ export async function POST(request: Request) {
     }
 
     const qbSettings = await getQBClientSettings();
-    let status = 0;
 
     if (!torrentLink.includes("animebytes")) {
         return NextResponse.json({ error: 'Invalid torrent link' }, { status: 403 });
     }
 
-    status = await addTorrent(
+    const status = await addTorrent(
         torrentLink, 
         qbSettings.qb_url || "", 
         qbSettings.qb_port || 0, 
@@ -30,7 +29,6 @@ export async function POST(request: Request) {
         addToLog
     );
     
-    return NextResponse.json({
-        status: {status},
-    });
+    
+    return NextResponse.json(status);
 }

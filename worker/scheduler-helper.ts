@@ -90,7 +90,7 @@ export async function processMatchedLink(
   ) {
   console.log(`Matched ab_id=${ab_id}. Download link: ${downloadLink}`);
 
-  addTorrent(downloadLink, 
+  const status = await addTorrent(downloadLink, 
     qbSettings.qb_url || "", 
     qbSettings.qb_port || 0, 
     qbSettings.qb_username || "", 
@@ -100,6 +100,11 @@ export async function processMatchedLink(
     [item.title],
     addToLog
   );
+
+  if (!status.ok) {
+    console.error("Error adding torrent:", status.error ?? "Unknown error");
+    return;
+  }
 
   await prisma.processedTorrent.create({
       data: {

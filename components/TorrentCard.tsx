@@ -25,12 +25,37 @@ async function handleSubmit(torrentUrl: string, torrentFileList: FileData[], set
         });
 
         if (!response.ok) {
-            toast.error("Failed to send POST request", {position: "bottom-right"})
-            console.error("Failed to send POST request");
+            toast.error("Failed to send POST request " + response.statusText, {position: "bottom-right"})
+
+            console.error("Failed to send POST request" + response.statusText);
+
+            return;
         }
 
-        const result = await response.json();
-        console.log(result);
+        let result;
+
+        try {
+            result = await response.json();
+        } catch {
+            toast.error("Invalid server response", { position: "bottom-right" });
+
+            console.error("Response was not valid JSON");
+
+            return;
+        }
+
+        if (!result.ok) {
+            console.log("ERRORR HERE: " + result.error);
+            toast.error(
+                result.error ? `Failed to add torrent: ${result.error}` : "Failed to add torrent",
+                { position: "bottom-right" }
+            );
+
+            console.log("Failed to Add Torrent " + result.error);
+
+            return;
+        }
+
         toast.success("Successfully added torrent!", {position: "bottom-right"})
     } catch (error) {
         console.error("Error:", error);

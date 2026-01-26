@@ -45,33 +45,43 @@ export async function addTorrent(
       });
 
       const base64Torrent = await getBase64FromTorrentURL(url)
-      const isPaused = qb_pause_torrent ? "true" : "false";
+
+      if (!base64Torrent || base64Torrent.length < 100) {
+        return { 
+          ok: false, 
+          error: "Invalid torrent data" 
+        };
+      }
 
       const torrentOption: Partial<AddTorrentOptions> = {
-        paused: isPaused,
+        paused: qb_pause_torrent ? "true" : "false",
         category: qb_default_label
       }
 
-      try {
-        const status = await client.addTorrent(base64Torrent, torrentOption);
 
-        if (status) {
-          for (const name of file_names) {
-            await Log(name, new Date());
-          }
+      const status = await client.addTorrent(base64Torrent, torrentOption);
+
+      if (status) {
+        for (const name of file_names) {
+          await Log(name, new Date());
         }
-
-        return 200;
-
-      } catch (error) {
-        console.error(`Error adding torrent to qBittorrent:`, error);
-        return 500;
       }
+
+      return {
+        ok: true,
+        error: null
+      };
+
 
 
     } catch (error) {
-      console.error(`Error creating QBittorrent client: `, error);
-      throw error;
+      const message = error instanceof Error ? error.message : String(error);
+      console.error(`addTorrent failed: `, message);
+
+      return {
+        ok: false,
+        error: message,
+      };
     }
 }
 
