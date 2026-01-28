@@ -1,6 +1,5 @@
 "use server";
 
-import { PrismaClient } from "@prisma/client";
 import { AniZipEpisode, AniZipSeries, AniZipTVDBData } from "./anizip.types";
 
 async function getAnimeInformation(anidb_id: number): Promise<AniZipSeries | null> {

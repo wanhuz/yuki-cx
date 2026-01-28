@@ -1,28 +1,6 @@
+import { FanartItem, FanartResponse, SeasonPoster, TvThumb } from "./fanarttv.types";
 
-type FanartItem = {
-  id: string;
-  lang: string;
-  url: string;
-  likes: string;
-  season?: string;
-};
 
-type TvThumb = {
-  id: string;
-  url: string;
-  likes: string;
-};
-
-type FanartResponse = {
-  hdtvlogo?: FanartItem[];
-  seasonposter?: FanartItem[];
-  tvthumb?: TvThumb[];
-};
-
-type SeasonPoster = {
-  hdtvlogo?: FanartItem;
-  seasonposter?: FanartItem | TvThumb;
-};
 
 export async function getFanartTV(tvdb_id : number) {
     const apiKey = process.env.FANARTTV_APIKEY;

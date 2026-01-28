@@ -1,4 +1,4 @@
-import { AnimeIdMap, AnimeResource, PrismaClient } from "@prisma/client";
+import { AnimeIdMap, PrismaClient } from "@prisma/client";
 import { getAnimes } from "../api/animebytes"
 import { getTVDBData } from "../api/anizip";
 import { getFanartTV } from "../api/fanarttv";
@@ -87,9 +87,7 @@ export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
   return enrichedAnime;
 }
 
-export async function getAnimeBanner(anidb_id : number) {
-    
-}
+
 
 export async function getTVDBMapping(anidb_id: number): Promise<AnimeIdMap | null> {
 
