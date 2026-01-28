@@ -1,5 +1,5 @@
 import { search } from "@/lib/api/animebytes";
-import { ABGroup } from "@/lib/api/animebytes.types";
+import { ABGroup } from "@/lib/interface/animebytes";
 import { extractOngoingStatus } from "@/lib/util/animebytes";
 import { useEffect, useState } from "react";
 

@@ -1,6 +1,6 @@
 "use server";
 
-import { ABSearchResponse, ABSearchQueryParams, ABGroup  } from "./animebytes.types";
+import { ABSearchResponse, ABSearchQueryParams, ABGroup  } from "../interface/animebytes";
 import { getABSettings } from "./settings";
 
 const ab_settings = await getABSettings();

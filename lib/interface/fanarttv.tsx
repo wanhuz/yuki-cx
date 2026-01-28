@@ -1,4 +1,4 @@
-export type FanartItem = {
+export interface FanartItem {
   id: string;
   lang: string;
   url: string;
@@ -6,19 +6,19 @@ export type FanartItem = {
   season?: string;
 };
 
-export type TvThumb = {
+export interface TvThumb {
   id: string;
   url: string;
   likes: string;
 };
 
-export type FanartResponse = {
+export interface FanartResponse {
   hdtvlogo?: FanartItem[];
   seasonposter?: FanartItem[];
   tvthumb?: TvThumb[];
 };
 
-export type SeasonPoster = {
+export interface SeasonPoster {
   hdtvlogo?: FanartItem;
   seasonposter?: FanartItem | TvThumb;
 };
