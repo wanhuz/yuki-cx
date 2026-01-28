@@ -9,9 +9,23 @@ const USERNAME = ab_settings.ab_username;
 const ANIMEBYTES_URL = "https://animebytes.tv/scrape.php"
 
 
-export async function search(series_name : string, type : string) {
+type ABSearchQueryParams = {
+  title: string;
+  type: string;
+  maxItem: number;
+  hentai?: number;   // default = 0
+  sort?: string;     // default = "relevance"
+  way?: string;      // default = "asc"
+  airing?: number;   // default = -1
+  epcount?: number;  // default = -1
+  epcount2?: number; // default = -1
+  year?: number;    // default = -1
+};
 
-    const search_query = generateSearchQuery(series_name, type, 25);
+export async function search(series_name : string, type : string) {
+    const search_query_params = {title: series_name, type: type, maxItem: 25};
+
+    const search_query = generateSearchQuery(search_query_params);
 
     const data = await fetch(search_query, {
         next: { revalidate: 3600 }, 
@@ -29,7 +43,9 @@ export async function search(series_name : string, type : string) {
     As a result, link to the page need to have title and ID
 */
 export async function getAnime(anime_title: string, id : number) {
-    const search_query = generateSearchQuery(anime_title, "", 10);
+    const search_query_params = {title: anime_title, type: "DEFAULT", maxItem: 5};
+
+    const search_query = generateSearchQuery(search_query_params);
 
     const data = await fetch(search_query, {
         next: { revalidate: 3600 }, 
@@ -54,34 +70,61 @@ export async function getAnime(anime_title: string, id : number) {
     return anime_data;
 }
 
-function generateSearchQuery(title : string, type : string, maxItem : number) {
-    const auth_params = ANIMEBYTES_URL + "?torrent_pass=" + PASSKEY + "&username=" + USERNAME;
-    let filter_anime_type_params;
+function generateSearchQuery({
+    title,
+    type,
+    maxItem,
+    hentai = 0,
+    sort = "relevance",
+    way = "asc",
+    airing = -1, 
+    epcount = -1,
+    epcount2 = -1,
+    year = -1
+    }: ABSearchQueryParams
+    ) {
+    const authParams = {
+        torrent_pass: PASSKEY,
+        username: USERNAME,
+    };
 
-    switch(type) {
-        default:
-            filter_anime_type_params = "&anime[tv_series]=1"  + "&anime[tv_special]=1" + "&anime[movie]=1" + "&anime[ova]=1" + "&anime[ona]=1"
-            break;
-        case "TV_SERIES":
-            filter_anime_type_params = "&anime[tv_series]=1"
-            break;
-        case "TV_SPECIAL":
-            filter_anime_type_params = "&anime[tv_special]=1"
-            break;
-        case "OVA":
-            filter_anime_type_params = "&anime[ova]=1"
-            break;
-        case "ONA":
-            filter_anime_type_params = "&anime[ona]=1"
-            break;
-        case "MOVIE":
-            filter_anime_type_params = "&anime[movie]=1"
-            break;
-    }
 
-    const search_query = auth_params + "&searchstr=" + title + "&type=anime" + "&search_type=title" + "&sort=relevance" + filter_anime_type_params + "&limit=" + maxItem;
+    const animeTypeMap: Record<string, Record<string, string>> = {
+        TV_SERIES:  { "anime[tv_series]": "1" },
+        TV_SPECIAL: { "anime[tv_special]": "1" },
+        OVA:        { "anime[ova]": "1" },
+        ONA:        { "anime[ona]": "1" },
+        MOVIE:      { "anime[movie]": "1" },
+        DEFAULT: {
+            "anime[tv_series]": "1",
+            "anime[tv_special]": "1",
+            "anime[movie]": "1",
+            "anime[ova]": "1",
+            "anime[ona]": "1",
+        },
+    };
 
-    return search_query
+    const params = new URLSearchParams({
+        torrent_pass: authParams.torrent_pass ?? "",
+        username: authParams.username ?? "",
+        hentai: String(hentai),
+        airing: airing === -1 ? "" : String(airing),
+        sort: String(sort),
+        way: String(way),
+        searchstr: decodeURIComponent(title),
+        ...animeTypeMap[type] ?? animeTypeMap.TV_SERIES,
+        type: "anime",
+        search_type: "title",
+        limit: String(maxItem),
+        epcount: epcount === -1 ? "" : String(epcount),
+        epcount2: epcount2 === -1 ? "" : String(epcount2),
+        year: year === -1 ? "" : String(year)
+    });
+
+
+    const search_query = `${ANIMEBYTES_URL}?${params.toString()}`;
+
+    return search_query;
 }
 
 export async function animeBytesStatusHealth() {
@@ -115,4 +158,18 @@ export async function animeBytesStatusHealth() {
   } catch (err) {
     return { ok: false, reason: "UNREACHABLE" };
   }
+}
+
+export async function getAnimes(ABSearchQueryParams: ABSearchQueryParams) {
+
+    const search_query = generateSearchQuery(ABSearchQueryParams);
+
+    const data = await fetch(search_query, {
+        next: { revalidate: 3600 }, 
+    });
+
+    const search_result = await data.json();
+    const search_result_groups = search_result["Groups"];
+         
+    return search_result_groups;
 }

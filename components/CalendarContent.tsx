@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getUpcomingAnime } from "@/lib/api/scheduler";
-import { buildDailyContainers, buildMonthlyContainers} from "../lib/app/calendarutils";
+import { buildDailyContainers, buildMonthlyContainers} from "../lib/app/calendar";
 
 export default function CalendarContent() {
   const [listContainers, setListContainers] = useState<JSX.Element[]>([]);

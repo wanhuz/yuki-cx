@@ -1,20 +1,32 @@
 "use server";
 
+import { PrismaClient } from "@prisma/client";
+
 type AniZipEpisode = {
-    episode: string | number;
-    airdate?: string;
-    airDateUtc?: string;
-    title: {
-        en?: string;
-    };
+  episode: string | number;
+  episodeNumber?: number;
+  seasonNumber?: number;
+
+  airdate?: string;
+  airDateUtc?: string;
+
+  title?: {
+    en?: string;
+    [lang: string]: string | undefined;
+  };
 };
 
 async function getAnimeInformation(anidb_id: number) {
-    const response = await fetch(`https://api.ani.zip/mappings?anidb_id=${anidb_id}`);
+    try {
+        const response = await fetch(`https://api.ani.zip/mappings?anidb_id=${anidb_id}`);
 
-    const data = await response.json();
+        const data = await response.json();
 
-    return data;
+        return data;
+    } catch (error) {
+        console.error('Error:', error);
+        return null;
+    }
 }
 
 export async function getAnimeAiringData(
@@ -39,4 +51,44 @@ export async function getAnimeAiringData(
         .sort((a, b) => a.airdate.getTime() - b.airdate.getTime());
 
     return futureEpisodes.length > 0 ? futureEpisodes : null;
+}
+
+export async function getTVDBId(anidb_id: number) {
+
+    const prisma = new PrismaClient();
+
+    const existing = await prisma.animeIdMap.findFirst({
+        where: {
+            anidb_id
+        }
+    });
+
+    if (existing) return existing.tvdb_id;
+
+    const data = await getAnimeInformation(anidb_id);
+
+    const tvdb_id = data.mappings.thetvdb_id;
+
+
+
+    const episodes = Object.values(data.episodes) as AniZipEpisode[];
+
+    const season_number = episodes.find( e => typeof e.episodeNumber === "number")?.seasonNumber;
+
+    if (!season_number) return null;
+
+    const title = data.titles.en;
+
+    await prisma.animeIdMap.create({
+        data: {
+            title,
+            anidb_id,
+            tvdb_id,
+            season_number
+        }
+    });
+
+    await prisma.$disconnect();
+
+    return data.mappings.tvdb_id;
 }

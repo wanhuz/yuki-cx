@@ -10,18 +10,14 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'artworks.thetvdb.com',
       },
+        {
+        protocol: 'https',
+        hostname: 'assets.fanart.tv',
+      },
     ],
   },
 
-  async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/search',
-        permanent: false,
-      },
-    ];
-  },
+
 };
 
 export default nextConfig;

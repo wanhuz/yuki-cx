@@ -13,22 +13,26 @@ model Settings {
   value String?
 }
 
-model ServiceMapping {
-  id        Int     @id @default(autoincrement())
-  anidbid   Int?
-  tvdbid    Int?
-  tmdbid    Int?
-  imdbid    Int?
-  name      String?
-  studio    String?
+model AnimeIdMap {
+  id            Int     @id @default(autoincrement())
+  title         String
+  anidb_id      Int
+  tvdb_id       Int
+  season_number Int 
+
+  resolved_at   DateTime @default(now())
+
+  @@unique([anidb_id, tvdb_id, season_number])
+  @@index([anidb_id])
 }
 
 model AnimeScheduler {
   id                      Int     @id @default(autoincrement())
   ab_id                   Int     @unique
-  anidb_id                Int?
-  mal_id                  Int?
-  anilist_id              Int?
+  anidb_id                Int     @default(-1)
+  mal_id                  Int     @default(-1)
+  anilist_id              Int     @default(-1)
+  tvdb_id                 Int     @default(-1)
   series_name             String
   filter_property         String  @default("720p")
   last_fetched_episode    Int     @default(0)
@@ -85,4 +89,13 @@ model DownloadLogs {
   title                 String
   scheduler_torrent_id  Int?
   download_at           DateTime
+}
+
+model AnimeResource {
+  id            Int @id @default(autoincrement())
+  anidb_id      Int
+  banner_url    String
+  logo_url      String
+
+  @@unique([anidb_id])
 }
