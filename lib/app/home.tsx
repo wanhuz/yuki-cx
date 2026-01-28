@@ -3,6 +3,8 @@ import { getAnimes } from "../api/animebytes"
 import { getTVDBData } from "../api/anizip";
 import { getFanartTV } from "../api/fanarttv";
 import { extractAniDBIDFromLinks, normalizeDictToArray } from "../util/util";
+import { generateSeriesLink } from "./series";
+import { ABGroup } from "../interface/animebytes";
 
 export type FeaturedAnimeBanner = {
     series_url: string;
@@ -20,7 +22,7 @@ export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
     hentai: 0,
     sort: "votes",
     way: "desc",
-    airing: 1,
+    airing: 0,
     epcount: 1,
     epcount2: 26
   };
@@ -29,12 +31,12 @@ export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
   const anime = await getAnimes(AB_SearchQuery);
 
   let enrichedAnime = await Promise.all(
-    anime.map(async (result: { Links: object; }) => {
+    anime.map(async (result:  ABGroup ): Promise<FeaturedAnimeBanner | null> => {
       const links = normalizeDictToArray(result.Links);
       const anidb_id = extractAniDBIDFromLinks(links);
 
       if (!anidb_id) {
-        return result;
+        return null;
       }
 
       // Check cache
@@ -42,10 +44,14 @@ export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
         where: { anidb_id }
       });
 
+      
+
       if (existing) {
+        const series_link = generateSeriesLink(existing.ab_title, existing.ab_id)
+
         return {
-          series_url: existing.anidb_id.toString(),
-          title: existing.anidb_id.toString(),
+          series_url: series_link,
+          title: existing.ab_title,
           banner_url: existing.banner_url,
           logo_url: existing.logo_url
         } as FeaturedAnimeBanner;
@@ -53,38 +59,49 @@ export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
 
       const tvdb_map = await getTVDBMapping(anidb_id);
 
-      if (!tvdb_map) return result;
+      if (!tvdb_map) return null;
 
-      const banner = await getFanartTV(tvdb_map.tvdb_id);
+      const banner = await getFanartTV(tvdb_map.tvdb_id, tvdb_map.season_number);
 
-      if (!banner?.hdtvlogo || !banner?.seasonposter) return result;
+      if (!banner?.hdtvlogo || !banner?.seasonposter) return null;
+
+      const ab_id = result.ID;
+      const ab_title = result.SeriesName;
 
       // persist
       await prisma.animeResource.create({
         data: {
+          ab_id,
+          ab_title,
           anidb_id,
           banner_url: banner.seasonposter.url,
           logo_url: banner.hdtvlogo.url
         }
       });
 
+      const series_link = generateSeriesLink(ab_title, ab_id)
+
       // return enriched object
       return {
-        series_url: anidb_id.toString(),
-        title: anidb_id.toString(),
+        series_url: series_link,
+        title: ab_title,
         banner_url: banner.seasonposter.url,
         logo_url: banner.hdtvlogo.url
-      };
+      } as FeaturedAnimeBanner;
     })
   );
 
-  enrichedAnime = enrichedAnime.filter(
+  const featuredAnime: FeaturedAnimeBanner[] = enrichedAnime.filter(
+    (item): item is FeaturedAnimeBanner => item !== null
+  );
+
+  const featuredAnimes: FeaturedAnimeBanner[] = featuredAnime.filter(
     (item: FeaturedAnimeBanner) => item.banner_url && item.logo_url
   )
 
   await prisma.$disconnect();
 
-  return enrichedAnime;
+  return featuredAnimes;
 }
 
 

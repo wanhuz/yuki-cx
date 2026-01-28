@@ -145,7 +145,7 @@ export async function animeBytesStatusHealth() {
   }
 }
 
-export async function getAnimes(ABSearchQueryParams: ABSearchQueryParams) {
+export async function getAnimes(ABSearchQueryParams: ABSearchQueryParams): Promise<ABGroup[]> {
 
     const search_query = generateSearchQuery(ABSearchQueryParams);
 

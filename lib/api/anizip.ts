@@ -1,6 +1,6 @@
 "use server";
 
-import { AniZipEpisode, AniZipSeries, AniZipTVDBData } from "./anizip.types";
+import { AniZipEpisode, AniZipSeries, AniZipTVDBData } from "../interface/anizip";
 
 async function getAnimeInformation(anidb_id: number): Promise<AniZipSeries | null> {
     try {
@@ -48,7 +48,7 @@ export async function getTVDBData(anidb_id: number): Promise<AniZipTVDBData | nu
     if (!data) return null;
 
     const tvdb_id = data?.mappings.thetvdb_id || null;
-    const season_number = data?.episodes[0].seasonNumber || null;
+    const season_number = data?.episodes[0] ? data.episodes[0].seasonNumber || 0 : 0;
     const title_en = data?.titles.en || null;
 
     const tvdb_data = { tvdb_id, season_number, title_en } as AniZipTVDBData;
