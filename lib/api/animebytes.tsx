@@ -1,5 +1,6 @@
 "use server";
 
+import { ABSearchResponse, ABSearchQueryParams, ABGroup  } from "./animebytes.types";
 import { getABSettings } from "./settings";
 
 const ab_settings = await getABSettings();
@@ -9,40 +10,24 @@ const USERNAME = ab_settings.ab_username;
 const ANIMEBYTES_URL = "https://animebytes.tv/scrape.php"
 
 
-type ABSearchQueryParams = {
-  title: string;
-  type: string;
-  maxItem: number;
-  hentai?: number;   // default = 0
-  sort?: string;     // default = "relevance"
-  way?: string;      // default = "asc"
-  airing?: number;   // default = -1
-  epcount?: number;  // default = -1
-  epcount2?: number; // default = -1
-  year?: number;    // default = -1
-};
+export async function search(series_name: string, type: string): Promise<ABGroup[]> {
+  const search_query_params = { title: series_name, type: type, maxItem: 25 };
+  const search_query = generateSearchQuery(search_query_params);
 
-export async function search(series_name : string, type : string) {
-    const search_query_params = {title: series_name, type: type, maxItem: 25};
+  const data = await fetch(search_query, {
+    next: { revalidate: 3600 },
+  });
 
-    const search_query = generateSearchQuery(search_query_params);
+  const search_result: ABSearchResponse = await data.json();
 
-    const data = await fetch(search_query, {
-        next: { revalidate: 3600 }, 
-    });
-
-    const search_result = await data.json();
-    const search_result_groups = search_result["Groups"];
-    
-    return search_result_groups;
+  return search_result.Groups;
 }
-
 /*
     This is pretty hackish way of getting anime metadata from AB to display anime page, as AB API didn't provide direct way to do it.
     Works by first searching title and then matching the ID from the search result link
     As a result, link to the page need to have title and ID
 */
-export async function getAnime(anime_title: string, id : number) {
+export async function getAnime(anime_title: string, id : number): Promise<ABGroup | null> {
     const search_query_params = {title: anime_title, type: "DEFAULT", maxItem: 5};
 
     const search_query = generateSearchQuery(search_query_params);
@@ -51,13 +36,13 @@ export async function getAnime(anime_title: string, id : number) {
         next: { revalidate: 3600 }, 
     });
 
-    const search_result = await data.json();
+    const search_result: ABSearchResponse = await data.json();
 
-    if (!search_result["Groups"]) {
+    if (!search_result.Groups) {
         return null;
     }
     
-    const search_result_groups = await search_result["Groups"];
+    const search_result_groups = search_result.Groups;
 
     for (const result of search_result_groups) {
         if (result.ID === id) {

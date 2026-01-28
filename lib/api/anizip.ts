@@ -1,26 +1,13 @@
 "use server";
 
 import { PrismaClient } from "@prisma/client";
+import { AniZipEpisode, AniZipSeries, AniZipTVDBData } from "./anizip.types";
 
-type AniZipEpisode = {
-  episode: string | number;
-  episodeNumber?: number;
-  seasonNumber?: number;
-
-  airdate?: string;
-  airDateUtc?: string;
-
-  title?: {
-    en?: string;
-    [lang: string]: string | undefined;
-  };
-};
-
-async function getAnimeInformation(anidb_id: number) {
+async function getAnimeInformation(anidb_id: number): Promise<AniZipSeries | null> {
     try {
         const response = await fetch(`https://api.ani.zip/mappings?anidb_id=${anidb_id}`);
 
-        const data = await response.json();
+        const data : AniZipSeries = await response.json();
 
         return data;
     } catch (error) {
@@ -53,42 +40,19 @@ export async function getAnimeAiringData(
     return futureEpisodes.length > 0 ? futureEpisodes : null;
 }
 
-export async function getTVDBId(anidb_id: number) {
 
-    const prisma = new PrismaClient();
 
-    const existing = await prisma.animeIdMap.findFirst({
-        where: {
-            anidb_id
-        }
-    });
-
-    if (existing) return existing.tvdb_id;
+export async function getTVDBData(anidb_id: number): Promise<AniZipTVDBData | null > {
 
     const data = await getAnimeInformation(anidb_id);
 
-    const tvdb_id = data.mappings.thetvdb_id;
+    if (!data) return null;
 
+    const tvdb_id = data?.mappings.thetvdb_id || null;
+    const season_number = data?.episodes[0].seasonNumber || null;
+    const title_en = data?.titles.en || null;
 
+    const tvdb_data = { tvdb_id, season_number, title_en } as AniZipTVDBData;
 
-    const episodes = Object.values(data.episodes) as AniZipEpisode[];
-
-    const season_number = episodes.find( e => typeof e.episodeNumber === "number")?.seasonNumber;
-
-    if (!season_number) return null;
-
-    const title = data.titles.en;
-
-    await prisma.animeIdMap.create({
-        data: {
-            title,
-            anidb_id,
-            tvdb_id,
-            season_number
-        }
-    });
-
-    await prisma.$disconnect();
-
-    return data.mappings.tvdb_id;
+    return tvdb_data;
 }

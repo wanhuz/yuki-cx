@@ -1,10 +1,11 @@
 import {formatBytes, extractSource, extractGroup, extractResolution, extractCodecs, extractExtension, extractSubtitle, extractEpisodeNo, extractFreeleechStatus} from "@/lib/util/animebytes";
 import { RawFilters } from "../interface/rawfilter";
+import { ABTorrent } from "../api/animebytes.types";
 
-export function extractTorrent(torrentResult: { ID: number; Property: string; Seeders: number; Leechers: number; Size: number; Link: string; FileList: [{filename : string, size : number}] }[]) : Torrent[] {
+export function extractTorrent(torrentResult: ABTorrent[]) : Torrent[] {
     const torrent_extracted: Torrent[] = [];
 
-    torrentResult.map((entry: { ID: number; Property: string; Seeders: number; Leechers: number; Size: number; Link: string; FileList: [{filename : string, size : number}]}) => {
+    torrentResult.map((entry: ABTorrent) => {
         torrent_extracted.push({
             ID: entry.ID, 
             Source: extractSource(entry.Property),

@@ -1,8 +1,9 @@
 import { search } from "@/lib/api/animebytes";
+import { ABGroup } from "@/lib/api/animebytes.types";
 import { extractOngoingStatus } from "@/lib/util/animebytes";
 import { useEffect, useState } from "react";
 
-async function getServerSideProps(title : string, type : string) {
+async function onSearch(title : string, type : string) {
 
     const searchResult = search(title, type);
  
@@ -10,7 +11,7 @@ async function getServerSideProps(title : string, type : string) {
 
     await searchResult.then((result) => {
         if (result) {
-            result.map((entry: { ID: number; SeriesName: string; FullName: string; Description: string; Image: string; GroupName : string, Year: string, Torrents: Torrent[] }) => {
+            result.map((entry: ABGroup) => {
 
                 if (entry.SeriesName.toLowerCase().includes(title.toLowerCase())) {
                     anime_search_result.push({
@@ -46,7 +47,7 @@ export default function SearchBar({
         onIsSearch(true);
         const getData = setTimeout(() => {
             
-            getServerSideProps(searchText, "").then((result) => {
+            onSearch(searchText, "").then((result) => {
                 onSearchTextChange(result);
                 onIsSearch(false);
             });

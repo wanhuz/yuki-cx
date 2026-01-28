@@ -1,8 +1,8 @@
 import FeaturedAnime from "@/components/FeaturedAnime";
-import { getFeaturedAnime } from "@/lib/app/home";
+import { FeaturedAnimeBanner, getFeaturedAnime } from "@/lib/app/home";
 
 export default async function HomeComponent() {
-    const featuredAnimes = await getFeaturedAnime();
+    const featuredAnimes: FeaturedAnimeBanner[] = await getFeaturedAnime();
 
     return (
       <>
