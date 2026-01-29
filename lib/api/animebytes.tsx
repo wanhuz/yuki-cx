@@ -28,7 +28,12 @@ export async function search(series_name: string, type: string): Promise<ABGroup
     As a result, link to the page need to have title and ID
 */
 export async function getAnime(anime_title: string, id : number): Promise<ABGroup | null> {
-    const search_query_params = {title: anime_title, type: "DEFAULT", maxItem: 5};
+    const search_query_params = {
+      title: anime_title, 
+      type: "DEFAULT", 
+      hentai: 2,
+      maxItem: 3
+    };
 
     const search_query = generateSearchQuery(search_query_params);
 

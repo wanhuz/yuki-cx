@@ -4,6 +4,7 @@ export interface FanartItem {
   url: string;
   likes: string;
   season?: string;
+  added: string;
 };
 
 export interface TvThumb {
@@ -15,6 +16,8 @@ export interface TvThumb {
 export interface FanartResponse {
   hdtvlogo?: FanartItem[];
   seasonposter?: FanartItem[];
+  showbackground?: FanartItem[];
+  tvposter?: FanartItem[];
   tvthumb?: TvThumb[];
 };
 

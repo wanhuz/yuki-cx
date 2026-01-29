@@ -15,7 +15,7 @@ type FeaturedAnimeImage = {
   logo_url: string;
 };
 
-export default function FeaturedAnime({ images, interval = 5000 }: FeaturedAnimeProps) {
+export default function FeaturedAnime({ images, interval = 7000 }: FeaturedAnimeProps) {
   const [index, setIndex] = useState(0);
   const [fade, setFade] = useState(true);
 
@@ -91,13 +91,13 @@ export default function FeaturedAnime({ images, interval = 5000 }: FeaturedAnime
         <>
           <button
             onClick={handlePrev}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/40 p-3 rounded-full hover:bg-black/60 transition"
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/40 p-3 rounded-full hover:bg-white/60 transition"
           >
             ←
           </button>
           <button
             onClick={handleNext}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/40 p-3 rounded-full hover:bg-black/60 transition"
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/40 p-3 rounded-full hover:bg-white/60 transition"
           >
             →
           </button>

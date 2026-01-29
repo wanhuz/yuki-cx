@@ -20,8 +20,11 @@ export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
     type: "TV_SERIES",
     maxItem: 20,
     hentai: 0,
-    sort: "votes",
-    way: "asc"
+    airing: 1,
+    sort: "relevance",
+    way: "desc",
+    epcount: 1,
+    epcount2: 26
   };
 
   const prisma = new PrismaClient();

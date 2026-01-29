@@ -38,6 +38,25 @@ function pickBest(
     })[0];
 }
 
+function pickBestSeasonPoster(items: FanartItem[] | undefined): FanartItem | undefined {
+  if (!items?.length) return undefined;
+
+  const sortedByLikes = [...items].sort((a, b) => Number(b.likes) - Number(a.likes));
+
+  const topLikeCount = Number(sortedByLikes[0].likes);
+
+  const topLikedItems = sortedByLikes.filter(item => Number(item.likes) === topLikeCount);
+
+  if (topLikedItems.length === 1) {
+    return topLikedItems[0];
+  }
+
+  const mostRecent = topLikedItems.sort((a, b) => new Date(b.added).getTime() - new Date(a.added).getTime());
+
+  return mostRecent[0];
+}
+
+
 function pickBestThumb(items: TvThumb[] | undefined): TvThumb | undefined {
   if (!items || items.length === 0) return undefined;
 
@@ -51,10 +70,9 @@ function getOneBanner(data: FanartResponse, season_number: number): SeasonPoster
 
   const seasonposter =
     pickBest(
-      data.seasonposter,
-      item => item.season === season_number.toString()
-    ) ??
-    pickBestThumb(data.tvthumb);
+      data.showbackground,
+    )
+    ?? pickBestThumb(data.tvthumb);
 
   return {
     hdtvlogo,
