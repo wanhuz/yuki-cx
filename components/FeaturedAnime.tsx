@@ -17,45 +17,60 @@ type FeaturedAnimeImage = {
 
 export default function FeaturedAnime({ images, interval = 5000 }: FeaturedAnimeProps) {
   const [index, setIndex] = useState(0);
+  const [fade, setFade] = useState(true);
 
-  // Automatic rotation
+  const changeSlide = (nextIndex: number) => {
+    setFade(false); // fade out
+
+    setTimeout(() => {
+      setIndex(nextIndex);
+      setFade(true); // fade in
+    }, 300); // must be <= duration-700
+  };
+
+
   useEffect(() => {
     if (images.length <= 1) return;
 
     const timer = setInterval(() => {
-      setIndex((prev) => (prev + 1) % images.length);
+      changeSlide((index + 1) % images.length);
     }, interval);
 
     return () => clearInterval(timer);
-  }, [images.length, interval]);
+  }, [index, images.length, interval]);
 
   if (images.length === 0) return null;
 
   const current = images[index];
 
   const handlePrev = () => {
-    setIndex((prev) => (prev - 1 + images.length) % images.length);
+    changeSlide((index - 1 + images.length) % images.length);
   };
 
   const handleNext = () => {
-    setIndex((prev) => (prev + 1) % images.length);
+    changeSlide((index + 1) % images.length);
   };
 
   return (
     <div className="relative  h-[70vh] w-full overflow-hidden">
       {/* Banner */}
       <Link href={current.series_url}>
-        <Image
-          key={current.banner_url}
-          src={current.banner_url}
-          fill
-          priority
-          className="object-cover object-half-bottom transition-opacity duration-700 -z-50"
-          alt="Featured anime banner"
-        />
+      <Image
+        src={current.banner_url}
+        fill
+        priority
+        className="object-cover object-half-bottom"
+        alt="Featured anime banner"
+      />
 
         {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <div
+          className={`
+            absolute inset-0 bg-black
+            transition-opacity duration-700
+            ${fade ? "opacity-0" : "opacity-100"}
+          `}
+        />
 
         {/* Logo */}
         {current.logo_url && (

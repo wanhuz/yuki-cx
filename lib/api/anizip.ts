@@ -45,11 +45,11 @@ export async function getTVDBData(anidb_id: number): Promise<AniZipTVDBData | nu
 
     const data = await getAnimeInformation(anidb_id);
 
-    if (!data) return null;
+    if (!data || !data.mappings) return null;
 
     const tvdb_id = data?.mappings.thetvdb_id || null;
     const season_number = data?.episodes[0] ? data.episodes[0].seasonNumber || 0 : 0;
-    const title_en = data?.titles.en || null;
+    const title_en = data?.titles.en || data?.titles["x-jat"] || null;
 
     const tvdb_data = { tvdb_id, season_number, title_en } as AniZipTVDBData;
 

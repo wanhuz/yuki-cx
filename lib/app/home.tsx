@@ -18,13 +18,10 @@ export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
   const AB_SearchQuery = {
     title: "",
     type: "TV_SERIES",
-    maxItem: 10,
+    maxItem: 20,
     hentai: 0,
     sort: "votes",
-    way: "desc",
-    airing: 0,
-    epcount: 1,
-    epcount2: 26
+    way: "asc"
   };
 
   const prisma = new PrismaClient();
@@ -56,6 +53,7 @@ export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
           logo_url: existing.logo_url
         } as FeaturedAnimeBanner;
       }
+
 
       const tvdb_map = await getTVDBMapping(anidb_id);
 
@@ -112,7 +110,7 @@ export async function getTVDBMapping(anidb_id: number): Promise<AnimeIdMap | nul
 
     const existing = await prisma.animeIdMap.findFirst({
         where: {
-            anidb_id
+            anidb_id: anidb_id
         }
     });
 
@@ -125,27 +123,28 @@ export async function getTVDBMapping(anidb_id: number): Promise<AnimeIdMap | nul
     const tvdb_data = await getTVDBData(anidb_id);
 
     if (!tvdb_data) return null;
+    if (!tvdb_data.tvdb_id) return null;
 
     const title = tvdb_data.title_en!;
     const tvdb_id = tvdb_data.tvdb_id!;
     const season_number = tvdb_data.season_number!;
 
-    await prisma.animeIdMap.create({
-        data: {
-            title,
-            anidb_id,
-            tvdb_id,
-            season_number
-        }
+    return await prisma.animeIdMap.upsert({
+      where: {
+        anidb_id_tvdb_id_season_number: {
+          anidb_id,
+          tvdb_id,
+          season_number,
+        },
+      },
+      update: {}, // nothing to update
+      create: {
+        title,
+        anidb_id,
+        tvdb_id,
+        season_number,
+      },
     });
 
-    const item = await prisma.animeIdMap.findFirst({
-        where: {
-            anidb_id
-        }
-    });
 
-    await prisma.$disconnect();
-
-    return item;
 }
