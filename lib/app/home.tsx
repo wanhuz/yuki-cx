@@ -97,8 +97,6 @@ export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
     (item: FeaturedAnimeBanner) => item.banner_url && item.logo_url
   )
 
-  await prisma.$disconnect();
-
   return featuredAnimes;
 }
 
@@ -115,8 +113,6 @@ export async function getTVDBMapping(anidb_id: number): Promise<AnimeIdMap | nul
     });
 
     if (existing) {
-      await prisma.$disconnect();
-    
       return existing
     };
 
