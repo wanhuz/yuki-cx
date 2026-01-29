@@ -69,7 +69,7 @@ function getOneBanner(data: FanartResponse, season_number: number): SeasonPoster
   const hdtvlogo = pickBest(data.hdtvlogo);
 
   const seasonposter =
-    pickBest(
+    pickBestSeasonPoster(
       data.showbackground,
     )
     ?? pickBestThumb(data.tvthumb);

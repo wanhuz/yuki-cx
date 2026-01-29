@@ -5,6 +5,7 @@ import { getFanartTV } from "../api/fanarttv";
 import { extractAniDBIDFromLinks, normalizeDictToArray } from "../util/util";
 import { generateSeriesLink } from "./series";
 import { ABGroup } from "../interface/animebytes";
+import { extractOngoingStatus } from "../util/animebytes";
 
 export type FeaturedAnimeBanner = {
     series_url: string;
@@ -146,4 +147,38 @@ export async function getTVDBMapping(anidb_id: number): Promise<AnimeIdMap | nul
     });
 
 
+}
+
+export async function getTrendingAnime(): Promise<Anime[] | null> {
+    const AB_SearchQuery_Trending = {
+    title: "",
+    type: "TV_SERIES",
+    maxItem: 25,
+    hentai: 0,
+    airing: 1,
+    sort: "relevance",
+    way: "desc",
+    epcount: 1,
+    epcount2: 26
+  };
+
+  const searchResult = await getAnimes(AB_SearchQuery_Trending);
+
+  const anime_search_result: Anime[] = [];
+
+
+  searchResult.map((entry: ABGroup) => {
+    anime_search_result.push({
+        ID: entry.ID, 
+        SeriesName: entry.SeriesName, 
+        FullName: entry.FullName,
+        Description: entry.Description, 
+        Image: entry.Image,
+        Type: entry.GroupName,
+        Aired: entry.Year,
+        Ongoing: extractOngoingStatus(entry.Torrents[0].Property ?? "")
+    } as Anime);
+  });
+
+  return anime_search_result;
 }
