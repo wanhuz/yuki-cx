@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useSettings } from "@/app/settings/SettingsContext";
+import { useSettings } from "@/app/(pages)/settings/SettingsContext";
 import { SettingsLogs } from "@/components/SettingsLog";
 
 
