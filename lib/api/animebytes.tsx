@@ -66,7 +66,7 @@ function generateSearchQuery({
     maxItem,
     hentai = 0,
     sort = "relevance",
-    way = "asc",
+    way = "desc",
     airing = -1, 
     epcount = -1,
     epcount2 = -1,

@@ -4,6 +4,8 @@ import SeriesCardSimple from "./SeriesCardSimple";
 export default function SeriesCardGrid({ contentCards }: { contentCards: Anime[] }) {
   const [page, setPage] = useState(1);
 
+
+
   // Create the cards
   const cards = contentCards?.map(entry => (
     <SeriesCardSimple
@@ -40,7 +42,7 @@ export default function SeriesCardGrid({ contentCards }: { contentCards: Anime[]
           </svg>
         </button>
       {/* Grid of 10 cards */}
-      <div className="grid grid-cols-10 gap-4">
+      <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-10 gap-4">
         {currentCards}
       </div>
 

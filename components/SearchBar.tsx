@@ -3,9 +3,9 @@ import { ABGroup } from "@/lib/interface/animebytes";
 import { extractOngoingStatus } from "@/lib/util/animebytes";
 import { useEffect, useState } from "react";
 
-async function onSearch(title : string, type : string) {
+async function onSearch(title : string) {
 
-    const searchResult = search(title, type);
+    const searchResult = search(title, "DEFAULT");
  
     const anime_search_result: Anime[] = [];
 
@@ -47,7 +47,7 @@ export default function SearchBar({
         onIsSearch(true);
         const getData = setTimeout(() => {
             
-            onSearch(searchText, "").then((result) => {
+            onSearch(searchText).then((result) => {
                 onSearchTextChange(result);
                 onIsSearch(false);
             });

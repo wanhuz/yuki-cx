@@ -25,5 +25,9 @@ export function generateTagLabel(type : string) {
             style += "bg-gray-500";
     }
 
-    return (<span className={style}>{type}</span>);
+    return (
+        <span className={style}>
+            {type}
+        </span>
+    );
 }

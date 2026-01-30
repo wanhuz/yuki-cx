@@ -15,13 +15,16 @@ export type FeaturedAnimeBanner = {
 }
 
 export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
+  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const randChar = chars[Math.floor(Math.random() * chars.length)];
+  const isSeason = Math.random() < 0.3;
 
   const AB_SearchQuery = {
-    title: "",
+    title: isSeason ? "" : randChar,
     type: "TV_SERIES",
-    maxItem: 20,
+    maxItem: 13,
     hentai: 0,
-    airing: 1,
+    airing: isSeason ? 1: 2,
     sort: "relevance",
     way: "desc",
     epcount: 1,
