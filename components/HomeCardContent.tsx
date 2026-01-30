@@ -13,7 +13,8 @@ import SeriesCardPlaceholder from "./SeriesCardPlaceholder";
 
   return (
     <div className="container px-5 sm:px-0 sm:mx-auto flex flex-col flex-wrap flex-1 md:gap-4 mt-2">
-            <h1 className="text-xl">{title}</h1>
+            <h1 className="px-8 text-xl">{title}</h1>
+
             <div className="flex flex-wrap flex-1 md:gap-3">
               {contentCard === null && placeholderCard}
 

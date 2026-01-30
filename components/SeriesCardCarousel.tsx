@@ -1,19 +1,16 @@
 import { useState } from "react";
-import SeriesCard from "./SeriesCard";
+import SeriesCardSimple from "./SeriesCardSimple";
 
 export default function SeriesCardGrid({ contentCards }: { contentCards: Anime[] }) {
   const [page, setPage] = useState(1);
 
   // Create the cards
   const cards = contentCards?.map(entry => (
-    <SeriesCard
+    <SeriesCardSimple
       key={entry.ID}
       title={entry.SeriesName}
       poster={entry.Image}
       id={entry.ID}
-      type={entry.Type}
-      year={entry.Aired}
-      isOngoing={entry.Ongoing}
       summary={entry.Description}
     />
   ));

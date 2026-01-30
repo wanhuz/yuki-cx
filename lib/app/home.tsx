@@ -4,7 +4,7 @@ import { getTVDBData } from "../api/anizip";
 import { getFanartTV } from "../api/fanarttv";
 import { extractAniDBIDFromLinks, normalizeDictToArray } from "../util/util";
 import { generateSeriesLink } from "./series";
-import { ABGroup } from "../interface/animebytes";
+import { ABGroup, ABSearchQueryParams } from "../interface/animebytes";
 import { extractOngoingStatus } from "../util/animebytes";
 
 export type FeaturedAnimeBanner = {
@@ -149,20 +149,9 @@ export async function getTVDBMapping(anidb_id: number): Promise<AnimeIdMap | nul
 
 }
 
-export async function getTrendingAnime(): Promise<Anime[] | null> {
-    const AB_SearchQuery_Trending = {
-    title: "",
-    type: "TV_SERIES",
-    maxItem: 25,
-    hentai: 0,
-    airing: 1,
-    sort: "relevance",
-    way: "desc",
-    epcount: 1,
-    epcount2: 26
-  };
+export async function getAnimeFromAB(search_query : ABSearchQueryParams) : Promise<Anime[] | null> {
 
-  const searchResult = await getAnimes(AB_SearchQuery_Trending);
+  const searchResult = await getAnimes(search_query);
 
   const anime_search_result: Anime[] = [];
 
@@ -180,5 +169,77 @@ export async function getTrendingAnime(): Promise<Anime[] | null> {
     } as Anime);
   });
 
+  return anime_search_result;
+}
+
+export async function getSeasonalAnime(): Promise<Anime[] | null> {
+
+  const AB_SearchQuery_Seasonal = {
+      title: "",
+      type: "TV_SERIES",
+      maxItem: 25,
+      hentai: 0,
+      airing: 1,
+      sort: "relevance",
+      way: "desc",
+      epcount: 1,
+      epcount2: 26
+  };
+
+  const anime_search_result = await getAnimeFromAB(AB_SearchQuery_Seasonal);
+
+  return anime_search_result;
+}
+
+export async function getTrendingAnimeThisYear(): Promise<Anime[] | null> {
+
+  const current_year = new Date().getFullYear();
+
+  const AB_SearchQuery_TrendingYear = {
+    title: "",
+    type: "TV_SERIES",
+    maxItem: 25,
+    hentai: 0,
+    sort: "votes",
+    way: "desc",
+    year: current_year,
+  };
+
+  const anime_search_result = await getAnimeFromAB(AB_SearchQuery_TrendingYear);
+
+  return anime_search_result;
+}
+
+export async function getYouMightLike(): Promise<Anime[] | null> {
+
+  const AB_SearchQuery_YouMightLike = {
+    title: "",
+    type: "DEFAULT",
+    maxItem: 25,
+    hentai: 0,
+    sort: "votes",
+    way: "desc"
+  };
+
+  const anime_search_result = await getAnimeFromAB(AB_SearchQuery_YouMightLike);
+
+  
+  return anime_search_result;
+}
+
+export async function getNewMovieRelease(): Promise<Anime[] | null> {
+
+  const AB_SearchQuery_YouMightLike = {
+    title: "",
+    type: "MOVIE",
+    maxItem: 25,
+    hentai: 0,
+    sort: "year",
+    way: "desc"
+  };
+
+  const anime_search_result = await getAnimeFromAB(AB_SearchQuery_YouMightLike);
+
+  
   return anime_search_result;
 }
