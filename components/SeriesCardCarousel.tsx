@@ -1,60 +1,91 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SeriesCardSimple from "./SeriesCardSimple";
+import useCardsPerPage from "@/hook/cardsPerPage";
 
 export default function SeriesCardGrid({ contentCards }: { contentCards: Anime[] }) {
-  const [page, setPage] = useState(1);
+  const cardsPerPage = useCardsPerPage();
+  const [page, setPage] = useState(1); // current page index (1-based)
+  const [isTransitioning, setIsTransitioning] = useState(true);
+  const containerRef = useRef<HTMLDivElement>(null);
 
+  // Split cards into pages
+  const pages = [];
+  for (let i = 0; i < contentCards.length; i += cardsPerPage) {
+    pages.push(contentCards.slice(i, i + cardsPerPage));
+  }
+  const totalPages = pages.length;
 
+  // Wrap-around: clone last page at start, first page at end
+  const displayPages = [pages[totalPages - 1], ...pages, pages[0]];
 
-  // Create the cards
-  const cards = contentCards?.map(entry => (
-    <SeriesCardSimple
-      key={entry.ID}
-      title={entry.SeriesName}
-      poster={entry.Image}
-      id={entry.ID}
-      summary={entry.Description}
-    />
-  ));
-
-  // Slice 10 cards per page
-  const cardsPerPage = 10;
-  const currentCards = cards.slice((page - 1) * cardsPerPage, page * cardsPerPage);
-
-  const totalPages = Math.ceil(cards.length / cardsPerPage);
+  // Handle next / prev
+  function handleNext() {
+    setPage((prev) => prev + 1);
+    setIsTransitioning(true);
+  }
 
   function handlePrev() {
-    setPage(page > 1 ? page - 1 : totalPages);
+    setPage((prev) => prev - 1);
+    setIsTransitioning(true);
   }
 
-  function handleNext() {
-    setPage(page < totalPages ? page + 1 : 1);
+  // After transition ends, handle wrap-around jump
+  function handleTransitionEnd() {
+    if (page === 0) {
+      // Jump to last real page
+      setIsTransitioning(false);
+      setPage(totalPages);
+    } else if (page === totalPages + 1) {
+      // Jump to first real page
+      setIsTransitioning(false);
+      setPage(1);
+    }
   }
+
+  // Re-enable transition when page changes
+  useEffect(() => {
+    if (!isTransitioning) setIsTransitioning(true);
+  }, [page]);
 
   return (
-    <div className="flex flex-row justify-between">
-      <button
-          onClick={handlePrev}
-          className="p-2 mb-12"
-        >
+    <div className="flex items-center">
+      <button onClick={handlePrev} className="p-2 mb-12">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-caret-left-fill" viewBox="0 0 16 16">
             <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
           </svg>
-        </button>
-      {/* Grid of 10 cards */}
-      <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-10 gap-4">
-        {currentCards}
+      </button>
+
+      <div className="overflow-hidden w-full">
+        <div
+          ref={containerRef}
+          className={`flex ${isTransitioning ? "transition-transform duration-500 ease-in-out" : ""}`}
+          style={{ transform: `translateX(-${page * 100}%)` }}
+          onTransitionEnd={handleTransitionEnd}
+        >
+          {displayPages.map((pageCards, i) => (
+            <div
+              key={i}
+              className="min-w-full grid grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-4"
+            >
+              {pageCards.map((entry) => (
+                <SeriesCardSimple
+                  key={entry.ID}
+                  title={entry.SeriesName}
+                  poster={entry.Image}
+                  id={entry.ID}
+                  summary={entry.Description}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
 
-
-        <button
-          onClick={handleNext}
-          className="p-2  mb-12"
-        >
+      <button onClick={handleNext} className="p-2 mb-12">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-caret-right-fill" viewBox="0 0 16 16">
           <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
         </svg>
-        </button>
-      </div>
+      </button>
+    </div>
   );
 }
