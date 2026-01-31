@@ -236,14 +236,21 @@ export async function getRandomAnime(): Promise<Anime[] | null> {
   const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   const randChar = chars[Math.floor(Math.random() * chars.length)];
 
+  const sorts = ["relevance", "name", "rating", "votes"];
+  const ways = ["asc", "desc"];
+
+  const randSort = sorts[Math.floor(Math.random() * sorts.length)];
+  const randWay = ways[Math.floor(Math.random() * ways.length)];
+
+
   const AB_SearchQuery = {
     title: randChar,
     type: "TV_SERIES",
     maxItem: 13,
     hentai: 0,
     airing: 2,
-    sort: "votes",
-    way: "desc"
+    sort: randSort,
+    way: randWay
   } as ABSearchQueryParams;
 
   const anime_search_result = await getAnimeFromAB(AB_SearchQuery);

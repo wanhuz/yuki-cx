@@ -1,6 +1,6 @@
 
 import FeaturedAnime from "@/components/FeaturedAnime";
-import { FeaturedAnimeBanner, getFeaturedAnime, getNewMovieRelease, getSeasonalAnime, getTrendingAnimeThisYear, getYouMightLike } from "@/lib/app/home";
+import { FeaturedAnimeBanner, getFeaturedAnime, getNewMovieRelease, getRandomAnime, getSeasonalAnime, getTrendingAnimeThisYear } from "@/lib/app/home";
 import HomeCardContent from "./HomeCardContent";
 import { getSeasonYear } from "@/lib/util/anime";
 
@@ -10,7 +10,7 @@ export default async function HomeComponent() {
     const featuredAnimes: FeaturedAnimeBanner[] | null = await getFeaturedAnime();
     const seasonalAnime = await getSeasonalAnime();
     const trendingThisYearAnime = await getTrendingAnimeThisYear();
-    const youMightLikeAnime = await getYouMightLike();
+    const youMightLikeAnime = await getRandomAnime();
     const movieNewReleaseAnime = await getNewMovieRelease();
 
     return (
@@ -29,7 +29,7 @@ export default async function HomeComponent() {
 
           {movieNewReleaseAnime ? <HomeCardContent title={"New Movie Release"} contentCard={movieNewReleaseAnime}/> : null}
 
-          {youMightLikeAnime ? <HomeCardContent title={"All Time Favorite"} contentCard={youMightLikeAnime}/> : null}
+          {youMightLikeAnime ? <HomeCardContent title={"You Might Like"} contentCard={youMightLikeAnime}/> : null}
 
         </div>
       </main>

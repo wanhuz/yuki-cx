@@ -91,7 +91,7 @@ const ChevronLeft = () => {
   return (
     <div className="relative  h-[70vh] w-full overflow-hidden">
       {/* Banner */}
-      <Link href={current.series_url}>
+      <Link href={current ? current.series_url : "#"}>
       <Image
         src={current.banner_url}
         fill
