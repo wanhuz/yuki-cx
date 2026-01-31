@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -18,6 +18,8 @@ type FeaturedAnimeImage = {
 export default function FeaturedAnime({ images, interval = 7000 }: FeaturedAnimeProps) {
   const [index, setIndex] = useState(0);
   const [fade, setFade] = useState(true);
+  const startX = useRef<number | null>(null);
+
 
 const ChevronRight = () => {
   return (
@@ -94,8 +96,28 @@ const ChevronLeft = () => {
     changeSlide((index + 1) % images.length);
   };
 
+  function onPointerDown(e: React.PointerEvent) {
+    startX.current = e.clientX;
+  }
+
+  function onPointerUp(e: React.PointerEvent) {
+    if (startX.current == null) return;
+
+    const delta = e.clientX - startX.current;
+
+    if (delta > 50) handlePrev();
+    if (delta < -50) handleNext();
+
+    startX.current = null;
+  }
+
+
   return (
-    <div className="relative  h-[70vh] w-full overflow-hidden">
+    <div className="relative  h-[70vh] w-full overflow-hidden"
+      onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
+      onPointerLeave={onPointerUp}
+    >
       {/* Banner */}
       <Link href={current ? current.series_url : "#"}>
       { current &&
