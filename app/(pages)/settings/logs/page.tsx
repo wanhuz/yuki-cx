@@ -9,8 +9,7 @@ export default function SchedulerSettingsPage() {
   const { setActiveIndex } = useSettings();
 
   useEffect(() => {
-    setActiveIndex(3);
-    
+    setActiveIndex(4);
   }, [setActiveIndex]);
  
 

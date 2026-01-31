@@ -19,6 +19,17 @@ export async function getABSettings() {
   }
 }
 
+export async function getFanartTVSettings() {
+  const fanart_key = await prisma.settings.findFirst({
+    where: { key: "fanart_key" },
+  });
+
+  return {
+    fanart_key: fanart_key?.value,
+  }
+}
+
+
 export async function getSchedulerSettings() {
   const settingSchedulerPaused = await prisma.settings.findFirst({
     where: { key: "yuki_scheduler_paused" },
@@ -82,6 +93,21 @@ export async function saveABSettings(settings: {
     update: { value: settings.ab_username },
     create: { key: "ab_username", value: settings.ab_username},
   });
+
+  return { success: true };
+}
+
+export async function saveFanartTVSettings(settings: { 
+  fanart_key: string,
+}) {
+
+  if (settings.fanart_key) {
+    await prisma.settings.upsert({
+    where: { key: "fanart_key" },
+    update: { value: settings.fanart_key },
+    create: { key: "fanart_key", value: settings.fanart_key },
+  });
+  }
 
   return { success: true };
 }

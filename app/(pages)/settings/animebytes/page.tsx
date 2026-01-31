@@ -25,8 +25,8 @@ export default function ABSettingsPage() {
   if (!defaultSettings) return <p className="px-8 py-6">...</p>;
 
   const fields = [
-    {name: "ab_username", label: "AnimeBytes Username", type: "text" as FieldType, defaultValue: defaultSettings.ab_username},
-    {name: "ab_key", label: "AnimeBytes Pass Key", type: "password" as FieldType},
+    {name: "ab_username", label: "AnimeByte username", type: "text" as FieldType, defaultValue: defaultSettings.ab_username},
+    {name: "ab_key", label: "AnimeByte passkey", type: "password" as FieldType},
   ];
 
   const handleSubmit = async (data: ABSettings) => {

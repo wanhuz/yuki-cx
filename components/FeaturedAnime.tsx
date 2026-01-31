@@ -26,6 +26,9 @@ const ChevronRight = () => {
       width="40"
       height="40"
       fill="white"
+      stroke="gray"
+      strokeWidth="0.1"
+      filter="drop-shadow(0px 0px 2px darkgray)"
       className="bi bi-chevron-right"
       viewBox="0 0 16 16"
     >
@@ -44,6 +47,9 @@ const ChevronLeft = () => {
       width="40"
       height="40"
       fill="white"
+      stroke="gray"
+      strokeWidth="0.1"
+      filter="drop-shadow(0px 0px 2px darkgray)"
       className="bi bi-chevron-left"
       viewBox="0 0 16 16"
     >
@@ -92,13 +98,15 @@ const ChevronLeft = () => {
     <div className="relative  h-[70vh] w-full overflow-hidden">
       {/* Banner */}
       <Link href={current ? current.series_url : "#"}>
-      <Image
-        src={current.banner_url}
-        fill
-        priority
-        className="object-cover object-half-bottom"
-        alt="Featured anime banner"
-      />
+      { current &&
+        <Image
+          src={current.banner_url}
+          fill
+          priority
+          className="object-cover object-half-bottom"
+          alt="Featured anime banner"
+        />
+        }
 
         {/* Overlay */}
         <div
@@ -110,7 +118,7 @@ const ChevronLeft = () => {
         />
 
         {/* Logo */}
-        {current.logo_url && (
+        {current && current.logo_url && (
           <div className="absolute right-12 bottom-24 h-20 w-auto">
             <Image
               src={current.logo_url}
@@ -124,7 +132,7 @@ const ChevronLeft = () => {
       </Link>
 
       {/* Navigation Arrows */}
-      {images.length > 1 && (
+      {images && images.length > 1 && (
         <>
           <button
             onClick={handlePrev}
