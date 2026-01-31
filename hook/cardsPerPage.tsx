@@ -8,7 +8,7 @@ export default function useCardsPerPage() {
       const width = window.innerWidth;
 
       if (width >= 1024) setCardsPerPage(10);      // lg
-      else if (width >= 768) setCardsPerPage(4);   // md
+      else if (width >= 568) setCardsPerPage(4);   // md
       else setCardsPerPage(3);                     // sm
     }
 

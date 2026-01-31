@@ -25,8 +25,8 @@ export default function SeriesCardSimple({
                         width={160} 
                         height={180}
                     />
-                    <div className="flex flex-col justify-between w-full px-2 sm:px-0 py-4 md:py-4 md:pt-5 md:min-h-[100px]">
-                        <div className="w-full px-2 font-normal md:w-auto text-xs line-clamp-2 overflow-hidden">{title}</div>
+                    <div className="flex flex-col justify-between w-full px-2 sm:px-0 py-4 md:py-4 md:pt-5">
+                        <div className="w-full font-normal md:w-auto text-xs line-clamp-2 overflow-hidden">{title}</div>
                         <div className="flex flex-row gap-1 flex-wrap w-32 px-2 text-xxs">
                         </div>
                     </div>
