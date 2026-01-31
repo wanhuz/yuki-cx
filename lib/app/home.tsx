@@ -18,7 +18,9 @@ export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
   const isSeason = Math.random() < 0.3;
 
   const prisma = new PrismaClient();
-  const anime = isSeason? await getSeasonalAnime() : await getRandomAnime();
+  
+  let anime = isSeason? await getSeasonalAnime() : await getRandomAnime();
+  anime = anime ?? await getSeasonalAnime();
 
   if (!anime) {
     return [];

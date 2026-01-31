@@ -1,7 +1,7 @@
 
 import FeaturedAnime from "@/components/FeaturedAnime";
 import { FeaturedAnimeBanner, getFeaturedAnime, getNewMovieRelease, getRandomAnime, getSeasonalAnime, getTrendingAnimeThisYear } from "@/lib/app/home";
-import HomeCardContent from "./HomeCardContent";
+import HomeCardContent from "@/components/HomeCardContent";
 import { getSeasonYear } from "@/lib/util/anime";
 
 
