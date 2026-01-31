@@ -103,7 +103,7 @@ const ChevronLeft = () => {
           src={current.banner_url}
           fill
           priority
-          className="object-cover object-half-bottom"
+          className="object-cover object-top"
           alt="Featured anime banner"
         />
         }
