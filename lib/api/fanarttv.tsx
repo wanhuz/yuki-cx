@@ -2,7 +2,7 @@ import { FanartItem, FanartResponse, SeasonPoster, TvThumb } from "../interface/
 
 
 
-export async function getFanartTV(tvdb_id : number, season_number: number) {
+export async function getFanartTV(tvdb_id : number) {
     const apiKey = process.env.FANARTTV_APIKEY;
 
     const url = `https://webservice.fanart.tv/v3.2/tv/${tvdb_id}?api_key=${apiKey}`;
@@ -11,7 +11,7 @@ export async function getFanartTV(tvdb_id : number, season_number: number) {
         const response = await fetch(url);
         const data : FanartResponse = await response.json();
 
-        const season_poster = getOneBanner(data, season_number);
+        const season_poster = getOneBanner(data);
 
         return season_poster;
     } catch (error) {
@@ -65,7 +65,7 @@ function pickBestThumb(items: TvThumb[] | undefined): TvThumb | undefined {
   )[0];
 }
 
-function getOneBanner(data: FanartResponse, season_number: number): SeasonPoster {
+function getOneBanner(data: FanartResponse): SeasonPoster {
   const hdtvlogo = pickBest(data.hdtvlogo);
 
   const seasonposter =

@@ -1,4 +1,4 @@
-import { generateSeriesLink, generateTagLabel } from "@/lib/app/series";
+import { generateSeriesLink } from "@/lib/app/series";
 import Image from "next/image";
 import Link from "next/link";
 

@@ -2,7 +2,7 @@ import { AnimeIdMap, PrismaClient } from "@prisma/client";
 import { getAnimes } from "../api/animebytes"
 import { getTVDBData } from "../api/anizip";
 import { getFanartTV } from "../api/fanarttv";
-import { extractAniDBIDFromLinks, normalizeDictToArray } from "../util/util";
+import { extractAniDBIDFromLinks } from "../util/util";
 import { generateSeriesLink } from "./series";
 import { ABGroup, ABSearchQueryParams } from "../interface/animebytes";
 import { extractOngoingStatus } from "../util/animebytes";
@@ -24,7 +24,7 @@ export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
     return [];
   }
 
-  let enrichedAnime = await Promise.all(
+  const enrichedAnime = await Promise.all(
     anime.map(async (result:  Anime ): Promise<FeaturedAnimeBanner | null> => {
       const links = result.Links;
       const anidb_id = extractAniDBIDFromLinks(links);
@@ -53,7 +53,7 @@ export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
 
       if (!tvdb_map) return null;
 
-      const banner = await getFanartTV(tvdb_map.tvdb_id, tvdb_map.season_number);
+      const banner = await getFanartTV(tvdb_map.tvdb_id);
 
       if (!banner?.hdtvlogo || !banner?.seasonposter) return null;
 
