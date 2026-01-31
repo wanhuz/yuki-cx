@@ -2,9 +2,11 @@
 import FeaturedAnime from "@/components/FeaturedAnime";
 import { FeaturedAnimeBanner, getFeaturedAnime, getNewMovieRelease, getSeasonalAnime, getTrendingAnimeThisYear, getYouMightLike } from "@/lib/app/home";
 import HomeCardContent from "./HomeCardContent";
+import { getSeasonYear } from "@/lib/util/anime";
 
 
 export default async function HomeComponent() {
+    const currentSeason = getSeasonYear(new Date());
     const featuredAnimes: FeaturedAnimeBanner[] | null = await getFeaturedAnime();
     const seasonalAnime = await getSeasonalAnime();
     const trendingThisYearAnime = await getTrendingAnimeThisYear();
@@ -21,7 +23,7 @@ export default async function HomeComponent() {
 
         <div className="flex flex-col">
 
-          {seasonalAnime ? <HomeCardContent title={"Winter 2026"} contentCard={seasonalAnime}/> : null}
+          {seasonalAnime ? <HomeCardContent title={`${currentSeason.season} ${currentSeason.year}`} contentCard={seasonalAnime}/> : null}
 
           {trendingThisYearAnime ? <HomeCardContent title={"Trending This Year"} contentCard={trendingThisYearAnime}/> : null}
 
