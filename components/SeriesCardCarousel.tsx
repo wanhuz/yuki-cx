@@ -7,6 +7,10 @@ export default function SeriesCardGrid({ contentCards }: { contentCards: Anime[]
   const [page, setPage] = useState(1); // current page index (1-based)
   const [isTransitioning, setIsTransitioning] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [translateX, setTranslateX] = useState(0); // dynamic during drag
+
 
   // Split cards into pages
   const pages = [];
@@ -42,30 +46,66 @@ export default function SeriesCardGrid({ contentCards }: { contentCards: Anime[]
     }
   }
 
+  function handlePointerDown(e: React.PointerEvent) {
+    setIsDragging(true);
+    setStartX(e.clientX);
+  }
+
+  function handlePointerMove(e: React.PointerEvent) {
+    if (!isDragging) return;
+    const delta = e.clientX - startX;
+    setTranslateX(-page * 100 + (delta / containerRef.current!.offsetWidth) * 100);
+  }
+
+  function handlePointerUp(e: React.PointerEvent) {
+    if (!isDragging) return;
+    setIsDragging(false);
+    const delta = e.clientX - startX;
+
+    if (delta > 50) {
+      handlePrev(); // swipe right → prev
+    } else if (delta < -50) {
+      handleNext(); // swipe left → next
+    } else {
+      // Not enough movement → snap back
+      setTranslateX(-page * 100);
+    }
+  }
+
+
   // Re-enable transition when page changes
   useEffect(() => {
     if (!isTransitioning) setIsTransitioning(true);
   }, [page]);
 
+  useEffect(() => {
+    setTranslateX(-page * 100);
+  }, [page]);
+
+
   return (
     <div className="flex items-center">
-      <button onClick={handlePrev} className="p-2 mb-12">
+      <button onClick={handlePrev} className="p-2 mb-12 hidden lg:block">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-caret-left-fill" viewBox="0 0 16 16">
             <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
           </svg>
       </button>
 
       <div className="overflow-hidden w-full">
-        <div
-          ref={containerRef}
-          className={`flex ${isTransitioning ? "transition-transform duration-500 ease-in-out" : ""}`}
-          style={{ transform: `translateX(-${page * 100}%)` }}
-          onTransitionEnd={handleTransitionEnd}
-        >
+          <div
+            ref={containerRef}
+            className={`flex ${isTransitioning && !isDragging ? "transition-transform duration-500 ease-in-out" : ""}`}
+            style={{ transform: `translateX(${translateX}%)` }}
+            onTransitionEnd={handleTransitionEnd}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerLeave={handlePointerUp} // handle drag leaving container
+          >
           {displayPages.map((pageCards, i) => (
             <div
               key={i}
-              className="min-w-full grid grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-4"
+              className="min-w-full grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-10  md:gap-4 sm:px-6 md:px-0"
             >
               {pageCards.map((entry) => (
                 <SeriesCardSimple
@@ -81,7 +121,7 @@ export default function SeriesCardGrid({ contentCards }: { contentCards: Anime[]
         </div>
       </div>
 
-      <button onClick={handleNext} className="p-2 mb-12">
+      <button onClick={handleNext} className="p-2 mb-12 hidden lg:block">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-caret-right-fill" viewBox="0 0 16 16">
           <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
         </svg>

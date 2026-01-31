@@ -29,7 +29,7 @@ const ChevronRight = () => {
       stroke="gray"
       strokeWidth="0.1"
       filter="drop-shadow(0px 0px 2px darkgray)"
-      className="bi bi-chevron-right"
+      className="bi bi-chevron-right hidden md:block"
       viewBox="0 0 16 16"
     >
       <path
@@ -50,7 +50,7 @@ const ChevronLeft = () => {
       stroke="gray"
       strokeWidth="0.1"
       filter="drop-shadow(0px 0px 2px darkgray)"
-      className="bi bi-chevron-left"
+      className="bi bi-chevron-left hidden md:block"
       viewBox="0 0 16 16"
     >
       <path
