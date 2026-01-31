@@ -15,40 +15,27 @@ export type FeaturedAnimeBanner = {
 }
 
 export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
-  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  const randChar = chars[Math.floor(Math.random() * chars.length)];
   const isSeason = Math.random() < 0.3;
 
-  const AB_SearchQuery = {
-    title: isSeason ? "" : randChar,
-    type: "TV_SERIES",
-    maxItem: 13,
-    hentai: 0,
-    airing: isSeason ? 1: 2,
-    sort: "relevance",
-    way: "desc",
-    epcount: 1,
-    epcount2: 26
-  };
-
   const prisma = new PrismaClient();
-  const anime = await getAnimes(AB_SearchQuery);
+  const anime = isSeason? await getSeasonalAnime() : await getRandomAnime();
+
+  if (!anime) {
+    return [];
+  }
 
   let enrichedAnime = await Promise.all(
-    anime.map(async (result:  ABGroup ): Promise<FeaturedAnimeBanner | null> => {
-      const links = normalizeDictToArray(result.Links);
+    anime.map(async (result:  Anime ): Promise<FeaturedAnimeBanner | null> => {
+      const links = result.Links;
       const anidb_id = extractAniDBIDFromLinks(links);
 
       if (!anidb_id) {
         return null;
       }
 
-      // Check cache
       const existing = await prisma.animeResource.findFirst({
         where: { anidb_id }
       });
-
-      
 
       if (existing) {
         const series_link = generateSeriesLink(existing.ab_title, existing.ab_id)
@@ -73,7 +60,6 @@ export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
       const ab_id = result.ID;
       const ab_title = result.SeriesName;
 
-      // persist
       await prisma.animeResource.create({
         data: {
           ab_id,
@@ -86,7 +72,6 @@ export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
 
       const series_link = generateSeriesLink(ab_title, ab_id)
 
-      // return enriched object
       return {
         series_url: series_link,
         title: ab_title,
@@ -168,7 +153,8 @@ export async function getAnimeFromAB(search_query : ABSearchQueryParams) : Promi
         Image: entry.Image,
         Type: entry.GroupName,
         Aired: entry.Year,
-        Ongoing: extractOngoingStatus(entry.Torrents[0].Property ?? "")
+        Ongoing: extractOngoingStatus(entry.Torrents[0].Property ?? ""),
+        Links:  Object.values(entry.Links)
     } as Anime);
   });
 
@@ -226,7 +212,6 @@ export async function getYouMightLike(): Promise<Anime[] | null> {
 
   const anime_search_result = await getAnimeFromAB(AB_SearchQuery_YouMightLike);
 
-  
   return anime_search_result;
 }
 
@@ -244,5 +229,24 @@ export async function getNewMovieRelease(): Promise<Anime[] | null> {
   const anime_search_result = await getAnimeFromAB(AB_SearchQuery_YouMightLike);
 
   
+  return anime_search_result;
+}
+
+export async function getRandomAnime(): Promise<Anime[] | null> {
+  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const randChar = chars[Math.floor(Math.random() * chars.length)];
+
+  const AB_SearchQuery = {
+    title: randChar,
+    type: "TV_SERIES",
+    maxItem: 13,
+    hentai: 0,
+    airing: 2,
+    sort: "votes",
+    way: "desc"
+  } as ABSearchQueryParams;
+
+  const anime_search_result = await getAnimeFromAB(AB_SearchQuery);
+
   return anime_search_result;
 }

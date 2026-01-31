@@ -6,7 +6,7 @@ export default function Header({isHomepage} : {isHomepage?: boolean}) {
         <nav className={`bg-header p-3 ${isHomepage ? "absolute  top-0 w-full opacity-80 z-50" : ""}`}>
             <div className="container mx-auto flex justify-between items-center">
 
-                <div className="space-x-3 sm:space-x-12">
+                <div className="space-x-3 sm:space-x-12 opacity-100">
                     <Link href="/" className="text-white hover:text-gray-400">Home</Link>
                     <Link href="/scheduler" className="text-white hover:text-gray-400">Scheduler</Link>
                     <Link href="/status" className="text-white hover:text-gray-400">Status</Link>
