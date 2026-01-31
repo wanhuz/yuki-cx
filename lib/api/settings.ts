@@ -20,12 +20,12 @@ export async function getABSettings() {
 }
 
 export async function getFanartTVSettings() {
-  const fanart_key = await prisma.settings.findFirst({
-    where: { key: "fanart_key" },
+  const fanart_api_key = await prisma.settings.findFirst({
+    where: { key: "fanart_api_key" },
   });
 
   return {
-    fanart_key: fanart_key?.value,
+    fanart_api_key: fanart_api_key?.value,
   }
 }
 
@@ -98,14 +98,14 @@ export async function saveABSettings(settings: {
 }
 
 export async function saveFanartTVSettings(settings: { 
-  fanart_key: string,
+  fanart_api_key: string,
 }) {
 
-  if (settings.fanart_key) {
+  if (settings.fanart_api_key) {
     await prisma.settings.upsert({
-    where: { key: "fanart_key" },
-    update: { value: settings.fanart_key },
-    create: { key: "fanart_key", value: settings.fanart_key },
+    where: { key: "fanart_api_key" },
+    update: { value: settings.fanart_api_key },
+    create: { key: "fanart_api_key", value: settings.fanart_api_key },
   });
   }
 

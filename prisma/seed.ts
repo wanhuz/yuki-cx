@@ -22,6 +22,7 @@ async function main() {
   await seedSetting("qb_password", process.env.QB_PASSWORD);
   await seedSetting("ab_key", process.env.AB_PASSKEY);
   await seedSetting("ab_username", process.env.AB_USERNAME);
+  await seedSetting("fanart_api_key", process.env.FANARTTV_APIKEY);
 }
 
 main()

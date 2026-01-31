@@ -1,9 +1,10 @@
 import { FanartItem, FanartResponse, SeasonPoster, TvThumb } from "../interface/fanarttv";
-
-
+import { getFanartTVSettings } from "./settings";
 
 export async function getFanartTV(tvdb_id : number) {
-    const apiKey = process.env.FANARTTV_APIKEY;
+    const apiKey = (await getFanartTVSettings()).fanart_api_key;
+
+    if (!apiKey) return null;
 
     const url = `https://webservice.fanart.tv/v3.2/tv/${tvdb_id}?api_key=${apiKey}`;
 

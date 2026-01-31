@@ -7,7 +7,7 @@ import { useSettings } from "@/app/(pages)/settings/SettingsContext";
 
 type FieldType = "text" | "password" | "checkbox" | "select";
 type FanartTVSettings = {
-  fanart_key?: string | null;
+  fanart_api_key?: string | null;
 };
 
 
@@ -24,12 +24,12 @@ export default function FanartTVSettingsPage() {
   if (!defaultSettings) return <p className="px-8 py-6">...</p>;
 
   const fields = [
-    {name: "fanart_key", label: "Fanart.TV passkey", type: "password" as FieldType},
+    {name: "fanart_api_key", label: "Fanart.TV API key", type: "password" as FieldType},
   ];
 
   const handleSubmit = async (data: FanartTVSettings) => {
     saveFanartTVSettings({
-      fanart_key: data.fanart_key || ""
+      fanart_api_key: data.fanart_api_key || ""
     });
   };
 
