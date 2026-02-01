@@ -1,7 +1,8 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import SeriesCard from "./SeriesCard";
 import SeriesCardPlaceholder from "./SeriesCardPlaceholder";
-
 
  export default function Content({ contentCard, isSearch }: { contentCard: Anime[], isSearch: boolean }) {
   const [listCards, setListCards] = useState<JSX.Element[]>([]);

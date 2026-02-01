@@ -9,6 +9,7 @@ export default async function HomeComponent() {
     const currentSeason = getSeasonYear(new Date());
     const featuredAnimes: FeaturedAnimeBanner[] | null = await getFeaturedAnime();
     const seasonalAnime = await getSeasonalAnime();
+
     const trendingThisYearAnime = await getTrendingAnimeThisYear();
     const youMightLikeAnime = await getRandomAnime();
     const movieNewReleaseAnime = await getNewMovieRelease();

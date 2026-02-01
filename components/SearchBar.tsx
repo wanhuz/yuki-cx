@@ -1,3 +1,5 @@
+"use client";
+
 import { search } from "@/lib/api/animebytes";
 import { ABGroup } from "@/lib/interface/animebytes";
 import { extractOngoingStatus } from "@/lib/util/animebytes";

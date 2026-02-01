@@ -1,3 +1,5 @@
+"use client";
+
 import { formatBytes } from "@/lib/util/animebytes";
 import React, { useState, useRef, useEffect } from "react";
 

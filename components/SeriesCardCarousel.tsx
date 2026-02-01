@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
 import SeriesCardSimple from "./SeriesCardSimple";
 import useCardsPerPage from "@/hook/cardsPerPage";

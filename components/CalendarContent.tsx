@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { getUpcomingAnime } from "@/lib/api/scheduler";
 import { buildDailyContainers, buildMonthlyContainers} from "../lib/app/calendar";
