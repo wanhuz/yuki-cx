@@ -50,22 +50,21 @@ export default function SeriesCardGrid({ contentCards }: { contentCards: Anime[]
 
   function handlePointerDown(e: React.PointerEvent) {
     e.currentTarget.setPointerCapture(e.pointerId);
+
     setIsDragging(true);
 
-    console.log("CLIENT X: START", e.clientX);
     setStartX(e.clientX);
   }
 
   function handlePointerMove(e: React.PointerEvent) {
     if (!isDragging) return;
-    
+  
     deltaRef.current = e.clientX - startX;
-    
-    // setTranslateX(-page * 100 + (delta / containerRef.current!.offsetWidth) * 100);
   }
 
   function handlePointerUp(e: React.PointerEvent) {
     if (!isDragging) return;
+
     e.currentTarget.releasePointerCapture(e.pointerId);
     setIsDragging(false);
 
@@ -74,13 +73,9 @@ export default function SeriesCardGrid({ contentCards }: { contentCards: Anime[]
     } else if (deltaRef.current < 0) {
       handleNext(); // swipe left → next
     } else {
-      // Not enough movement → snap back
       setTranslateX(-page * 100);
     }
   }
-
-
-
 
   useEffect(() => {
       setTranslateX(-page * 100);
@@ -117,7 +112,6 @@ export default function SeriesCardGrid({ contentCards }: { contentCards: Anime[]
                   title={entry.SeriesName}
                   poster={entry.Image}
                   id={entry.ID}
-                  summary={entry.Description}
                 />
               ))}
             </div>

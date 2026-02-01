@@ -5,13 +5,11 @@ import Link from "next/link";
 export default function SeriesCardSimple({
     title,
     poster,
-    id,
-    summary
+    id
 }: {
     title: string;
     poster: string;
     id: number;
-    summary: string;
 }) {
     const seriesLink = generateSeriesLink(title, id);
 
