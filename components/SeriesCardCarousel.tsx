@@ -70,13 +70,17 @@ export default function SeriesCardGrid({ contentCards }: { contentCards: Anime[]
     e.currentTarget.releasePointerCapture(e.pointerId);
     setIsDragging(false);
 
-    if (deltaRef.current > 0) {
+    console.log(deltaRef.current);
+
+    if (deltaRef.current >= 8) {
       handlePrev(); // swipe right → prev
-    } else if (deltaRef.current < 0) {
+    } else if (deltaRef.current <= -8) {
       handleNext(); // swipe left → next
     } else {
       setTranslateX(-page * 100);
     }
+
+    deltaRef.current = 0;
   }
 
   useEffect(() => {

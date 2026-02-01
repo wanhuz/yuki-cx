@@ -114,7 +114,7 @@ const ChevronLeft = () => {
 
     e.currentTarget.releasePointerCapture(e.pointerId);
 
-    if (deltaRef.current >= 8) handlePrev();
+    if (deltaRef.current >= 8) handlePrev(); // 8 is arbitrary after testing
     if (deltaRef.current <= -8) handleNext();
 
     deltaRef.current = 0;
