@@ -150,12 +150,12 @@ export async function animeBytesStatusHealth() {
   }
 }
 
-export async function getAnimes(ABSearchQueryParams: ABSearchQueryParams): Promise<ABGroup[]> {
+export async function getAnimes(ABSearchQueryParams: ABSearchQueryParams, is_cached: boolean = true): Promise<ABGroup[]> {
 
     const search_query = generateSearchQuery(ABSearchQueryParams);
 
     const data = await fetch(search_query, {
-        next: { revalidate: 3600 }, 
+        next: { revalidate: is_cached ? 3600 : 0 }, 
     });
 
     const search_result = await data.json();

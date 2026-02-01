@@ -18,7 +18,7 @@ export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
   const isSeason = Math.random() < 0.3;
 
   const prisma = new PrismaClient();
-  
+
   let anime = isSeason? await getSeasonalAnime() : await getRandomAnime();
   anime = anime ?? await getSeasonalAnime();
 
@@ -141,7 +141,7 @@ export async function getTVDBMapping(anidb_id: number): Promise<AnimeIdMap | nul
 
 export async function getAnimeFromAB(search_query : ABSearchQueryParams) : Promise<Anime[] | null> {
 
-  const searchResult = await getAnimes(search_query);
+  const searchResult = await getAnimes(search_query, false);
 
   const anime_search_result: Anime[] = [];
 
