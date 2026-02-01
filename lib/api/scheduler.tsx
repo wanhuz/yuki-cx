@@ -25,8 +25,8 @@ export async function addToScheduler(anime_data: Anime, filters: Filters) {
         await prisma.animeScheduler.update({
             where: { id: existingItem.id },
             data: {
-                anidb_id: anidb_id, //ID won't change - This is for existing data before migration that does not have ID
-                mal_id: mal_id,
+                anidb_id: Number(anidb_id), //ID won't change - This is for existing data before migration that does not have ID
+                mal_id: Number(mal_id),
                 anilist_id: anilist_id,
                 soft_deleted: false
             }
@@ -103,8 +103,8 @@ export async function addToScheduler(anime_data: Anime, filters: Filters) {
         const createdItem = await prisma.animeScheduler.create({       
             data: {
                 ab_id: ab_id,
-                mal_id: mal_id,
-                anidb_id: anidb_id,
+                mal_id: Number(mal_id),
+                anidb_id: Number(anidb_id),
                 anilist_id: anilist_id,
                 series_name: series_name.toLowerCase(),
             }  
