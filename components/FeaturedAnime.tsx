@@ -98,8 +98,6 @@ const ChevronLeft = () => {
   };
 
   function onPointerDown(e: React.PointerEvent) {
-    e.currentTarget.setPointerCapture(e.pointerId);
-
     startX.current = e.clientX;
   }
 
@@ -111,8 +109,6 @@ const ChevronLeft = () => {
 
   function onPointerUp(e: React.PointerEvent) {
     if (startX.current == null) return;
-
-    e.currentTarget.releasePointerCapture(e.pointerId);
 
     if (deltaRef.current >= 8) handlePrev(); // 8 is arbitrary after testing
     if (deltaRef.current <= -8) handleNext();
