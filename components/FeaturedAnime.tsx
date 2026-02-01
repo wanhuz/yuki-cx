@@ -18,6 +18,7 @@ type FeaturedAnimeImage = {
 export default function FeaturedAnime({ images, interval = 7000 }: FeaturedAnimeProps) {
   const [index, setIndex] = useState(0);
   const [fade, setFade] = useState(true);
+  const deltaRef = useRef(0);
   const startX = useRef<number | null>(null);
 
 
@@ -97,17 +98,26 @@ const ChevronLeft = () => {
   };
 
   function onPointerDown(e: React.PointerEvent) {
+    e.currentTarget.setPointerCapture(e.pointerId);
+
     startX.current = e.clientX;
+  }
+
+  function onPointerMove(e: React.PointerEvent) {
+    if (startX.current == null) return;
+
+    deltaRef.current = e.clientX - startX.current;
   }
 
   function onPointerUp(e: React.PointerEvent) {
     if (startX.current == null) return;
 
-    const delta = e.clientX - startX.current;
+    e.currentTarget.releasePointerCapture(e.pointerId);
 
-    if (delta > 50) handlePrev();
-    if (delta < -50) handleNext();
+    if (deltaRef.current >= 8) handlePrev();
+    if (deltaRef.current <= -8) handleNext();
 
+    deltaRef.current = 0;
     startX.current = null;
   }
 
@@ -115,6 +125,7 @@ const ChevronLeft = () => {
   return (
     <div className="relative  h-[70vh] w-full overflow-hidden"
       onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerLeave={onPointerUp}
     >
