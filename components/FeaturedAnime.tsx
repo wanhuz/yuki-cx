@@ -107,7 +107,7 @@ const ChevronLeft = () => {
     deltaRef.current = e.clientX - startX.current;
   }
 
-  function onPointerUp(e: React.PointerEvent) {
+  function onPointerUp() {
     if (startX.current == null) return;
 
     if (deltaRef.current >= 8) handlePrev(); // 8 is arbitrary after testing
