@@ -9,6 +9,7 @@ export default function SeriesCardGrid({ contentCards }: { contentCards: Anime[]
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
+  const deltaRef = useRef(0);
   const [translateX, setTranslateX] = useState(0); // dynamic during drag
 
 
@@ -36,35 +37,41 @@ export default function SeriesCardGrid({ contentCards }: { contentCards: Anime[]
   // After transition ends, handle wrap-around jump
   function handleTransitionEnd() {
     if (page === 0) {
-      // Jump to last real page
       setIsTransitioning(false);
       setPage(totalPages);
+
     } else if (page === totalPages + 1) {
-      // Jump to first real page
       setIsTransitioning(false);
       setPage(1);
+
     }
   }
 
+
   function handlePointerDown(e: React.PointerEvent) {
+    e.currentTarget.setPointerCapture(e.pointerId);
     setIsDragging(true);
+
+    console.log("CLIENT X: START", e.clientX);
     setStartX(e.clientX);
   }
 
   function handlePointerMove(e: React.PointerEvent) {
     if (!isDragging) return;
-    const delta = e.clientX - startX;
-    setTranslateX(-page * 100 + (delta / containerRef.current!.offsetWidth) * 100);
+    
+    deltaRef.current = e.clientX - startX;
+    
+    // setTranslateX(-page * 100 + (delta / containerRef.current!.offsetWidth) * 100);
   }
 
   function handlePointerUp(e: React.PointerEvent) {
     if (!isDragging) return;
+    e.currentTarget.releasePointerCapture(e.pointerId);
     setIsDragging(false);
-    const delta = e.clientX - startX;
 
-    if (delta > 50) {
+    if (deltaRef.current > 0) {
       handlePrev(); // swipe right → prev
-    } else if (delta < -50) {
+    } else if (deltaRef.current < 0) {
       handleNext(); // swipe left → next
     } else {
       // Not enough movement → snap back
@@ -73,13 +80,10 @@ export default function SeriesCardGrid({ contentCards }: { contentCards: Anime[]
   }
 
 
-  // Re-enable transition when page changes
-  useEffect(() => {
-    if (!isTransitioning) setIsTransitioning(true);
-  }, [page]);
+
 
   useEffect(() => {
-    setTranslateX(-page * 100);
+      setTranslateX(-page * 100);
   }, [page]);
 
 
