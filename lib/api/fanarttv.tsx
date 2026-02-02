@@ -9,7 +9,7 @@ export async function getFanartTV(tvdb_id : number) {
     const url = `https://webservice.fanart.tv/v3.2/tv/${tvdb_id}?api_key=${apiKey}`;
 
     try {
-        const response = await fetch(url);
+        const response = await fetch(url, { next: { revalidate: 604800 } });
         const data : FanartResponse = await response.json();
 
         const season_poster = getOneBanner(data);

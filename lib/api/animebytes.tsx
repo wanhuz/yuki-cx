@@ -150,7 +150,7 @@ export async function animeBytesStatusHealth() {
   }
 }
 
-export async function getAnimes(ABSearchQueryParams: ABSearchQueryParams, is_cached: boolean = true): Promise<ABGroup[]> {
+export async function getAnimes(ABSearchQueryParams: ABSearchQueryParams, is_cached: boolean = true): Promise<ABGroup[] | null> {
 
     const search_query = generateSearchQuery(ABSearchQueryParams);
 
@@ -158,8 +158,17 @@ export async function getAnimes(ABSearchQueryParams: ABSearchQueryParams, is_cac
         next: { revalidate: is_cached ? 3600 : 0 }, 
     });
 
-    const search_result = await data.json();
-    const search_result_groups = search_result["Groups"];
+    let search_result;
+    try {
+      search_result = await data.json();
+
+      const search_result_groups = search_result["Groups"];
          
-    return search_result_groups;
+  return search_result_groups;
+    } catch (error) {
+      console.error('Error:', error);
+    }
+
+    return null;
+    
 }
