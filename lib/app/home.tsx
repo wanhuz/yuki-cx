@@ -22,6 +22,7 @@ export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
   let anime = isSeason? await getSeasonalAnime() : await getRandomAnime();
   anime = anime ?? await getSeasonalAnime();
 
+
   if (!anime) {
     return [];
   }
@@ -82,6 +83,7 @@ export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
       } as FeaturedAnimeBanner;
     })
   );
+
 
   const featuredAnime: FeaturedAnimeBanner[] = enrichedAnime.filter(
     (item): item is FeaturedAnimeBanner => item !== null
@@ -146,7 +148,7 @@ export async function getAnimeFromAB(search_query : ABSearchQueryParams) : Promi
   const anime_search_result: Anime[] = [];
 
 
-  searchResult.map((entry: ABGroup) => {
+  searchResult?.map((entry: ABGroup) => {
     anime_search_result.push({
         ID: entry.ID, 
         SeriesName: entry.SeriesName, 
