@@ -2,6 +2,7 @@
 
 import { toast } from 'react-toastify';
 import { addToScheduler } from '@/lib/api/scheduler';
+import { Anime } from '@/lib/interface/anime';
 
 export function AddToSchedulerForm({ anime_data, filters }: { anime_data: Anime, filters: Filters }) {
     

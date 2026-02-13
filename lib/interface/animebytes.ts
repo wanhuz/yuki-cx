@@ -90,3 +90,8 @@ export type ABStatus = {
     tracker?: { status: number };
   };
 };
+
+export type ABAuth = {
+  username: string;
+  passkey: string;
+}

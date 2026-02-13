@@ -1,5 +1,6 @@
 "use client";
 
+import { Anime } from "@/lib/interface/anime";
 import SeriesCardCarousel from "./SeriesCardCarousel";
 import SeriesCardPlaceholder from "./SeriesCardPlaceholder";
 

@@ -1,62 +1,40 @@
 "use client";
 
-import { search } from "@/lib/api/animebytes";
-import { ABGroup } from "@/lib/interface/animebytes";
-import { extractOngoingStatus } from "@/lib/util/animebytes";
+import { searchAnimePage } from "@/lib/app/search";
+import { Anime } from "@/lib/interface/anime";
 import { useEffect, useState } from "react";
 
 async function onSearch(title : string) {
 
-    const searchResult = search(title, "DEFAULT");
- 
-    const anime_search_result: Anime[] = [];
+    const searchResult = await searchAnimePage(title);
 
-    await searchResult.then((result) => {
-        if (result) {
-            result.map((entry: ABGroup) => {
-
-                if (entry.SeriesName.toLowerCase().includes(title.toLowerCase())) {
-                    anime_search_result.push({
-                        ID: entry.ID, 
-                        SeriesName: entry.SeriesName, 
-                        FullName: entry.FullName,
-                        Description: entry.Description, 
-                        Image: entry.Image,
-                        Type: entry.GroupName,
-                        Aired: entry.Year,
-                        Ongoing: extractOngoingStatus(entry.Torrents[0].Property ?? "")
-                    } as Anime);
-                }
-            });
-        }
-   });
-
-    return anime_search_result;
- }
+    return searchResult;
+}
  
 
 export default function SearchBar({
-  onSearchTextChange,
+  updateSearchDisplay,
   onIsSearch,
 }: {
-  onSearchTextChange: React.Dispatch<React.SetStateAction<Anime[]>>;
+  updateSearchDisplay: React.Dispatch<React.SetStateAction<Anime[]>>;
   onIsSearch: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [searchText, setSearchText] = useState('');
 
     useEffect(() => {
-        onSearchTextChange([]);
+        updateSearchDisplay([]);
         onIsSearch(true);
         const getData = setTimeout(() => {
             
             onSearch(searchText).then((result) => {
-                onSearchTextChange(result);
+                if (!result) 
+                    updateSearchDisplay(result!);
                 onIsSearch(false);
             });
         }, 1000)
         
         return () => clearTimeout(getData)
-      }, [searchText, onSearchTextChange, onIsSearch])
+      }, [searchText, updateSearchDisplay, onIsSearch])
     
     return (
         <div className="container mx-auto my-8 px-2 md:px-0">

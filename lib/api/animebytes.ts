@@ -1,17 +1,8 @@
 "use server";
 
-import { ABSearchResponse, ABSearchQueryParams, ABGroup  } from "../interface/animebytes.js";
-
+import { ABSearchResponse, ABSearchQueryParams, ABGroup, ABStatus, ABAuth  } from "../interface/animebytes.js";
 
 const ANIMEBYTES_URL = "https://animebytes.tv/scrape.php"
-
-type ABStatus = {
-  success: boolean;
-  status: {
-    site?: { status: number };
-    tracker?: { status: number };
-  };
-};
 
 export async function search({passkey, username} : {passkey: string, username: string}, series_name: string, type: string): Promise<ABGroup[]> {
   const search_query_params = { title: series_name, type: type, maxItem: 25 };
@@ -28,7 +19,7 @@ export async function search({passkey, username} : {passkey: string, username: s
     Works by first searching title and then matching the ID from the search result link
     As a result, link to the page need to have title and ID
 */
-export async function getAnime({passkey, username} : {passkey: string, username: string}, anime_title: string, id : number): Promise<ABGroup | null> {
+export async function getAnime(ab_auth: ABAuth, anime_title: string, id : number): Promise<ABGroup | null> {
     const search_query_params = {
       title: anime_title, 
       type: "DEFAULT", 
@@ -36,7 +27,7 @@ export async function getAnime({passkey, username} : {passkey: string, username:
       maxItem: 3
     };
 
-    const search_query = generateSearchQuery( {passkey, username} , search_query_params);
+    const search_query = generateSearchQuery( ab_auth , search_query_params);
 
     const data = await fetch(search_query);
 
@@ -59,7 +50,7 @@ export async function getAnime({passkey, username} : {passkey: string, username:
     return anime_data;
 }
 
-function generateSearchQuery({passkey, username} : {passkey: string, username: string} , {
+function generateSearchQuery(ab_auth: ABAuth, {
     title,
     type,
     maxItem,
@@ -73,8 +64,8 @@ function generateSearchQuery({passkey, username} : {passkey: string, username: s
     }: ABSearchQueryParams
     ) {
     const authParams = {
-        torrent_pass: passkey,
-        username: username,
+        torrent_pass: ab_auth.passkey,
+        username: ab_auth.username,
     };
 
 
@@ -149,23 +140,30 @@ export async function animeBytesStatusHealth() {
   }
 }
 
-export async function getAnimes({passkey, username} : {passkey: string, username: string}, ABSearchQueryParams: ABSearchQueryParams): Promise<ABGroup[] | null> {
+export async function getAnimes(
+  ab_auth: ABAuth,
+  ABSearchQueryParams: ABSearchQueryParams
+): Promise<ABGroup[] | null> {
+  const search_query = generateSearchQuery(ab_auth, ABSearchQueryParams);
 
-    const search_query = generateSearchQuery({passkey, username}, ABSearchQueryParams);
+  try {
+    const response = await fetch(search_query);
 
-    const data = await fetch(search_query);
-
-    let search_result;
-    try {
-      search_result = await data.json();
-
-      const search_result_groups = search_result["Groups"];
-         
-  return search_result_groups;
-    } catch (error) {
-      console.error('Error:', error);
+    if (!response.ok) {
+      console.error(`Fetch failed: ${response.status} ${response.statusText}`);
+      return null;
     }
 
+    const search_result: ABSearchResponse | null = await response.json().catch(() => null);
+
+    if (!search_result || !search_result.Groups) {
+      console.warn("No groups found in search result");
+      return null;
+    }
+
+    return search_result.Groups;
+  } catch (err) {
+    console.error("Error fetching or parsing data:", err);
     return null;
-    
+  }
 }

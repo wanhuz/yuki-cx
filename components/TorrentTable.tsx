@@ -1,3 +1,4 @@
+import { Torrent } from "@/lib/interface/torrent";
 import { TorrentCard } from "./TorrentCard";
 
 function createTorrentRow(torrents_data : Torrent[]) {

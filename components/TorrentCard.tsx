@@ -5,6 +5,8 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Image from "next/image";
 import ExpandableTableRow from "./ExpandableTableRow";
+import { FileData } from "@/lib/interface/filedata";
+import { Torrent } from "@/lib/interface/torrent";
 
 
 async function handleSubmit(torrentUrl: string, torrentFileList: FileData[], setDownloadIcon: (iconUrl: string) => void) {

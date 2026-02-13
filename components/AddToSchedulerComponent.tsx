@@ -5,6 +5,7 @@ import {AddToSchedulerForm} from "./AddToSchedulerForm";
 import FilterProperty from "./FilterProperty";
 import { Popover, PopoverButton } from "@headlessui/react";
 import { extractTorrentFilter } from "@/lib/util/torrent";
+import { Anime } from "@/lib/interface/anime";
 
 
 export function AddToSchedulerComponent({ anime_data }: { anime_data: Anime }) {

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import SearchBar from "@/components/SearchBar";
 import SearchContent from "@/components/SearchContent";
+import { Anime } from "@/lib/interface/anime";
 
 export default function SearchComponent() {
   const [contentCard, setContentCard] = useState<Anime[]>([]);
@@ -10,7 +11,7 @@ export default function SearchComponent() {
 
   return (
     <>
-        <SearchBar onSearchTextChange={setContentCard} onIsSearch={setIsSearch} />
+        <SearchBar updateSearchDisplay={setContentCard} onIsSearch={setIsSearch} />
         <SearchContent contentCard={contentCard} isSearch={isSearch} />
     </>
   );

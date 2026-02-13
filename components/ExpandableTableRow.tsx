@@ -1,5 +1,6 @@
 "use client";
 
+import { FileData } from "@/lib/interface/filedata";
 import { formatBytes } from "@/lib/util/animebytes";
 import React, { useState, useRef, useEffect } from "react";
 

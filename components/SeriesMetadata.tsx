@@ -1,3 +1,4 @@
+import { Anime } from "@/lib/interface/anime";
 import { generateABTorrentLink } from "@/lib/util/animebytes";
 
 

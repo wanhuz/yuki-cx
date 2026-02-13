@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import SeriesCardSimple from "./SeriesCardSimple";
 import useCardsPerPage from "@/hook/cardsPerPage";
+import { Anime } from "@/lib/interface/anime";
 
 export default function SeriesCardGrid({ contentCards }: { contentCards: Anime[] }) {
   const cardsPerPage = useCardsPerPage();

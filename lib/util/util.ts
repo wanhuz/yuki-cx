@@ -1,7 +1,7 @@
 import { decode } from "entities";
 
 export function removeUnderscoreFromTitle(title : string) {
-    return title.replaceAll("_", " ");
+    return title.replace(/_/g, " ");
 }
 
 export function normalizeDictToArray(dict: object) {

@@ -1,6 +1,8 @@
 import {formatBytes, extractSource, extractGroup, extractResolution, extractCodecs, extractExtension, extractSubtitle, extractEpisodeNo, extractFreeleechStatus} from "@/lib/util/animebytes";
 import { RawFilters } from "../interface/rawfilter";
 import { ABTorrent } from "../interface/animebytes";
+import { Torrent } from "../interface/torrent";
+import { FileData } from "../interface/filedata";
 
 export function extractTorrent(torrentResult: ABTorrent[]) : Torrent[] {
     const torrent_extracted: Torrent[] = [];

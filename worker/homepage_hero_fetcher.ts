@@ -5,8 +5,9 @@ import cron from 'node-cron';
 import { getABSettings, getFanartTVSettings } from '../lib/api/settings.js';
 import { getFanartTV } from '../lib/api/fanarttv.js';
 import { getTVDBData } from '../lib/api/anizip.js';
-import { ABGroup, ABSearchQueryParams } from '../lib/interface/animebytes.js';
+import { ABAuth, ABGroup, ABSearchQueryParams } from '../lib/interface/animebytes.js';
 import {Anime} from '../lib/interface/anime.js';
+import { extractAniDBIDFromLinks } from '../lib/util/util.js';
 
 export type FeaturedAnimeBanner = {
   series_url: string;
@@ -15,16 +16,13 @@ export type FeaturedAnimeBanner = {
   logo_url: string;
 };
 
-
 const prisma = new PrismaClient();
-
-const ab_settings = await getABSettings();
-
-const PASSKEY = ab_settings.ab_key;
-const USERNAME = ab_settings.ab_username;
 
 const fanarttv_apikey = (await getFanartTVSettings()).fanart_api_key;
 
+export function generateSeriesLink(title : string, id : number) {
+    return "/anime/" + encodeURIComponent(title) + "?id=" + id;
+}
 
 export async function getTVDBMapping(anidb_id: number): Promise<AnimeIdMap | null> {
 
@@ -71,12 +69,19 @@ export async function getTVDBMapping(anidb_id: number): Promise<AnimeIdMap | nul
 
 export async function getAnimeFromAB(search_query : ABSearchQueryParams) : Promise<Anime[] | null> {
 
-  const searchResult = await getAnimes({passkey: PASSKEY!, username: USERNAME!}, search_query);
+    const ab_settings = await getABSettings();
 
-  const anime_search_result: Anime[] = [];
+    const ab_auth = {
+        passkey: ab_settings.ab_key,
+        username: ab_settings.ab_username
+    } as ABAuth;
+
+    const searchResult = await getAnimes(ab_auth, search_query);
+
+    const anime_search_result: Anime[] = [];
 
 
-  searchResult?.map((entry: ABGroup) => {
+    searchResult?.map((entry: ABGroup) => {
     anime_search_result.push({
         ID: entry.ID, 
         SeriesName: entry.SeriesName, 
@@ -88,28 +93,11 @@ export async function getAnimeFromAB(search_query : ABSearchQueryParams) : Promi
         Ongoing: extractOngoingStatus(entry.Torrents[0].Property ?? ""),
         Links:  Object.values(entry.Links)
     } as Anime);
-  });
+    });
 
-  return anime_search_result;
+    return anime_search_result;
 }
 
-export function generateSeriesLink(title : string, id : number) {
-    return "/anime/" + encodeURIComponent(title) + "?id=" + id;
-}
-
-export function extractAniDBIDFromLinks(links: string[]): number | null {
-    for (const link of links) {
-        if (!link.startsWith("https://anidb.net/anime/")) continue;
-
-        const match = link.match(/anidb\.net\/anime\/(\d+)/);
-
-        if (match) {
-            return Number(match[1]);
-        }
-    }
-
-    return null;
-}
 
 export async function getRandomAnime(): Promise<Anime[] | null> {
   const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -142,33 +130,30 @@ export async function getRandomAnime(): Promise<Anime[] | null> {
  * Fetch anime, insert into AnimeResource, create HomepageHero and HomepageItem.
  */
 async function populateHomepageHero(heroType: string, heroNumber: number = 1): Promise<FeaturedAnimeBanner[]> {
-  const startTime = Date.now();
 
-  // Step 1: Fetch random anime
   const animeList = await getRandomAnime();
+
   if (!animeList || animeList.length === 0) return [];
 
-  // Step 2: Find or create HomepageHero
-
-
   const hero = await prisma.homepageHero.create({
-      data: { type: heroType, number: heroNumber, created_at: new Date() }
-    });
+      data: { 
+        type: heroType, 
+        number: heroNumber, 
+        created_at: new Date() 
+      }
+  });
 
 
-  // Step 4: Process each anime
   const enrichedAnime = await Promise.all(
     animeList.map(async (anime: { Links: any; ID: any; SeriesName: any; }): Promise<FeaturedAnimeBanner | null> => {
-      const anidb_id = extractAniDBIDFromLinks(anime.Links);
-      if (!anidb_id) return null;
+        const anidb_id = extractAniDBIDFromLinks(anime.Links);
+        if (!anidb_id) return null;
 
-      // Check if AnimeResource exists
-      let animeResource = await prisma.animeResource.findFirst({ where: { anidb_id } });
+        let animeResource = await prisma.animeResource.findFirst({ where: { anidb_id } });
 
         const tvdb_map = await getTVDBMapping(anidb_id);
 
         if (!tvdb_map) return null;
-
 
         const banner = await getFanartTV(fanarttv_apikey!, tvdb_map.tvdb_id);
 
@@ -177,39 +162,34 @@ async function populateHomepageHero(heroType: string, heroNumber: number = 1): P
         const ab_id = anime.ID;
         const ab_title = anime.SeriesName;
 
-      // If not, create AnimeResource with placeholder banners/logos
-      if (!animeResource) {
-        animeResource = await prisma.animeResource.create({
-          data: {
-            ab_id: ab_id,
-            ab_title: ab_title,
-            anidb_id,
-            banner_url: banner.seasonposter.url,
-            logo_url: banner.hdtvlogo.url
-          }
-        });
-      }
-
-      // Step 5: Create HomepageItem
-      await prisma.homepageItem.create({
-        data: {
-          heroId: hero!.id,
-          animeResourceId: animeResource.id,
-          created_at: new Date()
+        if (!animeResource) {
+            animeResource = await prisma.animeResource.create({
+                data: {
+                ab_id: ab_id,
+                ab_title: ab_title,
+                anidb_id,
+                banner_url: banner.seasonposter.url,
+                logo_url: banner.hdtvlogo.url
+                }
+            });
         }
-      });
 
-      return {
-        series_url: generateSeriesLink(animeResource.ab_title, animeResource.ab_id),
-        title: animeResource.ab_title,
-        banner_url: animeResource.banner_url,
-        logo_url: animeResource.logo_url
-      };
+        await prisma.homepageItem.create({
+            data: {
+                heroId: hero!.id,
+                animeResourceId: animeResource.id,
+                created_at: new Date()
+            }
+        });
+
+        return {
+            series_url: generateSeriesLink(animeResource.ab_title, animeResource.ab_id),
+            title: animeResource.ab_title,
+            banner_url: animeResource.banner_url,
+            logo_url: animeResource.logo_url
+        };
     })
   );
-
-  const endTime = Date.now();
-  console.log(`HomepageHero ${hero.id} populated in ${(endTime - startTime) / 1000}s`);
 
   return enrichedAnime.filter((item): item is FeaturedAnimeBanner => item !== null);
 }

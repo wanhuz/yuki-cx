@@ -3,9 +3,10 @@ export const dynamic = "force-dynamic";
 import { PrismaClient } from "@prisma/client";
 import { getAnimes } from "../api/animebytes"
 import { generateSeriesLink } from "./series";
-import { ABGroup, ABSearchQueryParams } from "../interface/animebytes";
+import { ABAuth, ABGroup, ABSearchQueryParams } from "../interface/animebytes";
 import { extractOngoingStatus } from "../util/animebytes";
 import { Anime } from "../interface/anime";
+import { getABSettings } from "../api/settings";
 
 
 
@@ -17,7 +18,6 @@ export type FeaturedAnimeBanner = {
 };
 
 export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
-  const startTime = Date.now();
   const prisma = new PrismaClient();
 
   const heroes = await prisma.homepageHero.findMany({
@@ -47,10 +47,6 @@ export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
     [items[i], items[j]] = [items[j], items[i]];
   }
 
-  const endTime = Date.now();
-  console.log(`getFeaturedAnime: ${endTime - startTime}ms`);
-
-
   return items
     .map(item => {
       const anime = item.animeResource;
@@ -68,7 +64,15 @@ export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
 
 export async function getAnimeFromAB(search_query : ABSearchQueryParams) : Promise<Anime[] | null> {
 
-  const searchResult = await getAnimes(search_query);
+    const ab_settings = await getABSettings();
+
+    const ab_auth = {
+        username: ab_settings.ab_username,
+        passkey: ab_settings.ab_key
+    } as ABAuth;
+  
+
+  const searchResult = await getAnimes(ab_auth, search_query);
 
   const anime_search_result: Anime[] = [];
 

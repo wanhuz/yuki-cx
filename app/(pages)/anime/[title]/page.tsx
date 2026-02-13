@@ -4,10 +4,7 @@ import SeriesDescription from "@/components/SeriesDescription";
 import SeriesMetadata from "@/components/SeriesMetadata";
 import SeriesPoster from "@/components/SeriesPoster";
 import TorrentTable from "@/components/TorrentTable";
-import { getAnime } from "@/lib/api/animebytes";
-import { extractOngoingStatus} from "@/lib/util/animebytes";
-import {extractTorrent} from "@/lib/util/torrent";
-import {removeUnderscoreFromTitle, normalizeDictToArray} from "@/lib/util/util";
+import { getAnimePage } from "@/lib/app/series";
 import { notFound } from "next/navigation";
 
 export default async function Page({
@@ -18,34 +15,13 @@ export default async function Page({
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>
   } ) {
 
-  const title = (await params).title;
+  const ab_title = (await params).title;
   const filters = await searchParams;
-  const id = Number(filters.id);
+  const ab_id = Number(filters.id);
   
-  const result = await getAnime(removeUnderscoreFromTitle(title), id);
+  const anime_data = await getAnimePage(ab_title, ab_id);
 
-  if (!result) {
-    notFound();
-  }
-  
-  const anime_data: Anime = {
-    ID: result.ID,
-    SeriesName: result.SeriesName,
-    Description: result.DescriptionHTML,
-    Image: result.Image,
-    StudioList: result.StudioList,
-    AlternativeName: normalizeDictToArray(result.Synonymns),
-    Type: result.GroupName,
-    Episode: result.EpCount,
-    Aired: result.Year,
-    Tags: result.Tags,
-    Ongoing: extractOngoingStatus(result.Torrents[0].Property),
-    Links: normalizeDictToArray(result.Links),
-    Torrents: extractTorrent(result.Torrents),
-    FullName: ""
-  };
-
-  
+  if (!anime_data) notFound();
 
   return (
 

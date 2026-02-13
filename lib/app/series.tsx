@@ -1,3 +1,12 @@
+import { Anime } from "../interface/anime";
+import { removeUnderscoreFromTitle } from "../util/util";
+import { extractOngoingStatus} from "@/lib/util/animebytes";
+import {extractTorrent} from "@/lib/util/torrent";
+import {normalizeDictToArray} from "@/lib/util/util";
+import { getAnime } from "../api/animebytes";
+import { ABAuth } from "../interface/animebytes";
+import { getABSettings } from "../api/settings";
+
 export function generateSeriesLink(title : string, id : number) {
     return "/anime/" + encodeURIComponent(title) + "?id=" + id;
 }
@@ -30,4 +39,38 @@ export function generateTagLabel(type : string) {
             {type}
         </span>
     );
+}
+
+export async function getAnimePage(ab_title : string, ab_id: number) : Promise<Anime | null> {
+    const ab_settings = await getABSettings();
+
+    const ab_auth = {
+        username: ab_settings.ab_username,
+        passkey: ab_settings.ab_key
+    } as ABAuth;
+
+    const title = removeUnderscoreFromTitle(ab_title);
+
+    const result = await getAnime(ab_auth, title, ab_id);
+
+    if (!result) return null;
+    
+    const anime_data: Anime = {
+        ID: result.ID,
+        SeriesName: result.SeriesName,
+        Description: result.DescriptionHTML,
+        Image: result.Image,
+        StudioList: result.StudioList,
+        AlternativeName: normalizeDictToArray(result.Synonymns),
+        Type: result.GroupName,
+        Episode: result.EpCount,
+        Aired: result.Year,
+        Tags: result.Tags,
+        Ongoing: extractOngoingStatus(result.Torrents[0].Property),
+        Links: normalizeDictToArray(result.Links),
+        Torrents: extractTorrent(result.Torrents),
+        FullName: ""
+    };
+
+    return anime_data;
 }
