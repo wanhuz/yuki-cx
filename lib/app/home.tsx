@@ -5,6 +5,7 @@ import { getAnimes } from "../api/animebytes"
 import { generateSeriesLink } from "./series";
 import { ABGroup, ABSearchQueryParams } from "../interface/animebytes";
 import { extractOngoingStatus } from "../util/animebytes";
+import { Anime } from "../interface/anime";
 
 
 

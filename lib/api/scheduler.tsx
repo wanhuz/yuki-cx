@@ -5,6 +5,7 @@ import {getFirstStudioOnly} from "../util/animebytes";
 import { extractAniDBIDFromLinks, extractMalIDFromLinks, stripHTML } from "../util/util";
 import { getAnimeAiringTime, getAnilistID  } from "./anilist";
 import { getAnimeAiringData } from "./anizip";
+import { Anime } from "../interface/anime";
 
 const SCHEDULER_PORT = process.env.SCHEDULER_PORT || 4000;
 

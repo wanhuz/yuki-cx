@@ -149,7 +149,7 @@ export async function animeBytesStatusHealth() {
   }
 }
 
-export async function getAnimes({passkey, username} : {passkey: string, username: string}, ABSearchQueryParams: ABSearchQueryParams, is_cached: boolean = true): Promise<ABGroup[] | null> {
+export async function getAnimes({passkey, username} : {passkey: string, username: string}, ABSearchQueryParams: ABSearchQueryParams): Promise<ABGroup[] | null> {
 
     const search_query = generateSearchQuery({passkey, username}, ABSearchQueryParams);
 

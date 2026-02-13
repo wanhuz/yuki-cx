@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-interface FileData {
+export interface FileData {
     filename : string,
     size: number
 }

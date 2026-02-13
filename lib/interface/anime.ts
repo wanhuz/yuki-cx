@@ -1,5 +1,7 @@
+import { Torrent } from "./torrent";
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-interface Anime {
+export interface Anime {
     ID: number;
     SeriesName: string;
     FullName: string;

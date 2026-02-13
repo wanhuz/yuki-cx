@@ -1,5 +1,7 @@
+import { FileData } from "./filedata"
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-interface Torrent {
+export interface Torrent {
     ID: number,
     Source: string,
     Group: string,

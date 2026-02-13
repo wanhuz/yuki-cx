@@ -5,6 +5,16 @@ import cron from 'node-cron';
 import { getABSettings, getFanartTVSettings } from '../lib/api/settings.js';
 import { getFanartTV } from '../lib/api/fanarttv.js';
 import { getTVDBData } from '../lib/api/anizip.js';
+import { ABGroup, ABSearchQueryParams } from '../lib/interface/animebytes.js';
+import {Anime} from '../lib/interface/anime.js';
+
+export type FeaturedAnimeBanner = {
+  series_url: string;
+  title: string;
+  banner_url: string;
+  logo_url: string;
+};
+
 
 const prisma = new PrismaClient();
 
@@ -15,103 +25,6 @@ const USERNAME = ab_settings.ab_username;
 
 const fanarttv_apikey = (await getFanartTVSettings()).fanart_api_key;
 
-type Anime = {
-  ID: number;
-  SeriesName: string;
-  Links: string[];
-};
-
-type FeaturedAnimeBanner = {
-  series_url: string;
-  title: string;
-  banner_url: string;
-  logo_url: string;
-};
-
-// types/animeBytes.ts
-export interface ABTorrent {
-  ID: number;
-  EditionData: {
-    EditionTitle: string;
-  };
-  Link: string;
-  Property: string;
-  Size: number;
-  Snatched: number;
-  Seeders: number;
-  Leechers: number;
-  UploadTime: string;
-  FileList: {
-    filename: string;
-    size: number;
-  }[];
-}
-
-export interface ABGroup {
-  ID: number;
-  CategoryName: string;
-  FullName: string;
-  GroupName: string;
-  SeriesID: string;
-  SeriesName: string;
-  Artists: string | null;
-  Year: string;
-  Image: string;
-  Synonymns: string[];
-  SynonymnsV2: {
-    Japanese: string;
-    Romaji: string;
-    Alternative: string;
-  };
-  Snatched: number;
-  Comments: number;
-  Links: {
-    AniDB?: string;
-    ANN?: string;
-    Wikipedia?: string;
-    MAL?: string;
-  };
-  Votes: number;
-  AvgVote: number;
-  Associations: string | null;
-  Description: string;
-  DescriptionHTML: string;
-  EpCount: number;
-  StudioList: string;
-  PastWeek: number;
-  Incomplete: boolean;
-  Ongoing: boolean;
-  Tags: string[];
-  Torrents: ABTorrent[];
-}
-
-export interface ABSearchResponse {
-  Results: number;
-  Pagination: {
-    Current: number;
-    Max: number;
-    Limit: {
-      Min: number;
-      Coerced: number;
-      Max: number;
-    };
-  };
-  Matches: number;
-  Groups: ABGroup[];
-}
-
-export interface ABSearchQueryParams {
-  title: string;
-  type: string;
-  maxItem: number;
-  hentai?: number;   // default = 0
-  sort?: string;     // default = "relevance"
-  way?: string;      // default = "asc"
-  airing?: number;   // default = -1
-  epcount?: number;  // default = -1
-  epcount2?: number; // default = -1
-  year?: number;    // default = -1
-};
 
 export async function getTVDBMapping(anidb_id: number): Promise<AnimeIdMap | null> {
 
@@ -158,7 +71,7 @@ export async function getTVDBMapping(anidb_id: number): Promise<AnimeIdMap | nul
 
 export async function getAnimeFromAB(search_query : ABSearchQueryParams) : Promise<Anime[] | null> {
 
-  const searchResult = await getAnimes({passkey: PASSKEY!, username: USERNAME!}, search_query ,false);
+  const searchResult = await getAnimes({passkey: PASSKEY!, username: USERNAME!}, search_query);
 
   const anime_search_result: Anime[] = [];
 

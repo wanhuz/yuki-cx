@@ -83,7 +83,7 @@ export interface ABSearchQueryParams {
   year?: number;    // default = -1
 };
 
-type ABStatus = {
+export type ABStatus = {
   success: boolean;
   status: {
     site?: { status: number };
