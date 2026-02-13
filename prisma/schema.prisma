@@ -92,12 +92,32 @@ model DownloadLogs {
 }
 
 model AnimeResource {
-  id            Int @id @default(autoincrement())
-  ab_id         Int
-  ab_title      String
-  anidb_id      Int
-  banner_url    String
-  logo_url      String
+  id         Int             @id @default(autoincrement())
+  ab_id      Int
+  ab_title   String
+  anidb_id   Int             @unique
+  banner_url String
+  logo_url   String
 
-  @@unique([anidb_id])
+  homepageItems HomepageItem[] 
+}
+
+model HomepageHero {
+  id         Int            @id @default(autoincrement())
+  type       String
+  number     Int
+  created_at DateTime       @default(now())
+
+  homepageItems HomepageItem[]
+}
+
+model HomepageItem {
+  id            Int           @id @default(autoincrement())
+  created_at    DateTime      @default(now())
+  
+  heroId        Int
+  hero          HomepageHero  @relation(fields: [heroId], references: [id])
+
+  animeResourceId Int
+  animeResource   AnimeResource @relation(fields: [animeResourceId], references: [id])
 }

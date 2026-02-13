@@ -1,18 +1,27 @@
 
 import FeaturedAnime from "@/components/FeaturedAnime";
-import { FeaturedAnimeBanner, getFeaturedAnime, getNewMovieRelease, getRandomAnime, getSeasonalAnime, getTrendingAnimeThisYear } from "@/lib/app/home";
+import { getFeaturedAnime, getNewMovieRelease, getRandomAnime, getSeasonalAnime, getTrendingAnimeThisYear } from "@/lib/app/home";
 import HomeCardContent from "@/components/HomeCardContent";
 import { getSeasonYear } from "@/lib/util/anime";
 
 
 export default async function HomeComponent() {
-    const currentSeason = getSeasonYear(new Date());
-    const featuredAnimes: FeaturedAnimeBanner[] | null = await getFeaturedAnime();
-    const seasonalAnime = await getSeasonalAnime();
 
-    const trendingThisYearAnime = await getTrendingAnimeThisYear();
-    const youMightLikeAnime = await getRandomAnime();
-    const movieNewReleaseAnime = await getNewMovieRelease();
+    const [
+      currentSeason,
+      featuredAnimes,
+      seasonalAnime,
+      trendingThisYearAnime,
+      youMightLikeAnime,
+      movieNewReleaseAnime
+    ] = await Promise.all([
+      getSeasonYear(new Date()),
+      getFeaturedAnime(),
+      getSeasonalAnime(),
+      getTrendingAnimeThisYear(),
+      getRandomAnime(),
+      getNewMovieRelease()
+    ]);
 
     return (
       <main className="flex flex-col gap-6">

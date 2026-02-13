@@ -152,7 +152,6 @@ export default function FeaturedAnime({ images, interval = 7000 }: FeaturedAnime
       <Link href={current ? current.series_url : "#"}>
       {images.map((img, i) => (
         <Image
-          unoptimized
           key={i}
           src={img.banner_url}
           fill

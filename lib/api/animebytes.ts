@@ -1,12 +1,8 @@
 "use server";
 
-import { ABSearchResponse, ABSearchQueryParams, ABGroup  } from "../interface/animebytes";
-import { getABSettings } from "./settings";
+import { ABSearchResponse, ABSearchQueryParams, ABGroup  } from "../interface/animebytes.js";
 
-const ab_settings = await getABSettings();
 
-const PASSKEY = ab_settings.ab_key;
-const USERNAME = ab_settings.ab_username;
 const ANIMEBYTES_URL = "https://animebytes.tv/scrape.php"
 
 type ABStatus = {
@@ -17,13 +13,11 @@ type ABStatus = {
   };
 };
 
-export async function search(series_name: string, type: string): Promise<ABGroup[]> {
+export async function search({passkey, username} : {passkey: string, username: string}, series_name: string, type: string): Promise<ABGroup[]> {
   const search_query_params = { title: series_name, type: type, maxItem: 25 };
-  const search_query = generateSearchQuery(search_query_params);
+  const search_query = generateSearchQuery( {passkey, username} , search_query_params);
 
-  const data = await fetch(search_query, {
-    next: { revalidate: 3600 },
-  });
+  const data = await fetch(search_query);
 
   const search_result: ABSearchResponse = await data.json();
 
@@ -34,7 +28,7 @@ export async function search(series_name: string, type: string): Promise<ABGroup
     Works by first searching title and then matching the ID from the search result link
     As a result, link to the page need to have title and ID
 */
-export async function getAnime(anime_title: string, id : number): Promise<ABGroup | null> {
+export async function getAnime({passkey, username} : {passkey: string, username: string}, anime_title: string, id : number): Promise<ABGroup | null> {
     const search_query_params = {
       title: anime_title, 
       type: "DEFAULT", 
@@ -42,11 +36,9 @@ export async function getAnime(anime_title: string, id : number): Promise<ABGrou
       maxItem: 3
     };
 
-    const search_query = generateSearchQuery(search_query_params);
+    const search_query = generateSearchQuery( {passkey, username} , search_query_params);
 
-    const data = await fetch(search_query, {
-        next: { revalidate: 3600 }, 
-    });
+    const data = await fetch(search_query);
 
     const search_result: ABSearchResponse = await data.json();
 
@@ -67,7 +59,7 @@ export async function getAnime(anime_title: string, id : number): Promise<ABGrou
     return anime_data;
 }
 
-function generateSearchQuery({
+function generateSearchQuery({passkey, username} : {passkey: string, username: string} , {
     title,
     type,
     maxItem,
@@ -81,8 +73,8 @@ function generateSearchQuery({
     }: ABSearchQueryParams
     ) {
     const authParams = {
-        torrent_pass: PASSKEY,
-        username: USERNAME,
+        torrent_pass: passkey,
+        username: username,
     };
 
 
@@ -157,13 +149,11 @@ export async function animeBytesStatusHealth() {
   }
 }
 
-export async function getAnimes(ABSearchQueryParams: ABSearchQueryParams, is_cached: boolean = true): Promise<ABGroup[] | null> {
+export async function getAnimes({passkey, username} : {passkey: string, username: string}, ABSearchQueryParams: ABSearchQueryParams, is_cached: boolean = true): Promise<ABGroup[] | null> {
 
-    const search_query = generateSearchQuery(ABSearchQueryParams);
+    const search_query = generateSearchQuery({passkey, username}, ABSearchQueryParams);
 
-    const data = await fetch(search_query, {
-        next: { revalidate: is_cached ? 3600 : 0 }, 
-    });
+    const data = await fetch(search_query);
 
     let search_result;
     try {

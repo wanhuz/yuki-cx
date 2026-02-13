@@ -1,0 +1,320 @@
+import { extractOngoingStatus } from '../lib/util/animebytes.js';
+import { getAnimes } from '../lib/api/animebytes.js';
+import { AnimeIdMap, PrismaClient } from '@prisma/client';
+import cron from 'node-cron';
+import { getABSettings, getFanartTVSettings } from '../lib/api/settings.js';
+import { getFanartTV } from '../lib/api/fanarttv.js';
+import { getTVDBData } from '../lib/api/anizip.js';
+
+const prisma = new PrismaClient();
+
+const ab_settings = await getABSettings();
+
+const PASSKEY = ab_settings.ab_key;
+const USERNAME = ab_settings.ab_username;
+
+const fanarttv_apikey = (await getFanartTVSettings()).fanart_api_key;
+
+type Anime = {
+  ID: number;
+  SeriesName: string;
+  Links: string[];
+};
+
+type FeaturedAnimeBanner = {
+  series_url: string;
+  title: string;
+  banner_url: string;
+  logo_url: string;
+};
+
+// types/animeBytes.ts
+export interface ABTorrent {
+  ID: number;
+  EditionData: {
+    EditionTitle: string;
+  };
+  Link: string;
+  Property: string;
+  Size: number;
+  Snatched: number;
+  Seeders: number;
+  Leechers: number;
+  UploadTime: string;
+  FileList: {
+    filename: string;
+    size: number;
+  }[];
+}
+
+export interface ABGroup {
+  ID: number;
+  CategoryName: string;
+  FullName: string;
+  GroupName: string;
+  SeriesID: string;
+  SeriesName: string;
+  Artists: string | null;
+  Year: string;
+  Image: string;
+  Synonymns: string[];
+  SynonymnsV2: {
+    Japanese: string;
+    Romaji: string;
+    Alternative: string;
+  };
+  Snatched: number;
+  Comments: number;
+  Links: {
+    AniDB?: string;
+    ANN?: string;
+    Wikipedia?: string;
+    MAL?: string;
+  };
+  Votes: number;
+  AvgVote: number;
+  Associations: string | null;
+  Description: string;
+  DescriptionHTML: string;
+  EpCount: number;
+  StudioList: string;
+  PastWeek: number;
+  Incomplete: boolean;
+  Ongoing: boolean;
+  Tags: string[];
+  Torrents: ABTorrent[];
+}
+
+export interface ABSearchResponse {
+  Results: number;
+  Pagination: {
+    Current: number;
+    Max: number;
+    Limit: {
+      Min: number;
+      Coerced: number;
+      Max: number;
+    };
+  };
+  Matches: number;
+  Groups: ABGroup[];
+}
+
+export interface ABSearchQueryParams {
+  title: string;
+  type: string;
+  maxItem: number;
+  hentai?: number;   // default = 0
+  sort?: string;     // default = "relevance"
+  way?: string;      // default = "asc"
+  airing?: number;   // default = -1
+  epcount?: number;  // default = -1
+  epcount2?: number; // default = -1
+  year?: number;    // default = -1
+};
+
+export async function getTVDBMapping(anidb_id: number): Promise<AnimeIdMap | null> {
+
+    const prisma = new PrismaClient();
+
+    const existing = await prisma.animeIdMap.findFirst({
+        where: {
+            anidb_id: anidb_id
+        }
+    });
+
+    if (existing) {
+      return existing
+    };
+
+    const tvdb_data = await getTVDBData(anidb_id);
+
+    if (!tvdb_data) return null;
+    if (!tvdb_data.tvdb_id) return null;
+
+    const title = tvdb_data.title_en!;
+    const tvdb_id = tvdb_data.tvdb_id!;
+    const season_number = tvdb_data.season_number!;
+
+    return await prisma.animeIdMap.upsert({
+      where: {
+        anidb_id_tvdb_id_season_number: {
+          anidb_id,
+          tvdb_id,
+          season_number,
+        },
+      },
+      update: {}, // nothing to update
+      create: {
+        title,
+        anidb_id,
+        tvdb_id,
+        season_number,
+      },
+    });
+
+
+}
+
+export async function getAnimeFromAB(search_query : ABSearchQueryParams) : Promise<Anime[] | null> {
+
+  const searchResult = await getAnimes({passkey: PASSKEY!, username: USERNAME!}, search_query ,false);
+
+  const anime_search_result: Anime[] = [];
+
+
+  searchResult?.map((entry: ABGroup) => {
+    anime_search_result.push({
+        ID: entry.ID, 
+        SeriesName: entry.SeriesName, 
+        FullName: entry.FullName,
+        Description: entry.Description, 
+        Image: entry.Image,
+        Type: entry.GroupName,
+        Aired: entry.Year,
+        Ongoing: extractOngoingStatus(entry.Torrents[0].Property ?? ""),
+        Links:  Object.values(entry.Links)
+    } as Anime);
+  });
+
+  return anime_search_result;
+}
+
+export function generateSeriesLink(title : string, id : number) {
+    return "/anime/" + encodeURIComponent(title) + "?id=" + id;
+}
+
+export function extractAniDBIDFromLinks(links: string[]): number | null {
+    for (const link of links) {
+        if (!link.startsWith("https://anidb.net/anime/")) continue;
+
+        const match = link.match(/anidb\.net\/anime\/(\d+)/);
+
+        if (match) {
+            return Number(match[1]);
+        }
+    }
+
+    return null;
+}
+
+export async function getRandomAnime(): Promise<Anime[] | null> {
+  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const randChar = chars[Math.floor(Math.random() * chars.length)];
+
+  const sorts = ["relevance", "name", "rating", "votes"];
+  const ways = ["asc", "desc"];
+
+  const randSort = sorts[Math.floor(Math.random() * sorts.length)];
+  const randWay = ways[Math.floor(Math.random() * ways.length)];
+
+
+  const AB_SearchQuery = {
+    title: randChar,
+    type: "TV_SERIES",
+    maxItem: 13,
+    hentai: 0,
+    airing: 2,
+    sort: randSort,
+    way: randWay
+  } as ABSearchQueryParams;
+
+  const anime_search_result = await getAnimeFromAB(AB_SearchQuery);
+
+  return anime_search_result;
+}
+
+
+/**
+ * Fetch anime, insert into AnimeResource, create HomepageHero and HomepageItem.
+ */
+async function populateHomepageHero(heroType: string, heroNumber: number = 1): Promise<FeaturedAnimeBanner[]> {
+  const startTime = Date.now();
+
+  // Step 1: Fetch random anime
+  const animeList = await getRandomAnime();
+  if (!animeList || animeList.length === 0) return [];
+
+  // Step 2: Find or create HomepageHero
+
+
+  const hero = await prisma.homepageHero.create({
+      data: { type: heroType, number: heroNumber, created_at: new Date() }
+    });
+
+
+  // Step 4: Process each anime
+  const enrichedAnime = await Promise.all(
+    animeList.map(async (anime: { Links: any; ID: any; SeriesName: any; }): Promise<FeaturedAnimeBanner | null> => {
+      const anidb_id = extractAniDBIDFromLinks(anime.Links);
+      if (!anidb_id) return null;
+
+      // Check if AnimeResource exists
+      let animeResource = await prisma.animeResource.findFirst({ where: { anidb_id } });
+
+        const tvdb_map = await getTVDBMapping(anidb_id);
+
+        if (!tvdb_map) return null;
+
+
+        const banner = await getFanartTV(fanarttv_apikey!, tvdb_map.tvdb_id);
+
+        if (!banner?.hdtvlogo || !banner?.seasonposter) return null;
+
+        const ab_id = anime.ID;
+        const ab_title = anime.SeriesName;
+
+      // If not, create AnimeResource with placeholder banners/logos
+      if (!animeResource) {
+        animeResource = await prisma.animeResource.create({
+          data: {
+            ab_id: ab_id,
+            ab_title: ab_title,
+            anidb_id,
+            banner_url: banner.seasonposter.url,
+            logo_url: banner.hdtvlogo.url
+          }
+        });
+      }
+
+      // Step 5: Create HomepageItem
+      await prisma.homepageItem.create({
+        data: {
+          heroId: hero!.id,
+          animeResourceId: animeResource.id,
+          created_at: new Date()
+        }
+      });
+
+      return {
+        series_url: generateSeriesLink(animeResource.ab_title, animeResource.ab_id),
+        title: animeResource.ab_title,
+        banner_url: animeResource.banner_url,
+        logo_url: animeResource.logo_url
+      };
+    })
+  );
+
+  const endTime = Date.now();
+  console.log(`HomepageHero ${hero.id} populated in ${(endTime - startTime) / 1000}s`);
+
+  return enrichedAnime.filter((item): item is FeaturedAnimeBanner => item !== null);
+}
+
+/**
+ * Schedule via cron: run every day at 2 AM
+ */
+cron.schedule('0 2 * * *', async () => {
+  console.log('Running homepage hero fetcher...');
+  try {
+    await populateHomepageHero('featured', 1);
+  } catch (err) {
+    console.error('Error in homepage hero fetcher:', err);
+  }
+});
+
+
+populateHomepageHero('featured', 1)
+    .then((result) => console.log('Initial run complete:', result.length, 'items'))
+    .finally(async () => await prisma.$disconnect());
+

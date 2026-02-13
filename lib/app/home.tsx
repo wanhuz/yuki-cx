@@ -1,149 +1,73 @@
-import { AnimeIdMap, PrismaClient } from "@prisma/client";
+export const dynamic = "force-dynamic";
+
+import { PrismaClient } from "@prisma/client";
 import { getAnimes } from "../api/animebytes"
-import { getTVDBData } from "../api/anizip";
-import { getFanartTV } from "../api/fanarttv";
-import { extractAniDBIDFromLinks } from "../util/util";
 import { generateSeriesLink } from "./series";
 import { ABGroup, ABSearchQueryParams } from "../interface/animebytes";
 import { extractOngoingStatus } from "../util/animebytes";
 
+
+
 export type FeaturedAnimeBanner = {
-    series_url: string;
-    title: string;
-    banner_url: string;
-    logo_url: string;
-}
+  series_url: string;
+  title: string;
+  banner_url: string;
+  logo_url: string;
+};
 
 export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
-  const isSeason = Math.random() < 0.3;
-
+  const startTime = Date.now();
   const prisma = new PrismaClient();
 
-  let anime = isSeason? await getSeasonalAnime() : await getRandomAnime();
-  anime = anime ?? await getSeasonalAnime();
+  const heroes = await prisma.homepageHero.findMany({
+    where: {
+      type: 'featured'
+    },
+    include: {
+      homepageItems: {
+        include: {
+          animeResource: true
+        }
+      }
+    }
+  });
 
+  if (heroes.length === 0) return [];
 
-  if (!anime) {
-    return [];
+  // pick random hero
+  const hero = heroes[Math.floor(Math.random() * heroes.length)];
+
+  if (!hero.homepageItems.length) return [];
+
+  // shuffle items (Fisher-Yates)
+  const items = [...hero.homepageItems];
+  for (let i = items.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [items[i], items[j]] = [items[j], items[i]];
   }
 
-  const enrichedAnime = await Promise.all(
-    anime.map(async (result:  Anime ): Promise<FeaturedAnimeBanner | null> => {
-      const links = result.Links;
-      const anidb_id = extractAniDBIDFromLinks(links);
-
-      if (!anidb_id) {
-        return null;
-      }
-
-      const existing = await prisma.animeResource.findFirst({
-        where: { anidb_id }
-      });
-
-      if (existing) {
-        const series_link = generateSeriesLink(existing.ab_title, existing.ab_id)
-
-        return {
-          series_url: series_link,
-          title: existing.ab_title,
-          banner_url: existing.banner_url,
-          logo_url: existing.logo_url
-        } as FeaturedAnimeBanner;
-      }
+  const endTime = Date.now();
+  console.log(`getFeaturedAnime: ${endTime - startTime}ms`);
 
 
-      const tvdb_map = await getTVDBMapping(anidb_id);
-
-      if (!tvdb_map) return null;
-
-      const banner = await getFanartTV(tvdb_map.tvdb_id);
-
-      if (!banner?.hdtvlogo || !banner?.seasonposter) return null;
-
-      const ab_id = result.ID;
-      const ab_title = result.SeriesName;
-
-      await prisma.animeResource.create({
-        data: {
-          ab_id,
-          ab_title,
-          anidb_id,
-          banner_url: banner.seasonposter.url,
-          logo_url: banner.hdtvlogo.url
-        }
-      });
-
-      const series_link = generateSeriesLink(ab_title, ab_id)
+  return items
+    .map(item => {
+      const anime = item.animeResource;
+      if (!anime?.banner_url || !anime?.logo_url) return null;
 
       return {
-        series_url: series_link,
-        title: ab_title,
-        banner_url: banner.seasonposter.url,
-        logo_url: banner.hdtvlogo.url
-      } as FeaturedAnimeBanner;
+        series_url: generateSeriesLink(anime.ab_title, anime.ab_id),
+        title: anime.ab_title,
+        banner_url: anime.banner_url,
+        logo_url: anime.logo_url
+      };
     })
-  );
-
-
-  const featuredAnime: FeaturedAnimeBanner[] = enrichedAnime.filter(
-    (item): item is FeaturedAnimeBanner => item !== null
-  );
-
-  const featuredAnimes: FeaturedAnimeBanner[] = featuredAnime.filter(
-    (item: FeaturedAnimeBanner) => item.banner_url && item.logo_url
-  )
-
-  return featuredAnimes;
-}
-
-
-
-export async function getTVDBMapping(anidb_id: number): Promise<AnimeIdMap | null> {
-
-    const prisma = new PrismaClient();
-
-    const existing = await prisma.animeIdMap.findFirst({
-        where: {
-            anidb_id: anidb_id
-        }
-    });
-
-    if (existing) {
-      return existing
-    };
-
-    const tvdb_data = await getTVDBData(anidb_id);
-
-    if (!tvdb_data) return null;
-    if (!tvdb_data.tvdb_id) return null;
-
-    const title = tvdb_data.title_en!;
-    const tvdb_id = tvdb_data.tvdb_id!;
-    const season_number = tvdb_data.season_number!;
-
-    return await prisma.animeIdMap.upsert({
-      where: {
-        anidb_id_tvdb_id_season_number: {
-          anidb_id,
-          tvdb_id,
-          season_number,
-        },
-      },
-      update: {}, // nothing to update
-      create: {
-        title,
-        anidb_id,
-        tvdb_id,
-        season_number,
-      },
-    });
-
-
+    .filter((x): x is FeaturedAnimeBanner => x !== null);
 }
 
 export async function getAnimeFromAB(search_query : ABSearchQueryParams) : Promise<Anime[] | null> {
 
-  const searchResult = await getAnimes(search_query, false);
+  const searchResult = await getAnimes(search_query);
 
   const anime_search_result: Anime[] = [];
 
@@ -170,7 +94,7 @@ export async function getSeasonalAnime(): Promise<Anime[] | null> {
   const AB_SearchQuery_Seasonal = {
       title: "",
       type: "TV_SERIES",
-      maxItem: 25,
+      maxItem: 15,
       hentai: 0,
       airing: 1,
       sort: "relevance",
@@ -191,7 +115,7 @@ export async function getTrendingAnimeThisYear(): Promise<Anime[] | null> {
   const AB_SearchQuery_TrendingYear = {
     title: "",
     type: "TV_SERIES",
-    maxItem: 25,
+    maxItem: 15,
     hentai: 0,
     sort: "votes",
     way: "desc",
@@ -208,7 +132,7 @@ export async function getYouMightLike(): Promise<Anime[] | null> {
   const AB_SearchQuery_YouMightLike = {
     title: "",
     type: "DEFAULT",
-    maxItem: 25,
+    maxItem: 15,
     hentai: 0,
     sort: "votes",
     way: "desc"
@@ -224,7 +148,7 @@ export async function getNewMovieRelease(): Promise<Anime[] | null> {
   const AB_SearchQuery_YouMightLike = {
     title: "",
     type: "MOVIE",
-    maxItem: 25,
+    maxItem: 15,
     hentai: 0,
     sort: "year",
     way: "desc"

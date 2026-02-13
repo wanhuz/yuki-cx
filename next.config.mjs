@@ -15,9 +15,8 @@ const nextConfig = {
         hostname: 'assets.fanart.tv',
       },
     ],
-    minimumCacheTTL: 60,
-  },
-
+    minimumCacheTTL: 2678400, // 31 days
+  }
 
 };
 
