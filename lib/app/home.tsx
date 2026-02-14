@@ -14,13 +14,18 @@ import { FeaturedAnimeBanner } from "../interface/animebanner";
 export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
   const prisma = new PrismaClient();
 
-  const count = await prisma.homepageHero.count();
+  const heroType = getNextHeroType();
+
+  const typeName = HeroType[heroType];
+
+  const count = await prisma.homepageHero.count({
+    where: { type: typeName }
+  });
 
   if (count === 0) return [];
 
-  const heroType = getNextHeroType();
   const hero = await prisma.homepageHero.findFirst({
-    where: { type: HeroType[heroType] },
+    where: { type: typeName },
     skip: Math.floor(Math.random() * count),
     include: {
       homepageItems: {
