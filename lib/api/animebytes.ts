@@ -60,7 +60,8 @@ function generateSearchQuery(ab_auth: ABAuth, {
     airing = -1, 
     epcount = -1,
     epcount2 = -1,
-    year = -1
+    year = -1,
+    tags = ""
     }: ABSearchQueryParams
     ) {
     const authParams = {
@@ -98,7 +99,8 @@ function generateSearchQuery(ab_auth: ABAuth, {
         limit: String(maxItem),
         epcount: epcount === -1 ? "" : String(epcount),
         epcount2: epcount2 === -1 ? "" : String(epcount2),
-        year: year === -1 ? "" : String(year)
+        year: year === -1 ? "" : String(year),
+        tags: tags
     });
 
 

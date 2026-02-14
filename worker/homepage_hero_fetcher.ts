@@ -111,7 +111,13 @@ cron.schedule('0 */2 * * *', async () => {
   }
 });
 
-populateHomepageHero(heroTypeValues[0], 1)
-    .then((result) => console.log('Initial run complete:', result?.length ?? 0, 'items'))
-    .finally(async () => await prisma.$disconnect());
+//Initial seed for each hero type
+const promises = heroTypeValues.map((heroType, index) => new Promise<void>((resolve) => setTimeout(async () => {
+    await populateHomepageHero(heroType, 1)
+        .then((result) => console.log(`Initial run complete for ${HeroType[heroType]}`, result?.length ?? 0, 'items'))
+        .then(() => resolve());
+}, 3000 * index)));
+
+Promise.all(promises);
+
 

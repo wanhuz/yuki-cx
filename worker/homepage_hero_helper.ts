@@ -5,6 +5,7 @@ import { getABSettings, getFanartTVSettings } from '../lib/api/settings.js';
 import { getTVDBData } from '../lib/api/anizip.js';
 import { ABAuth, ABGroup, ABSearchQueryParams } from '../lib/interface/animebytes.js';
 import {Anime} from '../lib/interface/anime.js';
+import { ABGenre } from '../lib/enum/animebytes.js';
 
 
 const prisma = new PrismaClient();
@@ -157,16 +158,18 @@ export async function getAnimeHero(type: number):  Promise<Anime[] | null> {
 
 async function getAnimeByGenre(): Promise<Anime[] | null> {
 
+  const genres = Object.values(ABGenre) as string[];
+  const genre = genres[Math.floor(Math.random() * genres.length)];
+
   const AB_SearchQuery_Seasonal = {
       title: "",
       type: "TV_SERIES",
       maxItem: 15,
       hentai: 0,
-      airing: 1,
-      sort: "relevance",
+      airing: 0,
+      sort: "votes",
       way: "desc",
-      epcount: 1,
-      epcount2: 26
+      tags: genre
   };
 
   const anime_search_result = await getAnimeFromAB(AB_SearchQuery_Seasonal);

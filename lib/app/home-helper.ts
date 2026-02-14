@@ -18,7 +18,6 @@ export function getNextHeroType(): HeroType {
 
   const type = nonSeasonalTypes[rrIndex];
   rrIndex = (rrIndex + 1) % nonSeasonalTypes.length;
-  console.log("Next hero type:", type);
 
   return type;
 }
