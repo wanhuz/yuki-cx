@@ -11,6 +11,7 @@
     "start:worker": "node dist/worker/scheduler.js",
     "start:prod": "node entrypoint.js",
     "lint": "next lint",
+    "lint:prod": "tsc --noEmit",
     "test": "jest"
   },
   "dependencies": {
@@ -49,7 +50,7 @@
     "tsx": "^4.19.2",
     "typescript": "^5.6.3"
   },
-  "version": "0.8.5.0",
+  "version": "0.8.6.0",
   "description": "This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).",
   "main": "index.js",
   "directories": {
