@@ -100,7 +100,7 @@ async function populateHomepageHero(heroType: HeroType): Promise<FeaturedAnimeBa
 async function trimHomepageHeros() {
   const count = await prisma.homepageHero.count();
 
-  if (count <= 100) return;
+  if (count < 10) return;
 
   const toDelete = await prisma.homepageHero.findMany({
     where: {
@@ -135,7 +135,7 @@ cron.schedule('0 */2 * * *', async () => {
     console.log('Fetching homepage for ', HeroType[heroType]);
 
     const result = await populateHomepageHero(heroType);
-    
+
     console.log('Run complete:', result?.length ?? 0, 'items');
   } catch (err) {
     console.error('Error in homepage hero fetcher:', err);
