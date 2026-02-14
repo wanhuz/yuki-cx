@@ -1,23 +1,18 @@
 import { HeroType } from "../enum/hero";
 
-let rrIndex = 0;
-
-const nonSeasonalTypes: HeroType[] = [
-  HeroType.Genre,
-  HeroType.Year,
-  HeroType.Underrated,
-  HeroType.Wildcard
-];
 
 export function getNextHeroType(): HeroType {
-  const roll = Math.random();
+  // 20% chance for Seasonal
+  if (Math.random() < 0.2) return HeroType.Seasonal;
 
-  if (roll < 0.20) {
-    return HeroType.Seasonal;
-  }
+  // Pick randomly from the non-seasonal types
+  const nonSeasonalTypes = [
+    HeroType.Genre,
+    HeroType.Year,
+    HeroType.Underrated,
+    HeroType.Wildcard
+  ];
 
-  const type = nonSeasonalTypes[rrIndex];
-  rrIndex = (rrIndex + 1) % nonSeasonalTypes.length;
-
-  return type;
+  const randomIndex = Math.floor(Math.random() * nonSeasonalTypes.length);
+  return nonSeasonalTypes[randomIndex];
 }
