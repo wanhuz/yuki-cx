@@ -83,7 +83,12 @@ export default function SeriesCard({
                     <div className="flex flex-col p-3 gap-2">
                         <div className="text-sm font-bold">Episode {last_fetched_episode}</div>
                         <div className="text-xs text-gray-500">
-                            {last_fetched_episode === 0 ? "Added on" : "Fetched on"} {last_fetched_at.toLocaleString().replace(',', ' -')}
+                            {last_fetched_episode === 0 ? "Added on" : "Fetched on"}{" "}
+                                {new Intl.DateTimeFormat('en-GB', {
+                                    day: 'numeric',
+                                    month: 'numeric',
+                                    year: 'numeric'
+                                }).format(last_fetched_at)}
                         </div>
 
                         <div className="text-xs text-gray-500 flex flex-wrap gap-1 mt-1 mb-2">

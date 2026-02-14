@@ -178,6 +178,9 @@ export async function getAnimeInScheduler(searchQuery: string | null = null) :
         include: {
             references: true,
             filter: true
+        },
+        orderBy: {
+            last_fetched_at: 'desc'
         }
     });
 

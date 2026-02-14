@@ -15,6 +15,8 @@ startProcess('npx', ['tsx', 'prisma/seed.ts'], 'Prisma seed');
 startProcess('npx', ['next', 'start'], 'Next.js');
 
 // Start worker (compiled to JS)
-startProcess('node', ['./dist/worker/scheduler.js'], 'Worker');
+startProcess('node', ['./dist/worker/scheduler.js'], 'Yuki Scheduler Worker');
 
-startProcess('node', ['./dist/worker/episode_updater.js'], 'Worker');
+startProcess('node', ['./dist/worker/episode_updater.js'], 'Yuki Episode Updater Worker');
+
+startProcess('node', ['./dist/worker/homepage_hero_fetcher.js'], 'Yuki Homepage Hero Fetcher Worker');
