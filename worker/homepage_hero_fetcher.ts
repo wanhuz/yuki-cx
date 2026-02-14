@@ -23,7 +23,7 @@ function getNextHeroType(): HeroType {
 const prisma = new PrismaClient();
 const fanarttv_apikey = (await getFanartTVSettings()).fanart_api_key;
 
-async function populateHomepageHero(heroType: HeroType, heroNumber: number = 1): Promise<FeaturedAnimeBanner[] | null> {
+async function populateHomepageHero(heroType: HeroType): Promise<FeaturedAnimeBanner[] | null> {
 
     const animeList = await getAnimeHero(heroType);
 
@@ -36,6 +36,8 @@ async function populateHomepageHero(heroType: HeroType, heroNumber: number = 1):
 
         await prisma.homepageHero.deleteMany({ where: { type: HeroType[heroType] } });
     }
+
+    const heroNumber = await prisma.homepageHero.count({ where: { type: HeroType[heroType] } }) + 1;
 
     const hero = await prisma.homepageHero.create({
         data: { 
@@ -105,7 +107,7 @@ cron.schedule('0 */2 * * *', async () => {
 
     console.log('Fetching homepage for ', HeroType[heroType]);
 
-    await populateHomepageHero(heroType, 1).then((result) => console.log('Run complete:', result?.length ?? 0, 'items'));
+    await populateHomepageHero(heroType).then((result) => console.log('Run complete:', result?.length ?? 0, 'items'));
   } catch (err) {
     console.error('Error in homepage hero fetcher:', err);
   }
@@ -113,7 +115,7 @@ cron.schedule('0 */2 * * *', async () => {
 
 //Initial seed for each hero type
 const promises = heroTypeValues.map((heroType, index) => new Promise<void>((resolve) => setTimeout(async () => {
-    await populateHomepageHero(heroType, 1)
+    await populateHomepageHero(heroType)
         .then((result) => console.log(`Initial run complete for ${HeroType[heroType]}`, result?.length ?? 0, 'items'))
         .then(() => resolve());
 }, 3000 * index)));
