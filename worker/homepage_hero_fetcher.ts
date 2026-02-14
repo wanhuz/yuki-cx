@@ -98,28 +98,30 @@ async function populateHomepageHero(heroType: HeroType): Promise<FeaturedAnimeBa
 }
 
 async function trimHomepageHeros() {
-  const count = await prisma.homepageHero.count();
+    const count = await prisma.homepageHero.count();
 
-  if (count < 10) return;
+    if (count < 10) return;
 
-  const toDelete = await prisma.homepageHero.findMany({
+    const toDelete = await prisma.homepageHero.findMany({
     where: {
-      type: { not: HeroType[HeroType.Seasonal] },
+        type: { not: HeroType[HeroType.Seasonal] },
     },
     orderBy: {
-      created_at: "asc", // oldest first
+        created_at: "asc", // oldest first
     },
     take: 5,
     select: { id: true },
-  });
+    });
 
-  if (toDelete.length === 0) return;
+    if (toDelete.length === 0) return;
 
-  await prisma.homepageHero.deleteMany({
-    where: {
-      id: { in: toDelete.map(h => h.id) },
-    },
-  });
+    await prisma.homepageItem.deleteMany({
+        where: { heroId: { in: toDelete.map(h => h.id) } },
+    });
+    
+    await prisma.homepageHero.deleteMany({
+        where: { id: { in: toDelete.map(h => h.id) } },
+    });
 }
 
 /**
