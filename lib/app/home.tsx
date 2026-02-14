@@ -7,36 +7,30 @@ import { ABAuth, ABGroup, ABSearchQueryParams } from "../interface/animebytes";
 import { extractOngoingStatus } from "../util/animebytes";
 import { Anime } from "../interface/anime";
 import { getABSettings } from "../api/settings";
-
-
-
-export type FeaturedAnimeBanner = {
-  series_url: string;
-  title: string;
-  banner_url: string;
-  logo_url: string;
-};
+import {getNextHeroType} from "./home-helper";
+import { HeroType } from "../enum/hero";
+import { FeaturedAnimeBanner } from "../interface/animebanner";
 
 export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
   const prisma = new PrismaClient();
 
-  const heroes = await prisma.homepageHero.findMany({
-    where: {
-      type: 'featured'
-    },
+  const count = await prisma.homepageHero.count();
+
+  if (count === 0) return [];
+
+  const heroType = getNextHeroType();
+
+  const hero = await prisma.homepageHero.findFirst({
+    where: { type: HeroType[heroType] },
     include: {
       homepageItems: {
-        include: {
-          animeResource: true
-        }
+        include: { animeResource: true }
       }
     }
   });
 
-  if (heroes.length === 0) return [];
 
-  // pick random hero
-  const hero = heroes[Math.floor(Math.random() * heroes.length)];
+  if (!hero) return [];
 
   if (!hero.homepageItems.length) return [];
 
