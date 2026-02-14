@@ -19,9 +19,9 @@ export async function getFeaturedAnime(): Promise<FeaturedAnimeBanner[]> {
   if (count === 0) return [];
 
   const heroType = getNextHeroType();
-
   const hero = await prisma.homepageHero.findFirst({
     where: { type: HeroType[heroType] },
+    skip: Math.floor(Math.random() * count),
     include: {
       homepageItems: {
         include: { animeResource: true }
