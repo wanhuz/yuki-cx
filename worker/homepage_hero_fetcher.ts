@@ -97,17 +97,46 @@ async function populateHomepageHero(heroType: HeroType): Promise<FeaturedAnimeBa
   return enrichedAnime.filter((item): item is FeaturedAnimeBanner => item !== null);
 }
 
+async function trimHomepageHeros() {
+  const count = await prisma.homepageHero.count();
+
+  if (count <= 100) return;
+
+  const toDelete = await prisma.homepageHero.findMany({
+    where: {
+      type: { not: HeroType[HeroType.Seasonal] },
+    },
+    orderBy: {
+      created_at: "asc", // oldest first
+    },
+    take: 5,
+    select: { id: true },
+  });
+
+  if (toDelete.length === 0) return;
+
+  await prisma.homepageHero.deleteMany({
+    where: {
+      id: { in: toDelete.map(h => h.id) },
+    },
+  });
+}
+
 /**
  * Schedule via cron: run every 2 hours
  */
 cron.schedule('0 */2 * * *', async () => {
   console.log('Running homepage hero fetcher...');
   try {
+    await trimHomepageHeros();
+
     const heroType = getNextHeroType();
 
     console.log('Fetching homepage for ', HeroType[heroType]);
 
-    await populateHomepageHero(heroType).then((result) => console.log('Run complete:', result?.length ?? 0, 'items'));
+    const result = await populateHomepageHero(heroType);
+    
+    console.log('Run complete:', result?.length ?? 0, 'items');
   } catch (err) {
     console.error('Error in homepage hero fetcher:', err);
   }
