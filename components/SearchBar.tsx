@@ -5,7 +5,6 @@ import { Anime } from "@/lib/interface/anime";
 import { useEffect, useState } from "react";
 
 async function onSearch(title : string) {
-
     const searchResult = await searchAnimePage(title);
 
     return searchResult;
@@ -27,8 +26,7 @@ export default function SearchBar({
         const getData = setTimeout(() => {
             
             onSearch(searchText).then((result) => {
-                if (!result) 
-                    updateSearchDisplay(result!);
+                updateSearchDisplay(result!);
                 onIsSearch(false);
             });
         }, 1000)
