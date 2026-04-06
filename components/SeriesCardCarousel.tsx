@@ -64,7 +64,7 @@ export default function SeriesCardGrid({ contentCards }: { contentCards: Anime[]
     deltaRef.current = e.clientX - startX;
   }
 
-  function handlePointerUp(e: React.PointerEvent) {
+  function handlePointerUp() {
     if (!isDragging) return;
 
     setIsDragging(false);
