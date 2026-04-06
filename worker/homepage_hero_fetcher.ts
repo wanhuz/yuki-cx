@@ -102,15 +102,17 @@ async function trimHomepageHeros() {
 
     if (count < 10) return;
 
+    console.log('Trimming homepage heros...');
+
     const toDelete = await prisma.homepageHero.findMany({
-    where: {
-        type: { not: HeroType[HeroType.Seasonal] },
-    },
-    orderBy: {
-        created_at: "asc", // oldest first
-    },
-    take: 5,
-    select: { id: true },
+        where: {
+            type: { not: HeroType[HeroType.Seasonal] },
+        },
+        orderBy: {
+            created_at: "asc", // oldest first
+        },
+        take: 5,
+        select: { id: true },
     });
 
     if (toDelete.length === 0) return;
@@ -124,10 +126,18 @@ async function trimHomepageHeros() {
     });
 }
 
+async function deleteAllHomepageHeros() {
+    console.log('Deleting all homepage heroes...');
+
+    await prisma.homepageHero.deleteMany({});
+
+    console.log('All homepage heroes deleted.');
+}
+
 /**
  * Schedule via cron: run every 2 hours
  */
-cron.schedule('0 */2 * * *', async () => {
+cron.schedule('* */2 * * *', async () => {
   console.log('Running homepage hero fetcher...');
   try {
     await trimHomepageHeros();
@@ -143,6 +153,9 @@ cron.schedule('0 */2 * * *', async () => {
     console.error('Error in homepage hero fetcher:', err);
   }
 });
+
+// Delete cache on first run
+deleteAllHomepageHeros(); 
 
 //Initial seed for each hero type
 const promises = heroTypeValues.map((heroType, index) => new Promise<void>((resolve) => setTimeout(async () => {

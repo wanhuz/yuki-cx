@@ -116,7 +116,7 @@ model HomepageItem {
   created_at    DateTime      @default(now())
   
   heroId        Int
-  hero          HomepageHero  @relation(fields: [heroId], references: [id])
+  hero          HomepageHero  @relation(fields: [heroId], references: [id], onDelete: Cascade)
 
   animeResourceId Int
   animeResource   AnimeResource @relation(fields: [animeResourceId], references: [id])
