@@ -1,21 +1,7 @@
-"use server";
-
 import { ABSearchResponse, ABSearchQueryParams, ABGroup, ABStatus, ABAuth  } from "../interface/animebytes.js";
 
 const ANIMEBYTES_URL = "https://animebytes.tv/scrape.php"
 
-export async function search(ab_auth : ABAuth, search_query_params: ABSearchQueryParams): Promise<ABGroup[]> {
-
-  const search_query = generateSearchQuery(ab_auth, search_query_params);
-
-  const data = await fetch(search_query, {
-    next: { revalidate: 3600 }, // 1 hour
-  });
-
-  const search_result: ABSearchResponse = await data.json();
-
-  return search_result.Groups;
-}
 /*
     This is pretty hackish way of getting anime metadata from AB to display anime page, as AB API didn't provide direct way to do it.
     Works by first searching title and then matching the ID from the search result link
@@ -51,7 +37,6 @@ export async function getAnime(ab_auth: ABAuth, anime_title: string, id : number
 
     return anime_data;
 }
-
 function generateSearchQuery(ab_auth: ABAuth, {
     title,
     type,
@@ -64,8 +49,9 @@ function generateSearchQuery(ab_auth: ABAuth, {
     epcount2 = -1,
     year = -1,
     tags = ""
-    }: ABSearchQueryParams
-    ) {
+  }: ABSearchQueryParams
+  ) {
+
     const authParams = {
         torrent_pass: ab_auth.passkey,
         username: ab_auth.username,
@@ -146,17 +132,12 @@ export async function animeBytesStatusHealth() {
 
 export async function getAnimes(
   ab_auth: ABAuth,
-  ABSearchQueryParams: ABSearchQueryParams,
-  shouldCached?: boolean
+  ABSearchQueryParams: ABSearchQueryParams
 ): Promise<ABGroup[] | null> {
   const search_query = generateSearchQuery(ab_auth, ABSearchQueryParams);
 
   try {
-    const response = shouldCached
-      ? await fetch(search_query, {
-          next: { revalidate: 3600 },
-        })
-      : await fetch(search_query);
+    const response = await fetch(search_query);
 
     if (!response.ok) {
       console.error(`Fetch failed: ${response.status} ${response.statusText}`);

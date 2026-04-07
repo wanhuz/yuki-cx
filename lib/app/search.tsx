@@ -1,4 +1,4 @@
-import { search } from "../api/animebytes";
+import { search } from "@/lib/app/animebytes";
 import { getABSettings } from "../api/settings";
 import { Anime } from "../interface/anime";
 import { ABAuth, ABGroup, ABSearchQueryParams } from "../interface/animebytes";

@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import { PrismaClient } from "@prisma/client";
-import { getAnimes } from "../api/animebytes"
+import {getAnimes} from "@/lib/app/animebytes";
 import { generateSeriesLink } from "./series";
 import { ABAuth, ABGroup, ABSearchQueryParams } from "../interface/animebytes";
 import { extractOngoingStatus } from "../util/animebytes";
@@ -71,7 +71,7 @@ export async function getAnimeFromAB(search_query : ABSearchQueryParams) : Promi
     } as ABAuth;
   
 
-  const searchResult = await getAnimes(ab_auth, search_query, true);
+  const searchResult = await getAnimes(ab_auth, search_query);
 
   const anime_search_result: Anime[] = [];
 
