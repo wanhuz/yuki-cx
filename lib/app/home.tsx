@@ -102,9 +102,7 @@ export async function getSeasonalAnime(): Promise<Anime[] | null> {
       hentai: 0,
       airing: 1,
       sort: "relevance",
-      way: "desc",
-      epcount: 1,
-      epcount2: 26
+      way: "desc"
   };
 
   const anime_search_result = await getAnimeFromAB(AB_SearchQuery_Seasonal);
