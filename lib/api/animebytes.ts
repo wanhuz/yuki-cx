@@ -4,9 +4,10 @@ import { ABSearchResponse, ABSearchQueryParams, ABGroup, ABStatus, ABAuth  } fro
 
 const ANIMEBYTES_URL = "https://animebytes.tv/scrape.php"
 
-export async function search({passkey, username} : {passkey: string, username: string}, series_name: string, type: string): Promise<ABGroup[]> {
-  const search_query_params = { title: series_name, type: type, maxItem: 25 };
-  const search_query = generateSearchQuery( {passkey, username} , search_query_params);
+export async function search(ab_auth : ABAuth, search_query_params: ABSearchQueryParams): Promise<ABGroup[]> {
+  // const search_query_params = { title: series_name, type: type, maxItem: 25 };
+
+  const search_query = generateSearchQuery(ab_auth, search_query_params);
 
   const data = await fetch(search_query);
 
