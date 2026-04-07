@@ -39,6 +39,12 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
       status: statusOptions[0],
       count: countOptions[0],
     })
+
+    setFilters({
+      type: typeOptions[0],
+      status: statusOptions[0],
+      count: countOptions[0],
+    });
   };
 
   const rows: { label: string; key: keyof SearchFiltersState; options: FilterOption[] }[] = [
