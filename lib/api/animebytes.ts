@@ -1,4 +1,4 @@
-import { ABSearchResponse, ABSearchQueryParams, ABGroup, ABStatus, ABAuth  } from "../interface/animebytes.js";
+import { ABSearchResponse, ABSearchQueryParams, ABGroup, ABAuth  } from "../interface/animebytes.js";
 
 const ANIMEBYTES_URL = "https://animebytes.tv/scrape.php"
 
