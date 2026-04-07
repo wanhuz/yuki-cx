@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ServiceCheckComponent from "./ServiceCheckComponent";
-import { animeBytesStatusHealth } from "@/lib/api/animebytes";
+import { animeBytesStatusHealth } from "@/lib/app/animebytes";
 import { healthCheck } from "@/lib/api/qbittorent";
 import { schedulerHealthCheck } from "@/lib/api/scheduler";
 import { getQBClientSettings } from "@/lib/api/settings";

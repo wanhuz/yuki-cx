@@ -97,38 +97,7 @@ function generateSearchQuery(ab_auth: ABAuth, {
     return search_query;
 }
 
-export async function animeBytesStatusHealth() {
-  try {
-    const res = await fetch(
-      "https://status.animebytes.tv/api/status",
-      { cache: "no-store" }
-    );
 
-    if (!res.ok) {
-      return { ok: false, reason: "HTTP_ERROR" };
-    }
-
-    const data = (await res.json()) as ABStatus;
-
-    if (!data.success) {
-      return { ok: false, reason: "API_ERROR" };
-    }
-
-    const siteStatus = data.status?.site?.status;
-
-    if (siteStatus === 0) {
-      return { ok: false, reason: "SITE_OFFLINE" };
-    }
-
-    if (siteStatus === 2) {
-      return { ok: false, reason: "MAINTENANCE" };
-    }
-
-    return { ok: true };
-  } catch (err) {
-    return { ok: false, reason: "UNREACHABLE" };
-  }
-}
 
 export async function getAnimes(
   ab_auth: ABAuth,
