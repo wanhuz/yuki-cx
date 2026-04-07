@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
-
+import Image from "next/image";
+import { FilterOption, SearchFilterProps, SearchFiltersState } from "@/lib/app/search-filter";
 
 const DEFAULT_TYPE_OPTIONS = ["All", "TV Series", "Movie", "Special"];
 const DEFAULT_STATUS_OPTIONS = ["Any", "Ongoing", "Finished"];
@@ -50,10 +51,10 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
     <Popover className="relative inline-block ms-3">
       <PopoverButton className="flex items-center gap-1.5 px-3 py-2.5 text-sm rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors outline-none">
         Filters
-        <img
-            src="/filter.png"
-            className="w-4 h-4 "
-        />
+        <Image src="/filter.png" alt="Filter"
+          width={16}
+          height={16}
+          className="w-4 h-4"/>
       </PopoverButton>
 
       <PopoverPanel className="absolute z-50 mt-2 right-1 w-64 bg-white rounded-xl shadow-lg border border-gray-200 overflow-visible">
@@ -73,8 +74,11 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
               className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors min-w-[100px] justify-between"
             >
               <span>{filters[key]}</span>
-              <img
+              <Image
+                alt="Down arrow"
                 src="/down-arrow.png"
+                width={16}
+                height={16}
                 className="w-4 h-4 transition-transform"
                 style={{ transform: openDropdown === key ? "rotate(180deg)" : "" }}
               />

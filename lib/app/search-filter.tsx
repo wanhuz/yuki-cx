@@ -1,12 +1,12 @@
-type FilterOption = string;
+export type FilterOption = string;
 
-interface SearchFiltersState {
+export interface SearchFiltersState {
   type: FilterOption;
   status: FilterOption;
   count: FilterOption;
 }
 
-interface SearchFilterProps {
+export interface SearchFilterProps {
   typeOptions?: FilterOption[];
   statusOptions?: FilterOption[];
   countOptions?: FilterOption[];

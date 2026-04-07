@@ -1,6 +1,7 @@
 "use client";
 
 import { searchAnimePage } from "@/lib/app/search";
+import { SearchFiltersState } from "@/lib/app/search-filter";
 import { Anime } from "@/lib/interface/anime";
 import { useEffect, useState } from "react";
 
@@ -33,7 +34,7 @@ export default function SearchBar({
         }, 1000)
         
         return () => clearTimeout(getData)
-      }, [searchText, filters]);
+      }, [searchText, filters, updateSearchDisplay, onIsSearch]);
     
     return (
         <div className="relative w-11/12 mx-auto sm:w-full">

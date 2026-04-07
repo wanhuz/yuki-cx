@@ -3,6 +3,7 @@ import { getABSettings } from "../api/settings";
 import { Anime } from "../interface/anime";
 import { ABAuth, ABGroup, ABSearchQueryParams } from "../interface/animebytes";
 import { extractOngoingStatus } from "../util/animebytes";
+import { SearchFiltersState } from "./search-filter";
 
 export async function searchAnimePage(title: string, filters: SearchFiltersState): Promise<Anime[] | null> {
     const ab_settings = await getABSettings();
