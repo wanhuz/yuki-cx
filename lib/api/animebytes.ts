@@ -8,7 +8,9 @@ export async function search(ab_auth : ABAuth, search_query_params: ABSearchQuer
 
   const search_query = generateSearchQuery(ab_auth, search_query_params);
 
-  const data = await fetch(search_query);
+  const data = await fetch(search_query, {
+    next: { revalidate: 3600 }, // 1 hour
+  });
 
   const search_result: ABSearchResponse = await data.json();
 
@@ -144,12 +146,17 @@ export async function animeBytesStatusHealth() {
 
 export async function getAnimes(
   ab_auth: ABAuth,
-  ABSearchQueryParams: ABSearchQueryParams
+  ABSearchQueryParams: ABSearchQueryParams,
+  shouldCached?: boolean
 ): Promise<ABGroup[] | null> {
   const search_query = generateSearchQuery(ab_auth, ABSearchQueryParams);
 
   try {
-    const response = await fetch(search_query);
+    const response = shouldCached
+      ? await fetch(search_query, {
+          next: { revalidate: 3600 },
+        })
+      : await fetch(search_query);
 
     if (!response.ok) {
       console.error(`Fetch failed: ${response.status} ${response.statusText}`);

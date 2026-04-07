@@ -71,7 +71,7 @@ export async function getAnimeFromAB(search_query : ABSearchQueryParams) : Promi
     } as ABAuth;
   
 
-  const searchResult = await getAnimes(ab_auth, search_query);
+  const searchResult = await getAnimes(ab_auth, search_query, true);
 
   const anime_search_result: Anime[] = [];
 

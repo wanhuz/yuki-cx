@@ -1,4 +1,13 @@
 /** @type {import('next').NextConfig} */
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
+
+const handlerPath = require.resolve(
+  "next/dist/server/lib/incremental-cache/file-system-cache.js"
+);
+
+
 const nextConfig = {
   images: {
     remotePatterns: [
@@ -16,7 +25,8 @@ const nextConfig = {
       },
     ],
     minimumCacheTTL: 2678400, // 31 days
-  }
+  },
+  cacheHandler: handlerPath,
 
 };
 
