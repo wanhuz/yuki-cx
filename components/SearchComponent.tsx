@@ -15,6 +15,8 @@ export default function SearchComponent() {
     type: "All",
     status: "Any",
     count: "25",
+    sort: "Relevance",
+    direction: "Descending",
   });
 
   return (
@@ -33,6 +35,8 @@ export default function SearchComponent() {
                 type: "All",
                 status: "Any",
                 count: "25",
+                sort: "Relevance",
+                direction: "Descending",
               });
               setIsSearch(true);
             }}
