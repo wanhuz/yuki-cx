@@ -5,7 +5,7 @@ import SearchBar from "@/components/SearchBar";
 import SearchContent from "@/components/SearchContent";
 import { Anime } from "@/lib/interface/anime";
 import SearchFiltersComponent from "./SearchFilterComponent";
-import { SearchFiltersState } from "@/lib/app/search-filter";
+import { SearchFiltersState } from "@/lib/interface/search-filter";
 
 export default function SearchComponent() {
   const [contentCard, setContentCard] = useState<Anime[]>([]);

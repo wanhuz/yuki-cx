@@ -3,16 +3,20 @@
 import { useState } from "react";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import Image from "next/image";
-import { FilterOption, SearchFilterProps, SearchFiltersState } from "@/lib/app/search-filter";
+import { FilterOption, SearchFilterProps, SearchFiltersState } from "@/lib/interface/search-filter";
 
 const DEFAULT_TYPE_OPTIONS = ["All", "TV Series", "Movie", "Special"];
 const DEFAULT_STATUS_OPTIONS = ["Any", "Ongoing", "Finished"];
 const DEFAULT_COUNT_OPTIONS = ["25", "50", "100"];
+const DEFAULT_SORT_OPTIONS = ["Relevance", "Rating", "Year", "Votes", "Name"];
+const DEFAULT_SORT_DIRECTION_OPTIONS = ["Descending", "Ascending"];
 
 const SearchFilter: React.FC<SearchFilterProps> = ({
   typeOptions = DEFAULT_TYPE_OPTIONS,
   statusOptions = DEFAULT_STATUS_OPTIONS,
   countOptions = DEFAULT_COUNT_OPTIONS,
+  sortOptions = DEFAULT_SORT_OPTIONS,
+  sortDirectionsOptions = DEFAULT_SORT_DIRECTION_OPTIONS,
   initialFilters = {},
   onApply
 }) => {
@@ -20,6 +24,8 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
     type: initialFilters.type ?? typeOptions[0],
     status: initialFilters.status ?? statusOptions[0],
     count: initialFilters.count ?? countOptions[0],
+    sort: initialFilters.sort ?? sortOptions[0],
+    direction: initialFilters.direction ?? sortDirectionsOptions[0],
   });
 
   const [openDropdown, setOpenDropdown] = useState<keyof SearchFiltersState | null>(null);
@@ -38,12 +44,16 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
       type: typeOptions[0],
       status: statusOptions[0],
       count: countOptions[0],
+      sort: sortOptions[0],
+      direction: sortDirectionsOptions[0],
     })
 
     setFilters({
       type: typeOptions[0],
       status: statusOptions[0],
       count: countOptions[0],
+      sort: sortOptions[0],
+      direction: sortDirectionsOptions[0],
     });
   };
 
@@ -51,6 +61,8 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
     { label: "Type", key: "type", options: typeOptions },
     { label: "Status", key: "status", options: statusOptions },
     { label: "Count", key: "count", options: countOptions },
+    { label: "Sort", key: "sort", options: sortOptions },
+    { label: "Direction", key: "direction", options: sortDirectionsOptions },
   ];
 
   return (
@@ -60,7 +72,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
         <Image src="/filter.png" alt="Filter"
           width={16}
           height={16}
-          className="w-4 h-4"/>
+          className="w-4 h-4 me-4 md:mx-0 opacity-75" />
       </PopoverButton>
 
       <PopoverPanel className="absolute z-50 mt-2 right-1 w-64 bg-white rounded-xl shadow-lg border border-gray-200 overflow-visible">
@@ -115,6 +127,9 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
 
 
       <div className="flex items-center justify-end gap-2 px-4 py-3">
+        <PopoverButton className="px-4 py-1.5 text-sm rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors">
+          Close
+        </PopoverButton>
         <button
           onClick={handleReset}
           className="px-4 py-1.5 text-sm rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors"

@@ -3,7 +3,7 @@ import { getABSettings } from "../api/settings";
 import { Anime } from "../interface/anime";
 import { ABAuth, ABGroup, ABSearchQueryParams } from "../interface/animebytes";
 import { extractOngoingStatus } from "../util/animebytes";
-import { SearchFiltersState } from "./search-filter";
+import { SearchFiltersState } from "../interface/search-filter";
 
 export async function searchAnimePage(title: string, filters: SearchFiltersState): Promise<Anime[] | null> {
     const ab_settings = await getABSettings();
@@ -54,7 +54,7 @@ function generateABParams(title: string, filters: SearchFiltersState) : ABSearch
         case "Ongoing":
             ab_search_params.airing = 1;
             break;
-        case "Completed":
+        case "Finished":
             ab_search_params.airing = 0;
             break;
         default:
@@ -74,6 +74,36 @@ function generateABParams(title: string, filters: SearchFiltersState) : ABSearch
             break;
         default:
             ab_search_params.type = "DEFAULT";
+            break;
+    }
+
+    switch (filters.sort) {
+        case "Name":
+            ab_search_params.sort = "name";
+            break;
+        case "Year":
+            ab_search_params.sort = "year";
+            break;
+        case "Rating":
+            ab_search_params.sort = "rating";
+            break;
+        case "Votes":
+            ab_search_params.sort = "votes";
+            break;
+        default:
+            ab_search_params.sort = "relevance";
+            break;
+    }
+
+    switch (filters.direction) {
+        case "Ascending":
+            ab_search_params.way = "asc";
+            break;
+        case "Descending":
+            ab_search_params.way = "desc";
+            break;
+        default:
+            ab_search_params.way = "desc";
             break;
     }
 

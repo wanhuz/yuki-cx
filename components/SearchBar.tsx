@@ -1,7 +1,7 @@
 "use client";
 
 import { searchAnimePage } from "@/lib/app/search";
-import { SearchFiltersState } from "@/lib/app/search-filter";
+import { SearchFiltersState } from "@/lib/interface/search-filter";
 import { Anime } from "@/lib/interface/anime";
 import { useEffect, useState } from "react";
 
