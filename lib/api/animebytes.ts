@@ -7,36 +7,42 @@ const ANIMEBYTES_URL = "https://animebytes.tv/scrape.php"
     Works by first searching title and then matching the ID from the search result link
     As a result, link to the page need to have title and ID
 */
-export async function getAnime(ab_auth: ABAuth, anime_title: string, id : number): Promise<ABGroup | null> {
-    const search_query_params = {
-      title: anime_title, 
-      type: "DEFAULT", 
+export async function getAnime(ab_auth: ABAuth, anime_title: string, id: number): Promise<ABGroup | null> {
+
+  const search = async (maxItem: number): Promise<ABGroup | null> => {
+    const params = {
+      title: anime_title,
+      type: "DEFAULT",
       hentai: 2,
-      maxItem: 3
+      maxItem
     };
 
-    const search_query = generateSearchQuery( ab_auth , search_query_params);
+    const query = generateSearchQuery(ab_auth, params);
+    const res = await fetch(query);
+    const json: ABSearchResponse = await res.json();
 
-    const data = await fetch(search_query);
+    if (!json.Groups) return null;
 
-    const search_result: ABSearchResponse = await data.json();
-
-    if (!search_result.Groups) {
-        return null;
+    for (const result of json.Groups) {
+      if (result.ID === id) {
+        return result;
+      }
     }
-    
-    const search_result_groups = search_result.Groups;
 
-    for (const result of search_result_groups) {
-        if (result.ID === id) {
-            return result;
-        }
-    }
-    
-    const anime_data = search_result_groups[0] // Temporary default to first item if not found;
+    return null;
+  };
 
-    return anime_data;
+  // First attempt - faster with small result
+  let result = await search(3);
+  if (result) return result;
+
+  // Retry with bigger result set if anime is not found
+  result = await search(40);
+  if (result) return result;
+
+  return null;
 }
+
 function generateSearchQuery(ab_auth: ABAuth, {
     title,
     type,
