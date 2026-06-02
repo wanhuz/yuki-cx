@@ -12,6 +12,7 @@ type qbSettings = {
   qb_password: string;
   qb_pause_torrent: boolean;
   qb_default_label: string;
+  qb_scheduler_default_label: string;
 };
 
 type AnimeBytesItem = {

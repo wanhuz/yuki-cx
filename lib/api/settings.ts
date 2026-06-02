@@ -35,8 +35,13 @@ export async function getSchedulerSettings() {
     where: { key: "yuki_scheduler_paused" },
   });
 
+  const settingSchedulerDefaultLabel = await prisma.settings.findFirst({
+    where: { key: "qb_scheduler_default_label" },
+  });
+
   return {
     yuki_scheduler_paused: settingSchedulerPaused?.value === "true",
+    qb_scheduler_default_label: settingSchedulerDefaultLabel?.value
   }
 }
 
@@ -65,6 +70,10 @@ export async function getQBClientSettings() {
     where: { key: "qb_default_label" },
   });
 
+  const settingsSchedulerDefaultLabel = await prisma.settings.findFirst({
+    where: { key: "qb_scheduler_default_label" },
+  });
+
   return {
     qb_url: settingUrl?.value,
     qb_port: settingPort?.value ? parseInt(settingPort.value) : 80,
@@ -72,6 +81,7 @@ export async function getQBClientSettings() {
     qb_password: settingPassword?.value ? settingPassword.value : "",
     qb_pause_torrent: settingPauseTorrent?.value === "true",
     qb_default_label: settingDefaultLabel?.value ?? "",
+    qb_scheduler_default_label: settingsSchedulerDefaultLabel?.value ?? "",
   };
 }
 
@@ -112,7 +122,12 @@ export async function saveFanartTVSettings(settings: {
   return { success: true };
 }
 
-export async function saveSchedulerSettings(settings: { yuki_scheduler_paused: boolean}) {
+export async function saveSchedulerSettings(
+    settings: { 
+      yuki_scheduler_paused: boolean,
+      qb_scheduler_default_label: string
+    }) 
+  {
 
   if (settings.yuki_scheduler_paused === undefined) {
     throw new Error("No data provided");
@@ -122,6 +137,12 @@ export async function saveSchedulerSettings(settings: { yuki_scheduler_paused: b
     where: { key: "yuki_scheduler_paused" },
     update: { value: settings.yuki_scheduler_paused.toString() },
     create: { key: "yuki_scheduler_paused", value: settings.yuki_scheduler_paused.toString() },
+  });
+
+  await prisma.settings.upsert({
+    where: { key: "qb_scheduler_default_label" },
+    update: { value: settings.qb_scheduler_default_label.toString() },
+    create: { key: "qb_scheduler_default_label", value: settings.qb_scheduler_default_label.toString() },
   });
 
   return { success: true };

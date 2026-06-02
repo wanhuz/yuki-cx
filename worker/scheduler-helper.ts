@@ -27,6 +27,7 @@ type qbSettings = {
   qb_password: string;
   qb_pause_torrent: boolean;
   qb_default_label: string;
+  qb_scheduler_default_label: string;
 };
 
 const prisma = new PrismaClient();
@@ -93,7 +94,7 @@ export async function processMatchedLink(
     qbSettings.qb_username || "", 
     qbSettings.qb_password || "", 
     qbSettings.qb_pause_torrent || false, 
-    qbSettings.qb_default_label || "",
+    qbSettings.qb_scheduler_default_label || qbSettings.qb_default_label || "",
     [item.title],
     addToLog
   );
@@ -114,7 +115,7 @@ export async function processMatchedLink(
 }
 
 export async function processFeedItem(qbSettings : qbSettings, feed: { items: AnimeBytesItem[] }, seriesList: { ab_id: number, id: number }[]) {
-    for (const item of feed.items) {
+  for (const item of feed.items) {
 
     const groupId = parseInt(item.groupId ?? '', 10);
 
