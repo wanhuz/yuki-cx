@@ -94,7 +94,7 @@ export async function processMatchedLink(
     qbSettings.qb_username || "", 
     qbSettings.qb_password || "", 
     qbSettings.qb_pause_torrent || false, 
-    qbSettings.qb_scheduler_default_label || qbSettings.qb_default_label || "",
+    qbSettings.qb_scheduler_default_label || "",
     [item.title],
     addToLog
   );
