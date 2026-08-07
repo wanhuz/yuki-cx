@@ -63,16 +63,24 @@ function generateSearchQuery(ab_auth: ABAuth, {
         username: ab_auth.username,
     };
 
-
+    // This function is for backend, it must be the same as /app/animebytes.tsx
     const animeTypeMap: Record<string, Record<string, string>> = {
         TV_SERIES:  { "anime[tv_series]": "1" },
-        TV_SPECIAL: { "anime[tv_special]": "1" },
+        SPECIAL: { 
+          "anime[tv_special]": "1",
+          "anime[bd_special]": "1",
+          "anime[dvd_special]": "1",
+          "anime[ova]": "1",
+          "anime[ona]": "1",
+        },
         OVA:        { "anime[ova]": "1" },
         ONA:        { "anime[ona]": "1" },
         MOVIE:      { "anime[movie]": "1" },
         DEFAULT: {
             "anime[tv_series]": "1",
             "anime[tv_special]": "1",
+            "anime[bd_special]": "1",
+            "anime[dvd_special]": "1",
             "anime[movie]": "1",
             "anime[ova]": "1",
             "anime[ona]": "1",

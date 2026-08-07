@@ -12,17 +12,33 @@ export function generateSeriesLink(title : string, id : number) {
 }
 
 export function generateTagLabel(type : string) {
-    let style = "inline-block px-2 text-xxs  text-white  rounded-full "
+    let style = "inline-block text-xxs text-white rounded-full "
+
+    switch(type) {
+        case "DVD Special":
+            style += "px-1 ";
+        default:
+            style += "px-2 ";
+    }
     
     switch(type) {
         case "TV Series":
-            style += "bg-blue-500";
+            style += "bg-sky-500";
             break;
         case "Movie":
             style += "bg-green-500";
             break;
         case "TV Special":
             style += "bg-purple-500";
+            break;
+        case "BD Special":
+            style += "bg-green-500";
+            break;
+        case "DVD Special":
+            style += "bg-blue-500";
+            break;
+        case "ONA":
+            style += "bg-red-500";
             break;
         case "OVA":
             style += "bg-orange-500";

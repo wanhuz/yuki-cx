@@ -70,7 +70,7 @@ function generateABParams(title: string, filters: SearchFiltersState) : ABSearch
             ab_search_params.type = "MOVIE";
             break;
         case "Special":
-            ab_search_params.type = "TV_SPECIAL";
+            ab_search_params.type = "SPECIAL";
             break;
         default:
             ab_search_params.type = "DEFAULT";
