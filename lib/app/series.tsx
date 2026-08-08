@@ -23,19 +23,22 @@ export function generateTagLabel(type : string) {
     
     switch(type) {
         case "TV Series":
-            style += "bg-sky-500";
+            style += "bg-sky-600";
             break;
         case "Movie":
             style += "bg-green-500";
             break;
         case "TV Special":
-            style += "bg-purple-500";
+            style += "bg-purple-600";
+            type = "TV SP";
             break;
         case "BD Special":
-            style += "bg-green-500";
+            style += "bg-purple-700";
+            type = "BD SP";
             break;
         case "DVD Special":
-            style += "bg-blue-500";
+            style += "bg-purple-500";
+            type = "DVD SP";
             break;
         case "ONA":
             style += "bg-red-500";
