@@ -192,7 +192,6 @@ export default function FeaturedAnime({ images, interval = 7000 }: FeaturedAnime
               height={200}
               width={400}
               className="object-contain"
-              loading="lazy"
               decoding="async"
             />
           </div>
