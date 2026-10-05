@@ -198,6 +198,7 @@ async function getAnimeByYear(): Promise<Anime[] | null> {
 }
 
 export async function getYouMightLike(): Promise<Anime[] | null> {
+  const randomPage = Math.floor(Math.random() * 100) + 1;
 
   const AB_SearchQuery_YouMightLike = {
     title: "",
@@ -205,7 +206,8 @@ export async function getYouMightLike(): Promise<Anime[] | null> {
     maxItem: 15,
     hentai: 0,
     sort: "votes",
-    way: "desc"
+    way: "desc",
+    page: randomPage
   };
 
   const anime_search_result = await getAnimeFromAB(AB_SearchQuery_YouMightLike);

@@ -82,6 +82,7 @@ export interface ABSearchQueryParams {
   epcount2?: number; // default = -1
   year?: number;    // default = -1
   tags?: string;
+  page?: number;
 };
 
 export type ABStatus = {
