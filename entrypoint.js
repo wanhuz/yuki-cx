@@ -15,6 +15,8 @@ startProcess('npx', ['tsx', 'prisma/seed.ts'], 'Prisma seed');
 startProcess('npx', ['next', 'start'], 'Next.js');
 
 // Start worker (compiled to JS)
+startProcess('node', ['./dist/worker/scheduler-fetch-missing.js'], 'Yuki Scheduler Fetch Missing Worker');
+
 startProcess('node', ['./dist/worker/scheduler.js'], 'Yuki Scheduler Worker');
 
 startProcess('node', ['./dist/worker/episode_updater.js'], 'Yuki Episode Updater Worker');

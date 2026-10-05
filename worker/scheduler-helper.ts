@@ -137,3 +137,39 @@ export async function processFeedItem(qbSettings : qbSettings, feed: { items: An
     }
   }
 }
+
+export async function processMissingEpisode(
+    qbSettings : qbSettings, 
+    ab_id: number, 
+    downloadLink: string, 
+    torrentId: number, 
+    series_title: string
+  ) {
+
+  console.log(`Missing series ab_id=${ab_id}. Download link: ${downloadLink}`);
+
+  const status = await addTorrent(downloadLink, 
+    qbSettings.qb_url || "", 
+    qbSettings.qb_port || 0, 
+    qbSettings.qb_username || "", 
+    qbSettings.qb_password || "", 
+    qbSettings.qb_pause_torrent || false, 
+    qbSettings.qb_scheduler_default_label || "",
+    [series_title],
+    addToLog
+  );
+
+  if (!status.ok) {
+    throw new Error(
+        `Failed to add torrent ${torrentId}: ${status.error ?? "Unknown error"}`
+    );
+  }
+
+  await prisma.processedTorrent.create({
+      data: {
+          torrent_id: torrentId,
+          processedAt: new Date(Date.now())
+      }
+  });
+  
+}

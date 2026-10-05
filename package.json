@@ -9,6 +9,7 @@
     "build:worker": "tsc --project tsconfig.worker.json",
     "start": "next start",
     "start:worker_scheduler": "node dist/worker/scheduler.js",
+    "start:worker_fetch_missing": "node dist/worker/scheduler-fetch-missing.js",
     "start:worker_hero": "node dist/worker/homepage_hero_fetcher.js",
     "start:prod": "node entrypoint.js",
     "lint": "next lint",
@@ -51,7 +52,7 @@
     "tsx": "^4.19.2",
     "typescript": "^5.6.3"
   },
-  "version": "0.9.2.1",
+  "version": "0.9.3.0",
   "description": "This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).",
   "main": "index.js",
   "directories": {
