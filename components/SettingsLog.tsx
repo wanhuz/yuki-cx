@@ -99,18 +99,61 @@ export function SettingsLogs() {
                     Prev
                 </button>
 
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                {/* First page */}
+                <button
+                    onClick={() => setCurrentPage(1)}
+                    className={`px-3 py-1 border rounded ${
+                        currentPage === 1 ? "bg-gray-300" : ""
+                    }`}
+                >
+                    1
+                </button>
+
+                {/* Left ellipsis */}
+                {currentPage > 4 && (
+                    <span className="px-3 py-1">...</span>
+                )}
+
+                {/* Pages around current page */}
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter(page => {
+                        if (page === 1 || page === totalPages) return false;
+
+                        return Math.abs(page - currentPage) <= 2;
+                    })
+                    .map(page => (
+                        <button
+                            key={page}
+                            onClick={() => setCurrentPage(page)}
+                            className={`px-3 py-1 border rounded ${
+                                currentPage === page ? "bg-gray-300" : ""
+                            }`}
+                        >
+                            {page}
+                        </button>
+                    ))}
+
+                {/* Right ellipsis */}
+                {currentPage < totalPages - 3 && (
+                    <span className="px-3 py-1">...</span>
+                )}
+
+                {/* Last page */}
+                {totalPages > 1 && (
                     <button
-                        key={page}
-                        onClick={() => setCurrentPage(page)}
-                        className={`px-3 py-1 border rounded ${currentPage === page ? "bg-gray-300" : ""}`}
+                        onClick={() => setCurrentPage(totalPages)}
+                        className={`px-3 py-1 border rounded ${
+                            currentPage === totalPages ? "bg-gray-300" : ""
+                        }`}
                     >
-                        {page}
+                        {totalPages}
                     </button>
-                ))}
+                )}
 
                 <button
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    onClick={() =>
+                        setCurrentPage(prev => Math.min(prev + 1, totalPages))
+                    }
                     disabled={currentPage === totalPages}
                     className="px-3 py-1 border rounded disabled:opacity-50"
                 >

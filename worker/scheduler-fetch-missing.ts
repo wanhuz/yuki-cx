@@ -78,7 +78,7 @@ async function startProcessingMissingEpisode(qbSettings: qbSettings) {
                 item.ab_id, 
                 torrent.Link, 
                 torrent.ID, 
-                item.series_name
+                torrent.Property
             );
         }  
     }
