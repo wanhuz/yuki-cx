@@ -59,7 +59,7 @@ export default function EpisodeCalendarCard({
 
             <div className="flex flex-row rounded-sm overflow-hidden shadow bg-white max-w-md hover:bg-gray-100 max-h-[226px]">
                 <Link href={seriesLink} >
-                    <div className="w-full h-full min-w-[160px] max-w-[160px] max-h-[226px] max-w-[300px] relative ">
+                    <div className="w-full h-full min-w-[160px] max-w-[160px] max-h-[226px] max-w-[160px] relative ">
                         <Image
                             src={poster}
                             alt={series_name}
