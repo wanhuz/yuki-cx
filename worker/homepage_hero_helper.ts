@@ -6,6 +6,7 @@ import { getTVDBData } from '../lib/api/anizip.js';
 import { ABAuth, ABGroup, ABSearchQueryParams } from '../lib/interface/animebytes.js';
 import {Anime} from '../lib/interface/anime.js';
 import { ABGenre } from '../lib/enum/animebytes.js';
+import { HeroType } from '../lib/enum/hero.js';
 
 
 const prisma = new PrismaClient();
@@ -140,15 +141,15 @@ export async function getSeasonalAnime(): Promise<Anime[] | null> {
 export async function getAnimeHero(type: number):  Promise<Anime[] | null> {
 
   switch (type) {
-    case 0:
+    case HeroType.Seasonal:
       return await getSeasonalAnime();
-    case 1:
+    case HeroType.Genre:
       return await getAnimeByGenre();
-    case 2:
+    case HeroType.Year:
       return await getAnimeByYear();
-    case 3:
+    case HeroType.Underrated:
       return await getYouMightLike();
-    case 4:
+    case HeroType.Wildcard:
       return await getRandomAnime();
     default:
       return null;
