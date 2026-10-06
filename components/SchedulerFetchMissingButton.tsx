@@ -2,11 +2,16 @@
 
 import { toast } from 'react-toastify';
 import { startProcessingMissingEpisode } from '@/lib/api/scheduler-fetch-missing';
+import { useState } from 'react';
 
 export  function SchedulerFetchMissingButton() {
+    const [isLoading, setIsLoading] = useState(false);
     
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        if (isLoading) return; // guard against double submits
+
+        setIsLoading(true);
         try {
             const result = await startProcessingMissingEpisode().catch((error) => console.error(error));
 
@@ -39,18 +44,25 @@ export  function SchedulerFetchMissingButton() {
             );
         } catch (error) {
                 toast.error(`Failed to add  to scheduler`, { position: "bottom-right" });
-            }
-        };
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <>
             <form onSubmit={onSubmit} className="flex items-center space-x-2">
                 <button
                     type="submit"
+                    disabled={isLoading}
                     className="bg-sky-500 text-white py-1 px-3 sm:me-2 md:me-0 hover:bg-sky-600 h-10 rounded-xl text-sm sm:text-md disabled:bg-sky-300 text-nowrap"
                 >
-                    <span className='hidden sm:block'>Fetch missing episode</span>
-                    <span className='block sm:hidden'>Fetch</span>
+                    <span className="hidden sm:block">
+                        {isLoading ? "Fetching..." : "Fetch missing episode"}
+                    </span>
+                    <span className="block sm:hidden">
+                        {isLoading ? "..." : "Fetch"}
+                    </span>
                 </button>
 
             </form>
