@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState } from "react";
 import SeriesSchedulerCard from "./SeriesSchedulerCard";
 import { getAnimeInScheduler } from "@/lib/api/scheduler";
