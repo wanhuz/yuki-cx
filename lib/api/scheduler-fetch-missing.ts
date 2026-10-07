@@ -124,7 +124,7 @@ export async function processMissingEpisode(
     addToLog
   );
 
-  if (!status.ok) {
+  if (!status.ok && status.code !== "DUPLICATE") {
     return status;
   }
 
