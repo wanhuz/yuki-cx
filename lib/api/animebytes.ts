@@ -1,4 +1,5 @@
 import { ABSearchResponse, ABSearchQueryParams, ABGroup, ABAuth  } from "../interface/animebytes.js";
+import { abFetch } from "./animebytes-fetch";
 
 const ANIMEBYTES_URL = "https://animebytes.tv/scrape.php"
 
@@ -18,7 +19,7 @@ export async function getAnime(ab_auth: ABAuth, anime_title: string, id: number)
     };
 
     const query = generateSearchQuery(ab_auth, params);
-    const res = await fetch(query);
+    const res = await abFetch(query);
     const json: ABSearchResponse = await res.json();
 
     if (!json.Groups) return null;
@@ -122,7 +123,7 @@ export async function getAnimes(
   const search_query = generateSearchQuery(ab_auth, ABSearchQueryParams);
 
   try {
-    const response = await fetch(search_query);
+    const response = await abFetch(search_query);
 
     if (!response.ok) {
       console.error(`Fetch failed: ${response.status} ${response.statusText}`);
