@@ -17,7 +17,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@ctrl/qbittorrent": "^9.1.0",
+    "@ctrl/qbittorrent": "^10.0.1",
     "@headlessui/react": "^2.2.4",
     "@prisma/client": "^5.22.0",
     "better-sqlite3": "^11.5.0",

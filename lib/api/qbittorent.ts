@@ -76,6 +76,7 @@ export async function addTorrent(
 
       const torrentOption: Partial<AddTorrentOptions> = {
         paused: qb_pause_torrent ? "true" : "false",
+        stopped: qb_pause_torrent ? "true" : "false", // Version 5x
         category: qb_default_label
       }
 
