@@ -3,11 +3,12 @@
 import { AddTorrentOptions, QBittorrent, TorrentClientError } from '@ctrl/qbittorrent';
 import { ActionResult } from '../type/ActionResult';
 import parseTorrent from 'parse-torrent';
+import { abFetchTorrent } from './animebytes-torrent-fetch';
 
 const DEV_MODE = process.env.DEV_MODE === "true" ? true : false
 
 async function fetchTorrentBuffer(url: string): Promise<Buffer> {
-  const response = await fetch(url);
+  const response = await abFetchTorrent(url);
 
   if (!response.ok) {
     throw new Error(`Failed to fetch torrent file: ${response.statusText}`);
