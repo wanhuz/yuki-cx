@@ -71,10 +71,10 @@ async function fetchAndProcessRSS() {
     return;
   }
 
-  const health = await isQBHealthy(qbSettings);
+  const qbStatus = await isQBHealthy(qbSettings);
 
-  if (!health.ok) {
-    console.error('Skipping Processing RSS: qBittorrent not reachable:', health.message);
+  if (!qbStatus.ok) {
+    console.error('Skipping Processing RSS: qBittorrent not reachable:', qbStatus.error);
     return;
   }
 

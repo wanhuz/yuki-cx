@@ -9,7 +9,7 @@ import { getQBClientSettings } from "@/lib/api/settings";
 
 type ServiceStatus = {
   ok: boolean;
-  reason?: string;
+  reason?: string ;
 };
 
 export default function StatusCheckComponent() {
@@ -45,10 +45,16 @@ export default function StatusCheckComponent() {
       );
 
       if (mounted) {
-        setQbStatus({
-          ok: result.ok,
-          reason: result.ok ? undefined : result.message,
-        });
+        setQbStatus(
+          result.ok ?
+            {
+              ok: result.ok
+            } :
+            {
+              ok: result.ok,
+              reason: result.error,
+            }
+        );
       }
     }
     async function checkYukiScheduler() {

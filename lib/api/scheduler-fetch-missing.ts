@@ -6,6 +6,8 @@ import { addToLog, getABSettings, getQBClientSettings } from "@/lib/api/settings
 import { ABAuth } from "@/lib/interface/animebytes";
 import { validateSeriesFilter } from "@/lib/util/animebytes";
 import { addTorrent } from "./qbittorent";
+import { ActionResult } from "@/lib/type/ActionResult";
+import { FetchResult } from "@/lib/type/FetchResult";
 
 type qbSettings = {
   qb_url: string;
@@ -38,7 +40,7 @@ async function isTorrentProcessed(prisma: PrismaClient, torrentId: number) {
     return torrent ? true : false;
 }
 
-export async function startProcessingMissingEpisode() {
+export async function startProcessingMissingEpisode(): Promise<FetchResult[]> {
     const prisma = new PrismaClient();
 
     const fetchedEpisode = [];
@@ -79,7 +81,7 @@ export async function startProcessingMissingEpisode() {
             console.log(`Processing missing episode for series ${item.series_name} - ${torrent.Property}...`);
             const fileName = torrent.FileList[0].filename;
 
-            await processMissingEpisode(
+            const status = await processMissingEpisode(
                 qbSettings, 
                 item.ab_id, 
                 torrent.Link, 
@@ -88,7 +90,10 @@ export async function startProcessingMissingEpisode() {
                 prisma
             );
 
-            fetchedEpisode.push(fileName);
+            fetchedEpisode.push({
+                fileName,
+                status
+            } as FetchResult);
         }  
     }
 
@@ -104,7 +109,7 @@ export async function processMissingEpisode(
     torrentId: number, 
     series_title: string,
     prisma = new PrismaClient()
-  ) {
+  ): Promise<ActionResult> {
 
   console.log(`Missing series ab_id=${ab_id}. Download link: ${downloadLink}`);
 
@@ -120,9 +125,7 @@ export async function processMissingEpisode(
   );
 
   if (!status.ok) {
-    throw new Error(
-        `Failed to add torrent ${torrentId}: ${status.error ?? "Unknown error"}`
-    );
+    return status;
   }
 
   await prisma.processedTorrent.create({
@@ -131,7 +134,8 @@ export async function processMissingEpisode(
           processedAt: new Date(Date.now())
       }
   });
-  
+
+  return status;
 }
 
 async function getActiveSeries(prisma: PrismaClient) {

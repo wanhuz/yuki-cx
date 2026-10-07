@@ -1,8 +1,8 @@
 import { addTorrent, healthCheck } from '../lib/api/qbittorent.js';
 import { extractEpisodeNo, validateSeriesFilter } from '../lib/util/animebytes.js';
-import { decode } from 'entities';
 import { PrismaClient } from '@prisma/client';
 import { addToLog } from '../lib/api/settings.js';
+import { ActionResult } from '../lib/type/ActionResult.js';
 
 type AnimeBytesItem = {
   title: string;
@@ -38,26 +38,23 @@ export async function getActiveSeries() {
   });
 }
 
-export async function isQBHealthy(qbSettings : qbSettings): Promise<{ ok: boolean; message: string }> {
-  const health = await healthCheck(
+export async function isQBHealthy(qbSettings : qbSettings): Promise<ActionResult> {
+
+  const status = await healthCheck(
     qbSettings.qb_url || "",
     qbSettings.qb_port || 0,
     qbSettings.qb_username || "",
     qbSettings.qb_password || ""
   );
-    if (!health.ok) {
-      console.error("Skipping RSS fetch: qBittorrent not reachable:", health.message);
-      return {
-        ok: false,
-        message: health.message
-      };
-    }
 
-    return {
-      ok: true,
-      message: "Connected to qBittorrent"
-    };
+  if (!status.ok) {
+    console.error("qBittorrent not reachable:", status.error);
+
+    return status;
   }
+
+  return status;
+}
 
 export async function updateSeriesScheduler(ab_id: number, item: AnimeBytesItem) {
 
