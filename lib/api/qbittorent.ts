@@ -1,6 +1,6 @@
 "use server";
 
-import { AddTorrentOptions, QBittorrent } from '@ctrl/qbittorrent';
+import { AddTorrentOptions, QBittorrent, TorrentClientError } from '@ctrl/qbittorrent';
 import { ActionResult } from '../type/ActionResult';
 import parseTorrent from 'parse-torrent';
 
@@ -28,10 +28,9 @@ async function checkDuplicateTorrent(
     return { ok: false, error: "Corrupt or invalid .torrent file", code: "INVALID" };
   }
 
-  const all = await client.listTorrents();
-  const exists = all.some((t) => t.hash.toLowerCase() === infoHash.toLowerCase());
+  const found = await client.listTorrents({ hashes: infoHash.toLowerCase() });
 
-  if (exists) {
+  if (found.length > 0) {
     return { ok: false, error: "Torrent already added", code: "DUPLICATE" };
   }
 
@@ -71,6 +70,8 @@ export async function addTorrent(
       const check = await checkDuplicateTorrent(client, buffer);
 
       if (!check.ok) {
+        console.log("Duplicate torrent found, skipping...");
+        
         return check;
       }
 
@@ -80,10 +81,29 @@ export async function addTorrent(
         category: qb_default_label
       }
 
-      const added = await client.addTorrent(buffer.toString('base64'), torrentOption);
+      try {
+        await client.addTorrent(buffer.toString('base64'), torrentOption);
+      }
+      catch (error) {
+        if (error instanceof TorrentClientError) {
 
-      if (!added) {
-        return { ok: false, error: "qBittorrent rejected the torrent", code: "REJECTED" };
+          console.error("qBittorrent error:", {
+            code: error.code,
+            status: error.status,
+            message: error.message,
+            cause: error.cause,
+          });
+
+          if (error.code === "unauthorized") {
+            return { ok: false, error: "qBittorrent login failed, check username and password", code: "UNAUTHORIZED" };
+          }
+
+          return {
+            ok: false,
+            error: error.message,
+            code: "REJECTED",
+          };
+        }
       }
 
       const now = new Date();
@@ -101,6 +121,7 @@ export async function addTorrent(
       return {
         ok: false,
         error: message,
+        code: "UNKNOWN"
       };
     }
 }

@@ -4,5 +4,5 @@ export type ActionResult<T extends object = object> =
   | {
       ok: false;
       error: string;
-      code?: "DUPLICATE" | "INVALID" | "REJECTED" | "UNKNOWN";
+      code?: "DUPLICATE" | "INVALID" | "REJECTED" | "UNAUTHORIZED" | "UNKNOWN";
     };
