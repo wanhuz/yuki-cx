@@ -92,7 +92,7 @@ export async function addTorrent(
             code: error.code,
             status: error.status,
             message: error.message,
-            cause: error.cause,
+            cause: (error as Error & { cause?: unknown }).cause,
           });
 
           if (error.code === "unauthorized") {
