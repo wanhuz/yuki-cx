@@ -3,6 +3,7 @@ import { extractEpisodeNo, validateSeriesFilter } from '../lib/util/animebytes.j
 import { PrismaClient } from '@prisma/client';
 import { addToLog } from '../lib/api/settings.js';
 import { ActionResult } from '../lib/type/ActionResult.js';
+import { QBSettings } from '@/lib/type/QBSettings.js';
 
 type AnimeBytesItem = {
   title: string;
@@ -20,16 +21,6 @@ type AnimeBytesItem = {
   poster_url?: string;      // custom field
 };
 
-type qbSettings = {
-  qb_url: string;
-  qb_port: number;
-  qb_username: string;
-  qb_password: string;
-  qb_pause_torrent: boolean;
-  qb_default_label: string;
-  qb_scheduler_default_label: string;
-};
-
 const prisma = new PrismaClient();
 
 export async function getActiveSeries() {
@@ -38,13 +29,13 @@ export async function getActiveSeries() {
   });
 }
 
-export async function isQBHealthy(qbSettings : qbSettings): Promise<ActionResult> {
+export async function isQBHealthy(qbSettings : QBSettings): Promise<ActionResult> {
 
   const status = await healthCheck(
-    qbSettings.qb_url || "",
-    qbSettings.qb_port || 0,
-    qbSettings.qb_username || "",
-    qbSettings.qb_password || ""
+    qbSettings.connection.url,
+    qbSettings.connection.port,
+    qbSettings.connection.username,
+    qbSettings.connection.password
   );
 
   if (!status.ok) {
@@ -77,21 +68,22 @@ export async function updateSeriesScheduler(ab_id: number, item: AnimeBytesItem)
 }
 
 export async function processMatchedLink(
-    qbSettings : qbSettings, 
+    qbSettings : QBSettings, 
     ab_id: number, 
     downloadLink: string, 
     torrentId: number, 
     item: AnimeBytesItem
   ) {
+
   console.log(`Matched ab_id=${ab_id}. Download link: ${downloadLink}`);
 
   const status = await addTorrent(downloadLink, 
-    qbSettings.qb_url || "", 
-    qbSettings.qb_port || 0, 
-    qbSettings.qb_username || "", 
-    qbSettings.qb_password || "", 
-    qbSettings.qb_pause_torrent || false, 
-    qbSettings.qb_scheduler_default_label || "",
+    qbSettings.connection.url, 
+    qbSettings.connection.port, 
+    qbSettings.connection.username, 
+    qbSettings.connection.password, 
+    qbSettings.add.scheduler.pauseTorrent, 
+    qbSettings.add.scheduler.label,
     [item.title],
     addToLog
   );
@@ -111,7 +103,7 @@ export async function processMatchedLink(
   await updateSeriesScheduler(ab_id, item);
 }
 
-export async function processFeedItem(qbSettings : qbSettings, feed: { items: AnimeBytesItem[] }, seriesList: { ab_id: number, id: number }[]) {
+export async function processFeedItem(qbSettings : QBSettings, feed: { items: AnimeBytesItem[] }, seriesList: { ab_id: number, id: number }[]) {
   for (const item of feed.items) {
 
     const groupId = parseInt(item.groupId ?? '', 10);

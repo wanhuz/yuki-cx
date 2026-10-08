@@ -19,12 +19,12 @@ export async function POST(request: Request) {
 
     const status = await addTorrent(
         torrentLink, 
-        qbSettings.qb_url || "", 
-        qbSettings.qb_port || 0, 
-        qbSettings.qb_username || "", 
-        qbSettings.qb_password || "", 
-        qbSettings.qb_pause_torrent || false, 
-        qbSettings.qb_default_label || "",
+        qbSettings.connection.url, 
+        qbSettings.connection.port, 
+        qbSettings.connection.username, 
+        qbSettings.connection.password, 
+        qbSettings.add.manual.pauseTorrent , 
+        qbSettings.add.manual.label,
         torrentName,
         addToLog
     );

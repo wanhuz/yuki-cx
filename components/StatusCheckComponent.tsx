@@ -38,10 +38,10 @@ export default function StatusCheckComponent() {
       const qbSettings = await getQBClientSettings();
 
       const result = await healthCheck(
-        qbSettings.qb_url || "",
-        qbSettings.qb_port || 0,
-        qbSettings.qb_username || "",
-        qbSettings.qb_password || ""
+        qbSettings.connection.url,
+        qbSettings.connection.port,
+        qbSettings.connection.username,
+        qbSettings.connection.password
       );
 
       if (mounted) {

@@ -21,7 +21,15 @@ export default function ClientSettingsPage() {
 
   useEffect(() => {
     setActiveIndex(0);
-    getQBClientSettings().then((data) => setDefaultSettings(data as ClientSettings));
+    getQBClientSettings().then((qbSettings) => setDefaultSettings(
+      {
+        qb_url: qbSettings.connection.url,
+        qb_port: qbSettings.connection.port,
+        qb_username: qbSettings.connection.username,
+        qb_password: qbSettings.connection.password,
+        qb_pause_torrent: qbSettings.add.manual.pauseTorrent,
+        qb_default_label: qbSettings.add.manual.label,}
+    ));
   }, [setActiveIndex]);
 
   const [defaultSettings, setDefaultSettings] = useState<ClientSettings | null>(null);

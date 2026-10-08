@@ -10,7 +10,7 @@ type qbSettings = {
   qb_port: number;
   qb_username: string;
   qb_password: string;
-  qb_pause_torrent: boolean;
+  qb_scheduler_pause_torrent: boolean;
   qb_default_label: string;
   qb_scheduler_default_label: string;
 };
@@ -53,7 +53,7 @@ const SCHEDULER_PORT = process.env.SCHEDULER_PORT ? process.env.SCHEDULER_PORT :
 const RSS_FEED_URL = 'https://animebytes.tv/feed/rss_torrents_airing_anime/' + AB_PASSKEY; 
 
 async function fetchAndProcessRSS() {
-  const qbSettings = await getQBClientSettings() as qbSettings;
+  const qbSettings = await getQBClientSettings();
 
   console.log('Fetching RSS feed...');
 

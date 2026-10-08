@@ -8,16 +8,8 @@ import { validateSeriesFilter } from "@/lib/util/animebytes";
 import { addTorrent } from "./qbittorent";
 import { ActionResult } from "@/lib/type/ActionResult";
 import { FetchResult } from "@/lib/type/FetchResult";
+import { QBSettings } from "@/lib/type/QBSettings";
 
-type qbSettings = {
-  qb_url: string;
-  qb_port: number;
-  qb_username: string;
-  qb_password: string;
-  qb_pause_torrent: boolean;
-  qb_default_label: string;
-  qb_scheduler_default_label: string;
-};
 
 async function searchAnimeAB(ab_id: number, ab_anime_title: string) {
     const abSettings = await getABSettings();
@@ -45,7 +37,7 @@ export async function startProcessingMissingEpisode(): Promise<FetchResult[]> {
 
     const fetchedEpisode = [];
 
-    const qbSettings = await getQBClientSettings() as qbSettings;
+    const qbSettings = await getQBClientSettings();
     const series = await getActiveSeries(prisma);
 
     for (const item of series) {
@@ -103,7 +95,7 @@ export async function startProcessingMissingEpisode(): Promise<FetchResult[]> {
 }
 
 export async function processMissingEpisode(
-    qbSettings : qbSettings, 
+    qbSettings : QBSettings, 
     ab_id: number, 
     downloadLink: string, 
     torrentId: number, 
@@ -114,12 +106,12 @@ export async function processMissingEpisode(
   console.log(`Missing series ab_id=${ab_id}. Download link: ${downloadLink}`);
 
   const status = await addTorrent(downloadLink, 
-    qbSettings.qb_url || "", 
-    qbSettings.qb_port || 0, 
-    qbSettings.qb_username || "", 
-    qbSettings.qb_password || "", 
-    qbSettings.qb_pause_torrent || false, 
-    qbSettings.qb_scheduler_default_label || "",
+    qbSettings.connection.url, 
+    qbSettings.connection.port, 
+    qbSettings.connection.username, 
+    qbSettings.connection.password, 
+    qbSettings.add.scheduler.pauseTorrent , 
+    qbSettings.add.scheduler.label,
     [series_title],
     addToLog
   );

@@ -1,6 +1,7 @@
 "use server";
 
 import { PrismaClient } from '@prisma/client';
+import { QBSettings } from '../type/QBSettings';
 
 const prisma = new PrismaClient();
 
@@ -35,55 +36,59 @@ export async function getSchedulerSettings() {
     where: { key: "yuki_scheduler_paused" },
   });
 
+  const settingSchedulerQBPaused = await prisma.settings.findFirst({
+    where: { key: "qb_scheduler_pause_torrent" },
+  });
+
   const settingSchedulerDefaultLabel = await prisma.settings.findFirst({
     where: { key: "qb_scheduler_default_label" },
   });
 
   return {
     yuki_scheduler_paused: settingSchedulerPaused?.value === "true",
+    qb_scheduler_pause_torrent: settingSchedulerQBPaused?.value === "true",
     qb_scheduler_default_label: settingSchedulerDefaultLabel?.value
   }
 }
 
-export async function getQBClientSettings() {
-  const settingUrl = await prisma.settings.findFirst({
-    where: { key: "qb_url" },
+
+export async function getQBClientSettings(): Promise<QBSettings> {
+  const rows = await prisma.settings.findMany({
+    where: {
+      key: {
+        in: [
+          "qb_url", "qb_port", "qb_username", "qb_password",
+          "qb_pause_torrent", "qb_default_label",
+          "qb_scheduler_pause_torrent", "qb_scheduler_default_label",
+        ],
+      },
+    },
   });
 
-  const settingPort = await prisma.settings.findFirst({
-    where: { key: "qb_port" },
-  });
-
-  const settingUsername = await prisma.settings.findFirst({
-    where: { key: "qb_username" },
-  });
-
-  const settingPassword = await prisma.settings.findFirst({
-    where: { key: "qb_password" },
-  });
-
-  const settingPauseTorrent = await prisma.settings.findFirst({
-    where: { key: "qb_pause_torrent" },
-  });
-
-  const settingDefaultLabel = await prisma.settings.findFirst({
-    where: { key: "qb_default_label" },
-  });
-
-  const settingsSchedulerDefaultLabel = await prisma.settings.findFirst({
-    where: { key: "qb_scheduler_default_label" },
-  });
+  const s = new Map(rows.map((r) => [r.key, r.value]));
+  const bool = (key: string) => s.get(key)?.trim().toLowerCase() === "true";
+  const port = parseInt(s.get("qb_port") ?? "", 10);
 
   return {
-    qb_url: settingUrl?.value,
-    qb_port: settingPort?.value ? parseInt(settingPort.value) : 80,
-    qb_username: settingUsername?.value ? settingUsername.value : "",
-    qb_password: settingPassword?.value ? settingPassword.value : "",
-    qb_pause_torrent: settingPauseTorrent?.value === "true",
-    qb_default_label: settingDefaultLabel?.value ?? "",
-    qb_scheduler_default_label: settingsSchedulerDefaultLabel?.value ?? "",
+    connection: {
+      url: s.get("qb_url") ?? "",
+      port: Number.isNaN(port) ? 80 : port,
+      username: s.get("qb_username") ?? "",
+      password: s.get("qb_password") ?? "",
+    },
+    add: {
+      manual: {
+        pauseTorrent: bool("qb_pause_torrent"),
+        label: s.get("qb_default_label") ?? "",
+      },
+      scheduler: {
+        pauseTorrent: bool("qb_scheduler_pause_torrent"),
+        label: s.get("qb_scheduler_default_label") ?? "",
+      },
+    },
   };
 }
+
 
 export async function saveABSettings(settings: { 
   ab_key: string,
@@ -125,6 +130,7 @@ export async function saveFanartTVSettings(settings: {
 export async function saveSchedulerSettings(
     settings: { 
       yuki_scheduler_paused: boolean,
+      qb_scheduler_pause_torrent: boolean,
       qb_scheduler_default_label: string
     }) 
   {
@@ -137,6 +143,12 @@ export async function saveSchedulerSettings(
     where: { key: "yuki_scheduler_paused" },
     update: { value: settings.yuki_scheduler_paused.toString() },
     create: { key: "yuki_scheduler_paused", value: settings.yuki_scheduler_paused.toString() },
+  });
+
+  await prisma.settings.upsert({
+    where: { key: "qb_scheduler_pause_torrent" },
+    update: { value: settings.qb_scheduler_pause_torrent.toString() },
+    create: { key: "qb_scheduler_pause_torrent", value: settings.qb_scheduler_pause_torrent.toString() },
   });
 
   await prisma.settings.upsert({
