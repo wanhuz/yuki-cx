@@ -138,7 +138,7 @@ export async function animeBytesStatusHealth() {
       return { ok: false, reason: "SITE_OFFLINE" };
     }
 
-    if (siteStatus === 2) {
+    if (siteStatus === 3) {
       return { ok: false, reason: "MAINTENANCE" };
     }
 

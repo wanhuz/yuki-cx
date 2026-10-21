@@ -31,7 +31,7 @@ export default async function HomeComponent() {
           logo_url: a.logo_url
         }))} /> : null}
 
-        <div className="flex flex-col">
+        <div className={`flex flex-col ${seasonalAnime !== null && seasonalAnime.length > 0 ? 'mt-0' : 'mt-20'}`}>
 
           {seasonalAnime ? <HomeCardContent title={`${currentSeason.season} ${currentSeason.year}`} contentCard={seasonalAnime}/> : null}
 
